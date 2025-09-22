@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { WebhookService } from '@/lib/webhooks'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,10 +17,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verificar se o usuário permite analytics
+    // Verificar se o usuário permite analytics e buscar configurações
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { privacySettings: true }
+      select: { 
+        privacySettings: true,
+        integrationSettings: true,
+        email: true
+      }
     })
 
     if (!user) {
@@ -60,6 +65,24 @@ export async function POST(request: NextRequest) {
       device
     }
 
+    // Buscar informações do link para webhook
+    const link = await prisma.link.findUnique({
+      where: { id: linkId },
+      select: {
+        id: true,
+        title: true,
+        url: true,
+        clickCount: true
+      }
+    })
+
+    if (!link) {
+      return NextResponse.json(
+        { success: false, error: 'Link não encontrado' },
+        { status: 404 }
+      )
+    }
+
     // Salvar no banco de dados
     const analytics = await prisma.analytics.create({
       data: analyticsData
@@ -74,10 +97,37 @@ export async function POST(request: NextRequest) {
         clickCount: {
           increment: 1
         }
+      },
+      select: {
+        clickCount: true
       }
     })
 
     console.log('✅ Link atualizado:', { linkId, newClickCount: updatedLink.clickCount })
+
+    // Enviar webhook se configurado (não bloquear resposta)
+    const integrationSettings = user.integrationSettings as any;
+    if (integrationSettings?.webhookUrl) {
+      // Executar webhook em background (não aguardar)
+      WebhookService.sendLinkClicked(
+        integrationSettings,
+        {
+          linkId: link.id,
+          linkTitle: link.title,
+          linkUrl: link.url,
+          clickCount: updatedLink.clickCount,
+          ipAddress: ip,
+          userAgent,
+          country,
+          device,
+          clickedAt: analytics.clickedAt.toISOString(),
+        },
+        userId,
+        user.email || undefined
+      ).catch(error => {
+        console.error('Erro ao enviar webhook de clique:', error);
+      });
+    }
 
     return NextResponse.json({
       success: true,

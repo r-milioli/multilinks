@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { FormSubmission } from '@/types/form.types';
+import { WebhookService } from '@/lib/webhooks';
 
 export async function GET(request: NextRequest) {
   try {
@@ -87,7 +88,9 @@ export async function POST(request: NextRequest) {
         user: {
           select: {
             id: true,
+            email: true,
             themeSettings: true,
+            integrationSettings: true,
           },
         },
       },
@@ -105,6 +108,11 @@ export async function POST(request: NextRequest) {
     if (linkId) {
       link = await prisma.link.findUnique({
         where: { id: linkId },
+        select: {
+          id: true,
+          title: true,
+          url: true,
+        },
       });
     }
 
@@ -145,6 +153,31 @@ export async function POST(request: NextRequest) {
       redirectUrl = link.url;
     } else if (form.redirectUrl) {
       redirectUrl = form.redirectUrl;
+    }
+
+    // Enviar webhook se configurado (não bloquear resposta)
+    const integrationSettings = form.user.integrationSettings as any;
+    if (integrationSettings?.webhookUrl) {
+      // Executar webhook em background (não aguardar)
+      WebhookService.sendLeadCaptured(
+        integrationSettings,
+        {
+          leadId: lead.id,
+          formId: form.id,
+          formTitle: form.title,
+          linkId: link?.id,
+          linkTitle: link?.title,
+          linkUrl: link?.url,
+          fields: data,
+          ipAddress,
+          userAgent,
+          createdAt: lead.createdAt.toISOString(),
+        },
+        form.user.id,
+        form.user.email || undefined
+      ).catch(error => {
+        console.error('Erro ao enviar webhook de lead:', error);
+      });
     }
 
     return NextResponse.json({

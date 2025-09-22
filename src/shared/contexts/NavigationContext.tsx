@@ -4,6 +4,10 @@ import { createContext, useContext, useState, ReactNode } from 'react'
 
 type NavigationSection = 
   | 'dashboard' 
+  | 'dashboard-links'
+  | 'dashboard-analytics'
+  | 'dashboard-performance'
+  | 'dashboard-activity'
   | 'forms-list' 
   | 'forms-create' 
   | 'analytics' 
@@ -38,7 +42,11 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     
     // Atualizar título baseado na seção
     const titles = {
-      'dashboard': 'Dashboard',
+      'dashboard': 'Visão Geral',
+      'dashboard-links': 'Meus Links',
+      'dashboard-analytics': 'Analytics do Dashboard',
+      'dashboard-performance': 'Performance',
+      'dashboard-activity': 'Atividade',
       'forms-list': 'Formulários',
       'forms-create': 'Criar Formulário',
       'analytics': 'Analytics',

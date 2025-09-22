@@ -16,7 +16,11 @@ import {
   Palette,
   Shield,
   Globe,
-  AlertTriangle
+  AlertTriangle,
+  BarChart,
+  TrendingUp,
+  Eye,
+  Activity
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
@@ -37,7 +41,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { currentSection, setCurrentSection } = useNavigation()
-  const [expandedItems, setExpandedItems] = useState<string[]>(['forms', 'settings'])
+  const [expandedItems, setExpandedItems] = useState<string[]>(['dashboard', 'forms', 'settings'])
 
   console.log('🔧 Sidebar: currentSection =', currentSection, 'setCurrentSection =', setCurrentSection)
 
@@ -46,7 +50,38 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       id: 'dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
-      section: 'dashboard'
+      children: [
+        {
+          id: 'dashboard-overview',
+          label: 'Visão Geral',
+          icon: LayoutDashboard,
+          section: 'dashboard'
+        },
+        {
+          id: 'dashboard-links',
+          label: 'Meus Links',
+          icon: LinkIcon,
+          section: 'dashboard-links'
+        },
+        {
+          id: 'dashboard-analytics',
+          label: 'Analytics',
+          icon: BarChart,
+          section: 'dashboard-analytics'
+        },
+        {
+          id: 'dashboard-performance',
+          label: 'Performance',
+          icon: TrendingUp,
+          section: 'dashboard-performance'
+        },
+        {
+          id: 'dashboard-activity',
+          label: 'Atividade',
+          icon: Activity,
+          section: 'dashboard-activity'
+        }
+      ]
     },
     {
       id: 'forms',

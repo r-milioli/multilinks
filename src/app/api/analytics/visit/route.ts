@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { WebhookService } from '@/lib/webhooks'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +20,11 @@ export async function POST(request: NextRequest) {
     // Verificar se o usuário permite analytics
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { privacySettings: true }
+      select: { 
+        privacySettings: true,
+        integrationSettings: true,
+        email: true
+      }
     })
 
     if (!user) {
@@ -66,6 +71,29 @@ export async function POST(request: NextRequest) {
     })
 
     console.log('✅ Visita registrada:', analytics.id)
+
+    // Enviar webhook se configurado (não bloquear resposta)
+    const integrationSettings = user.integrationSettings as any;
+    if (integrationSettings?.webhookUrl) {
+      // Executar webhook em background (não aguardar)
+      WebhookService.sendPageVisited(
+        integrationSettings,
+        {
+          userId,
+          userEmail: user.email || undefined,
+          pageUrl: request.headers.get('referer') || 'unknown',
+          ipAddress: ip,
+          userAgent,
+          country,
+          device,
+          visitedAt: analytics.clickedAt.toISOString(),
+        },
+        userId,
+        user.email || undefined
+      ).catch(error => {
+        console.error('Erro ao enviar webhook de visita:', error);
+      });
+    }
 
     return NextResponse.json({
       success: true,

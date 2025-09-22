@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
+import { useIntegrations } from '@/modules/integrations/hooks/useIntegrations'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { Label } from '@/shared/components/ui/Label'
 import { Switch } from '@/shared/components/ui/Switch'
+import { WebhookEventsInfo } from '@/shared/components/ui/WebhookEventsInfo'
 // import { Textarea } from '@/shared/components/ui/Textarea' // Componente não existe
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/Select' // Componente não existe
 // Ícones removidos - agora usando sidebar principal
@@ -17,6 +19,14 @@ type SettingsSection = 'profile' | 'notifications' | 'appearance' | 'security' |
 export function SettingsContent() {
   const { data: session } = useSession()
   const { currentSection, setCurrentSection } = useNavigation()
+  const { 
+    integrationSettings, 
+    isLoading: integrationsLoading, 
+    isSaving: integrationsSaving,
+    saveIntegrationSettings,
+    updateIntegrationSetting,
+    testWebhook 
+  } = useIntegrations()
   
   // Determinar a seção ativa baseada na navegação
   const getActiveSection = (): SettingsSection => {
@@ -76,13 +86,7 @@ export function SettingsContent() {
     twoFactor: false
   })
 
-  // Integrations state
-  const [integrations, setIntegrations] = useState({
-    googleAnalytics: '',
-    facebookPixel: '',
-    webhookUrl: '',
-    captchaKey: ''
-  })
+  // Integrations state - agora gerenciado pelo hook useIntegrations
 
   useEffect(() => {
     // Carregar dados do usuário quando a sessão estiver disponível
@@ -154,14 +158,11 @@ export function SettingsContent() {
   }
 
   const handleSaveIntegrations = async () => {
-    try {
-      // Implementar salvamento das integrações
-      console.log('Salvando integrações:', integrations)
-      alert('Integrações salvas com sucesso!')
-    } catch (error) {
-      console.error('Erro ao salvar integrações:', error)
-      alert('Erro ao salvar integrações')
-    }
+    await saveIntegrationSettings(integrationSettings)
+  }
+
+  const handleTestWebhook = async () => {
+    await testWebhook()
   }
 
   const handleDeleteAccount = () => {
@@ -464,53 +465,147 @@ export function SettingsContent() {
         <p className="text-gray-600">Conecte com outras ferramentas e serviços</p>
       </div>
       
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="google-analytics">Google Analytics</Label>
-          <Input
-            id="google-analytics"
-            value={integrations.googleAnalytics}
-            onChange={(e) => setIntegrations({...integrations, googleAnalytics: e.target.value})}
-            placeholder="UA-XXXXXXXXX-X"
-          />
-          <p className="text-sm text-gray-500 mt-1">ID de rastreamento do Google Analytics</p>
+      {integrationsLoading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-gray-500 mt-2">Carregando configurações...</p>
         </div>
-        
-        <div>
-          <Label htmlFor="facebook-pixel">Facebook Pixel</Label>
-          <Input
-            id="facebook-pixel"
-            value={integrations.facebookPixel}
-            onChange={(e) => setIntegrations({...integrations, facebookPixel: e.target.value})}
-            placeholder="123456789012345"
-          />
-          <p className="text-sm text-gray-500 mt-1">ID do Facebook Pixel</p>
+      ) : (
+        <div className="space-y-6">
+          {/* Google Analytics */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Google Analytics</CardTitle>
+              <CardDescription>
+                Configure o rastreamento do Google Analytics para suas páginas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="google-analytics">ID de Rastreamento</Label>
+                <Input
+                  id="google-analytics"
+                  value={integrationSettings.googleAnalytics || ''}
+                  onChange={(e) => updateIntegrationSetting('googleAnalytics', e.target.value)}
+                  placeholder="UA-XXXXXXXXX-X ou G-XXXXXXXXXX"
+                />
+                <p className="text-sm text-gray-500">
+                  Formato: UA-XXXXXXXXX-X (Universal Analytics) ou G-XXXXXXXXXX (Google Analytics 4)
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Facebook Pixel */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Facebook Pixel</CardTitle>
+              <CardDescription>
+                Configure o Facebook Pixel para rastreamento de conversões
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="facebook-pixel">Pixel ID</Label>
+                <Input
+                  id="facebook-pixel"
+                  value={integrationSettings.facebookPixel || ''}
+                  onChange={(e) => updateIntegrationSetting('facebookPixel', e.target.value)}
+                  placeholder="123456789012345"
+                />
+                <p className="text-sm text-gray-500">
+                  ID numérico do seu Facebook Pixel (15-16 dígitos)
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Webhook */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Webhook</CardTitle>
+              <CardDescription>
+                Configure um webhook para receber notificações de novos leads
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="webhook-url">URL do Webhook</Label>
+                  <Input
+                    id="webhook-url"
+                    value={integrationSettings.webhookUrl || ''}
+                    onChange={(e) => updateIntegrationSetting('webhookUrl', e.target.value)}
+                    placeholder="https://seu-servidor.com/webhook"
+                  />
+                  <p className="text-sm text-gray-500">
+                    URL completa onde os dados dos leads serão enviados
+                  </p>
+                </div>
+                
+                {integrationSettings.webhookUrl && (
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleTestWebhook}
+                    >
+                      Testar Webhook
+                    </Button>
+                    <p className="text-xs text-gray-500 self-center">
+                      Teste se o webhook está funcionando
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Informações sobre Webhooks */}
+          <WebhookEventsInfo />
+
+          {/* 2Captcha */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">2Captcha</CardTitle>
+              <CardDescription>
+                Configure a chave da API do 2Captcha para resolução automática de captchas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="captcha-key">Chave da API</Label>
+                <Input
+                  id="captcha-key"
+                  type="password"
+                  value={integrationSettings.captchaKey || ''}
+                  onChange={(e) => updateIntegrationSetting('captchaKey', e.target.value)}
+                  placeholder="Sua chave da API do 2Captcha"
+                />
+                <p className="text-sm text-gray-500">
+                  Chave secreta da API do 2Captcha para resolução automática
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Botões de Ação */}
+          <div className="flex gap-4 pt-4">
+            <Button 
+              onClick={handleSaveIntegrations}
+              disabled={integrationsSaving}
+            >
+              {integrationsSaving ? 'Salvando...' : 'Salvar Integrações'}
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => window.location.reload()}
+            >
+              Cancelar
+            </Button>
+          </div>
         </div>
-        
-        <div>
-          <Label htmlFor="webhook-url">Webhook URL</Label>
-          <Input
-            id="webhook-url"
-            value={integrations.webhookUrl}
-            onChange={(e) => setIntegrations({...integrations, webhookUrl: e.target.value})}
-            placeholder="https://seu-servidor.com/webhook"
-          />
-          <p className="text-sm text-gray-500 mt-1">URL para receber notificações de novos leads</p>
-        </div>
-        
-        <div>
-          <Label htmlFor="captcha-key">Chave do 2Captcha</Label>
-          <Input
-            id="captcha-key"
-            value={integrations.captchaKey}
-            onChange={(e) => setIntegrations({...integrations, captchaKey: e.target.value})}
-            placeholder="Sua chave da API do 2Captcha"
-          />
-          <p className="text-sm text-gray-500 mt-1">Chave para resolução automática de captchas</p>
-        </div>
-      </div>
-      
-      <Button onClick={handleSaveIntegrations}>Salvar Integrações</Button>
+      )}
     </div>
   )
 

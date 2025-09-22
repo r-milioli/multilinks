@@ -47,6 +47,7 @@ model User {
   themeSettings   Json?        @default("{}")
   privacySettings Json?        @default("{}")
   notificationSettings Json?   @default("{}")
+  integrationSettings Json?    @default("{}")
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   accounts        Account[]

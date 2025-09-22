@@ -23,6 +23,10 @@ export function DynamicContent() {
 
   switch (currentSection) {
     case 'dashboard':
+    case 'dashboard-links':
+    case 'dashboard-analytics':
+    case 'dashboard-performance':
+    case 'dashboard-activity':
       return <DashboardContent />
     
     case 'forms-list':
