@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
 import { Button } from '@/shared/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/Card'
@@ -22,7 +23,8 @@ import {
   Clock,
   Globe,
   Palette,
-  Database
+  Database,
+  MessageSquare
 } from 'lucide-react'
 
 export default function PricingPage() {

@@ -80,7 +80,7 @@ export default async function UserPage({ params }: PageProps) {
       notFound()
     }
 
-    return <PublicPageWrapper user={user} />
+    return <PublicPageWrapper user={user as any} />
   } catch (error) {
     console.error('Erro ao carregar página do usuário:', error)
     notFound()

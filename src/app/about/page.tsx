@@ -26,7 +26,8 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  Github
+  Github,
+  Database
 } from 'lucide-react'
 
 export default function AboutPage() {
@@ -47,53 +48,46 @@ export default function AboutPage() {
     },
     {
       name: 'Maria Costa',
-      role: 'Head of Design',
+      role: 'Designer UX/UI',
       image: 'MC',
-      description: 'Designer criativo focada em interfaces intuitivas e experiências memoráveis.',
-      color: 'from-purple-500 to-violet-600'
-    },
-    {
-      name: 'João Oliveira',
-      role: 'Head of Growth',
-      image: 'JO',
-      description: 'Especialista em marketing digital e crescimento de produtos.',
-      color: 'from-green-500 to-emerald-600'
+      description: 'Criativa e focada em criar experiências visuais excepcionais.',
+      color: 'from-purple-500 to-indigo-600'
     }
   ]
 
   const values = [
     {
       icon: Heart,
-      title: 'Paixão',
-      description: 'Amamos o que fazemos e acreditamos no poder de conectar pessoas através de links.'
-    },
-    {
-      icon: Users,
-      title: 'Colaboração',
-      description: 'Acreditamos que as melhores soluções nascem da colaboração e do trabalho em equipe.'
+      title: 'Paixão pelo Cliente',
+      description: 'Cada decisão é tomada pensando no sucesso dos nossos usuários.'
     },
     {
       icon: Lightbulb,
-      title: 'Inovação',
-      description: 'Estamos sempre buscando novas formas de melhorar e inovar nossa plataforma.'
+      title: 'Inovação Constante',
+      description: 'Sempre buscando novas formas de simplificar e melhorar a experiência.'
     },
     {
       icon: Shield,
-      title: 'Transparência',
-      description: 'Mantemos transparência total em nossos processos e comunicação com os usuários.'
+      title: 'Segurança em Primeiro',
+      description: 'Protegemos os dados dos nossos usuários com as melhores práticas.'
+    },
+    {
+      icon: Zap,
+      title: 'Performance',
+      description: 'Velocidade e eficiência são fundamentais em tudo que fazemos.'
     }
   ]
 
-  const milestones = [
+  const timeline = [
     {
-      year: '2024',
-      title: 'Lançamento do MultiLink',
-      description: 'Nossa plataforma foi lançada com funcionalidades básicas de gestão de links.'
+      year: '2023',
+      title: 'Nascimento da Ideia',
+      description: 'Identificamos a necessidade de uma solução simples e eficaz para gerenciar links.'
     },
     {
-      year: '2024',
-      title: 'Analytics Avançados',
-      description: 'Implementamos sistema completo de analytics em tempo real.'
+      year: '2023',
+      title: 'Primeira Versão',
+      description: 'Lançamos a primeira versão do MultiLink com funcionalidades básicas.'
     },
     {
       year: '2024',
@@ -127,230 +121,194 @@ export default function AboutPage() {
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 MultiLink
               </span>
-            </div>
-          </div>
-          <Button variant="ghost" asChild>
-            <Link href="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar ao início
             </Link>
-          </Button>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link href="/">
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Voltar</span>
+              </Button>
+            </Link>
+          </div>
         </nav>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Hero */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Sobre o MultiLink
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Somos uma equipe apaixonada por tecnologia, dedicada a criar a melhor plataforma 
-              para gerenciamento de links e crescimento online.
-            </p>
-          </div>
+      <main className="container mx-auto px-4 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+            Sobre o MultiLink
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Somos uma equipe apaixonada por criar ferramentas que simplificam a vida digital. 
+            O MultiLink nasceu da necessidade de ter uma solução elegante e funcional para 
+            gerenciar links e capturar leads de forma eficiente.
+          </p>
+        </div>
 
-          {/* Mission */}
-          <div className="mb-16">
-            <Card className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-              <CardContent className="p-12 text-center">
-                <div className="max-w-4xl mx-auto">
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                    Nossa Missão
-                  </h2>
-                  <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
-                    Democratizar o acesso a ferramentas profissionais de gestão de links, 
-                    permitindo que qualquer pessoa ou empresa tenha uma presença online 
-                    profissional e eficaz, independentemente do tamanho ou orçamento.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2">
-                      <Target className="h-4 w-4 mr-2" />
-                      Foco no usuário
-                    </Badge>
-                    <Badge className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-4 py-2">
-                      <Zap className="h-4 w-4 mr-2" />
-                      Inovação constante
-                    </Badge>
-                    <Badge className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-2">
-                      <Shield className="h-4 w-4 mr-2" />
-                      Segurança em primeiro lugar
-                    </Badge>
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+          {stats.map((stat, index) => (
+            <Card key={index} className="text-center p-6 border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+              <CardContent className="p-0">
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full">
+                    <stat.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">{stat.label}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          ))}
+        </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-            {stats.map((stat, index) => (
-              <Card key={index} className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-center">
-                <CardContent className="p-6">
-                  <stat.icon className="h-8 w-8 text-blue-500 mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">
-                    {stat.label}
+        {/* Mission */}
+        <Card className="mb-16 border-0 shadow-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Nossa Missão
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              Democratizar o acesso a ferramentas profissionais de marketing digital, 
+              permitindo que qualquer pessoa ou empresa possa criar uma presença online 
+              eficaz sem complicações técnicas ou custos exorbitantes.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Values */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Nossos Valores
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, index) => (
+              <Card key={index} className="text-center p-6 border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:shadow-xl transition-shadow">
+                <CardContent className="p-0">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="p-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full">
+                      <value.icon className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{value.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300">{value.description}</p>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+        </div>
 
-          {/* Values */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-              Nossos Valores
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {values.map((value, index) => (
-                <Card key={index} className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-center">
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <value.icon className="h-6 w-6 text-white" />
+        {/* Team */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Nossa Equipe
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {team.map((member, index) => (
+              <Card key={index} className="text-center p-6 border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:shadow-xl transition-shadow">
+                <CardContent className="p-0">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className={`w-20 h-20 bg-gradient-to-br ${member.color} rounded-full flex items-center justify-center text-white text-2xl font-bold`}>
+                      {member.image}
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                      {value.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      {value.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Team */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-              Nossa Equipe
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {team.map((member, index) => (
-                <Card key={index} className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-center">
-                  <CardContent className="p-6">
-                    <div className={`w-20 h-20 bg-gradient-to-br ${member.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                      <span className="text-2xl font-bold text-white">{member.image}</span>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{member.name}</h3>
+                      <Badge variant="outline" className="mt-1">{member.role}</Badge>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                      {member.name}
-                    </h3>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium mb-3">
-                      {member.role}
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      {member.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Timeline */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-              Nossa Jornada
-            </h2>
-            <div className="space-y-8">
-              {milestones.map((milestone, index) => (
-                <Card key={index} className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-6">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold">{milestone.year}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                          {milestone.title}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300">
-                          {milestone.description}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Technology */}
-          <div className="mb-16">
-            <Card className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-center text-2xl">Tecnologias que Utilizamos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <Code className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Next.js</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Framework React</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">{member.description}</p>
                   </div>
-                  
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <Database className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">PostgreSQL</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Banco de dados</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <Palette className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Tailwind CSS</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Estilização</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <Zap className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Vercel</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Hospedagem</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Nossa História
+          </h2>
+          <div className="space-y-8">
+            {timeline.map((item, index) => (
+              <div key={index} className="flex items-start space-x-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold">{item.year}</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Contact */}
-          <Card className="border-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-            <CardContent className="p-12 text-center">
-              <h2 className="text-3xl font-bold mb-4">
-                Vamos conversar?
-              </h2>
-              <p className="text-xl mb-8 opacity-90">
-                Estamos sempre abertos para feedback, sugestões e parcerias
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
-                  <Link href="/contact">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Entre em contato
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
-                  <Link href="/careers">
-                    <Users className="h-4 w-4 mr-2" />
-                    Trabalhe conosco
-                  </Link>
-                </Button>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{item.description}</p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
         </div>
+
+        {/* Tech Stack */}
+        <Card className="mb-16 border-0 shadow-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Tecnologias que Utilizamos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { name: 'Next.js', icon: Code },
+                { name: 'React', icon: Zap },
+                { name: 'TypeScript', icon: FileText },
+                { name: 'Tailwind CSS', icon: Palette },
+                { name: 'Prisma', icon: Database },
+                { name: 'PostgreSQL', icon: BarChart3 },
+                { name: 'Docker', icon: Rocket },
+                { name: 'Vercel', icon: Globe }
+              ].map((tech, index) => (
+                <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700">
+                  <tech.icon className="h-5 w-5 text-blue-600" />
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{tech.name}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Contact */}
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Entre em Contato
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+              Tem alguma dúvida ou sugestão? Adoraríamos ouvir de você!
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Mail className="h-4 w-4" />
+                <span>contato@multilink.com</span>
+              </Button>
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Twitter className="h-4 w-4" />
+                <span>@multilink</span>
+              </Button>
+            </div>
+            <div className="flex justify-center">
+              <Link href="/contact">
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  Fale Conosco
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )
