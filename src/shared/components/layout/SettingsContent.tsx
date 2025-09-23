@@ -6,6 +6,8 @@ import { useNavigation } from '@/shared/contexts/NavigationContext'
 import { useIntegrations } from '@/modules/integrations/hooks/useIntegrations'
 import { useNotifications } from '@/modules/notifications/hooks/useNotifications'
 import { useSecurity } from '@/modules/security/hooks/useSecurity'
+import { useAccount } from '@/modules/account/hooks/useAccount'
+import { DeleteAccountModal } from '@/modules/account/components/DeleteAccountModal'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
@@ -47,6 +49,12 @@ export function SettingsContent() {
     isLoading: securityLoading,
     error: securityError
   } = useSecurity()
+
+  const {
+    deleteAccount,
+    isLoading: accountLoading,
+    error: accountError
+  } = useAccount()
   
   // Determinar a seção ativa baseada na navegação
   const getActiveSection = (): SettingsSection => {
@@ -135,6 +143,9 @@ export function SettingsContent() {
   // Active sessions state
   const [activeSessions, setActiveSessions] = useState<any[]>([])
   const [sessionsLoading, setSessionsLoading] = useState(false)
+
+  // Delete account modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   // Integrations state - agora gerenciado pelo hook useIntegrations
 
@@ -272,10 +283,14 @@ export function SettingsContent() {
   }
 
   const handleDeleteAccount = () => {
-    if (confirm('Tem certeza que deseja deletar sua conta? Esta ação é irreversível!')) {
-      // Implementar exclusão da conta
-      console.log('Deletando conta')
-      toast.success('Conta deletada com sucesso!')
+    setShowDeleteModal(true)
+  }
+
+  const handleConfirmDelete = async (password: string, confirmText: string) => {
+    const result = await deleteAccount(password, confirmText)
+    if (result.success) {
+      setShowDeleteModal(false)
+      // O hook já faz o logout e redirecionamento
     }
   }
 
@@ -638,7 +653,12 @@ export function SettingsContent() {
       {/* Autenticação de Dois Fatores */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Autenticação de Dois Fatores</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            Autenticação de Dois Fatores
+            <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-medium">
+              🚧 Em Desenvolvimento
+            </span>
+          </CardTitle>
           <CardDescription>
             Adicione uma camada extra de segurança à sua conta
           </CardDescription>
@@ -666,13 +686,11 @@ export function SettingsContent() {
               }}
             />
           </div>
-          {!security.twoFactor && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>Recomendado:</strong> Ative a autenticação de dois fatores para proteger sua conta contra acessos não autorizados.
-              </p>
-            </div>
-          )}
+          <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+            <p className="text-sm text-orange-800">
+              <strong>🚧 Em Desenvolvimento:</strong> A funcionalidade de autenticação de dois fatores está sendo desenvolvida e será disponibilizada em breve.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -851,6 +869,14 @@ export function SettingsContent() {
           {activeSection === 'danger' && renderDangerSection()}
         </CardContent>
       </Card>
+
+      {/* Modal de Exclusão de Conta */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={accountLoading}
+      />
     </div>
   )
 }

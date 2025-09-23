@@ -56,13 +56,9 @@ export function useAccount() {
     setError(null)
     
     try {
-      // Primeiro, fazer logout para limpar a sessão
-      console.log('🚪 Fazendo logout antes de deletar conta...')
-      await signOut({ redirect: false })
+      console.log('🗑️ Iniciando processo de exclusão da conta...')
       
-      // Aguardar um pouco para garantir que o logout foi processado
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      // Primeiro, deletar a conta (com sessão ativa)
       const response = await fetch('/api/user/delete-account', {
         method: 'POST',
         headers: {
@@ -74,14 +70,23 @@ export function useAccount() {
         }),
       })
       
+      console.log('📡 Resposta da API:', response.status, response.statusText)
+      
       const result = await response.json()
+      console.log('📋 Resultado da API:', result)
       
       if (!result.success) {
+        console.error('❌ Erro na API:', result.error)
         setError(result.error || 'Erro ao deletar conta')
         toast.error(result.error || 'Erro ao deletar conta')
         return { success: false, error: result.error }
       }
 
+      console.log('✅ Conta deletada com sucesso, fazendo logout...')
+      
+      // Após deletar com sucesso, fazer logout
+      await signOut({ redirect: false })
+      
       toast.success('Conta deletada com sucesso!')
       
       // Redirecionar para página inicial após deletar conta

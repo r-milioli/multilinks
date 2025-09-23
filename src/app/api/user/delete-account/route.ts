@@ -13,9 +13,13 @@ const deleteAccountSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🗑️ API: Iniciando exclusão de conta...')
+    
     const session = await getServerSession(authOptions)
+    console.log('🔍 API: Sessão encontrada:', !!session?.user?.id)
 
     if (!session?.user?.id) {
+      console.log('❌ API: Usuário não autorizado')
       return NextResponse.json(
         { success: false, error: 'Não autorizado' },
         { status: 401 }
@@ -23,9 +27,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    console.log('📋 API: Dados recebidos:', { hasPassword: !!body.confirmPassword, confirmText: body.confirmText })
+    
     const validatedData = deleteAccountSchema.safeParse(body)
 
     if (!validatedData.success) {
+      console.log('❌ API: Validação falhou:', validatedData.error.errors[0].message)
       return NextResponse.json(
         { success: false, error: validatedData.error.errors[0].message },
         { status: 400 }
@@ -33,6 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { confirmPassword } = validatedData.data
+    console.log('✅ API: Validação passou, verificando senha...')
 
     // Buscar usuário para verificar senha
     const user = await prisma.user.findUnique({
@@ -50,19 +58,25 @@ export async function POST(request: NextRequest) {
     // Verificar senha
     const { compare } = await import('bcryptjs')
     const isPasswordValid = await compare(confirmPassword, user.password)
+    console.log('🔐 API: Senha válida:', isPasswordValid)
     
     if (!isPasswordValid) {
+      console.log('❌ API: Senha incorreta')
       return NextResponse.json(
         { success: false, error: 'Senha incorreta' },
         { status: 400 }
       )
     }
 
+    console.log('🗑️ API: Deletando usuário e todos os dados relacionados...')
+    
     // Deletar todos os dados do usuário em cascata
     // O Prisma vai deletar automaticamente devido às relações onDelete: Cascade
     await prisma.user.delete({
       where: { id: session.user.id }
     })
+
+    console.log('✅ API: Usuário deletado com sucesso!')
 
     return NextResponse.json({
       success: true,
