@@ -7,6 +7,7 @@ import { getFaviconUrl, formatUrlForDisplay } from '@/lib/utils'
 import { cn } from '@/shared/utils/cn'
 import { FormModal } from '@/modules/forms/components/FormModal'
 import { usePublicForm } from '@/modules/forms/hooks/usePublicForm'
+import { trackEvent } from '@/shared/components/TrackingScripts'
 
 interface PublicLinkItemProps {
   link: Link
@@ -55,6 +56,14 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
   const handleFormSuccess = useCallback((redirectUrl?: string) => {
     setShowForm(false)
     
+    // Tracking de submissão de formulário
+    if (form) {
+      trackEvent.formSubmission(
+        form.id,
+        form.title || link.title || 'Formulário'
+      )
+    }
+    
     // Aguardar um pouco antes de redirecionar para garantir que o modal foi fechado
     setTimeout(() => {
       // Se há URL de redirecionamento, usar ela, senão usar a URL do link
@@ -63,7 +72,7 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         window.open(finalUrl, '_blank', 'noopener,noreferrer')
       }
     }, 100)
-  }, [link.url])
+  }, [link.url, link.title, form])
 
   const getButtonStyle = () => {
     if (!themeSettings) {

@@ -784,30 +784,6 @@ export function SettingsContent() {
           {/* Informações sobre Webhooks */}
           <WebhookEventsInfo />
 
-          {/* 2Captcha */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">2Captcha</CardTitle>
-              <CardDescription>
-                Configure a chave da API do 2Captcha para resolução automática de captchas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="captcha-key">Chave da API</Label>
-                <Input
-                  id="captcha-key"
-                  type="password"
-                  value={integrationSettings.captchaKey || ''}
-                  onChange={(e) => updateIntegrationSetting('captchaKey', e.target.value)}
-                  placeholder="Sua chave da API do 2Captcha"
-                />
-                <p className="text-sm text-gray-500">
-                  Chave secreta da API do 2Captcha para resolução automática
-                </p>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Botões de Ação */}
           <div className="flex gap-4 pt-4">

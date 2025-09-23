@@ -5,6 +5,8 @@ import { User, Link, SocialLink } from '@prisma/client'
 import { PublicLinkItem } from './PublicLinkItem'
 import { SocialLinks } from './SocialLinks'
 import { ThemeProvider } from './ThemeProvider'
+import { TrackingScripts, trackEvent } from '@/shared/components/TrackingScripts'
+import { TrackingDebug } from '@/shared/components/TrackingDebug'
 import { getInitials } from '@/lib/utils'
 import { cn } from '@/shared/utils/cn'
 
@@ -57,6 +59,12 @@ export function PublicPage({ user }: PublicPageProps) {
         if (result.success) {
           setVisitTracked(true)
           console.log('🎉 Visita da página registrada com sucesso!')
+          
+          // Tracking de página visualizada
+          trackEvent.pageView(
+            `${user.name || user.username || 'MultiLink'} - Links`,
+            typeof window !== 'undefined' ? window.location.href : ''
+          )
         } else {
           console.log('❌ Erro ao registrar visita:', result.error)
           // Reset em caso de erro para permitir nova tentativa
@@ -83,6 +91,9 @@ export function PublicPage({ user }: PublicPageProps) {
     
     setClickedLinks(prev => new Set(prev).add(linkId))
 
+    // Encontrar o link clicado para tracking
+    const clickedLink = user.links.find(link => link.id === linkId)
+    
     try {
       console.log('📡 Enviando clique para API...')
       // Registrar clique no analytics
@@ -102,6 +113,15 @@ export function PublicPage({ user }: PublicPageProps) {
       
       if (result.success) {
         console.log('🎉 Clique registrado com sucesso!')
+        
+        // Tracking de eventos externos
+        if (clickedLink) {
+          trackEvent.linkClick(
+            clickedLink.id,
+            clickedLink.title || 'Link sem título',
+            clickedLink.url
+          )
+        }
       } else {
         console.log('❌ Erro na API:', result.error)
       }
@@ -112,6 +132,7 @@ export function PublicPage({ user }: PublicPageProps) {
 
   const themeSettings = user.themeSettings as any || {}
   const privacySettings = user.privacySettings as any || {}
+  const integrationSettings = user.integrationSettings as any || {}
 
   // Aplicar estilos do tema diretamente
   const getBackgroundStyle = () => {
@@ -150,6 +171,15 @@ export function PublicPage({ user }: PublicPageProps) {
 
   return (
     <ThemeProvider themeSettings={themeSettings}>
+      {/* Tracking Scripts */}
+      <TrackingScripts
+        googleAnalytics={integrationSettings.googleAnalytics}
+        facebookPixel={integrationSettings.facebookPixel}
+        userId={user.id}
+        pageTitle={`${user.name || user.username || 'MultiLink'} - Links`}
+        pageUrl={typeof window !== 'undefined' ? window.location.href : ''}
+      />
+      
       <div 
         className="min-h-screen"
         style={{
@@ -338,6 +368,12 @@ export function PublicPage({ user }: PublicPageProps) {
           </div>
         </div>
       </div>
+      
+      {/* Debug de Tracking (apenas em desenvolvimento) */}
+      <TrackingDebug
+        googleAnalytics={integrationSettings.googleAnalytics}
+        facebookPixel={integrationSettings.facebookPixel}
+      />
     </ThemeProvider>
   )
 }
