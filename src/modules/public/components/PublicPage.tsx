@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { User, Link, SocialLink } from '@prisma/client'
 import { PublicLinkItem } from './PublicLinkItem'
 import { SocialLinks } from './SocialLinks'
@@ -19,6 +19,7 @@ export function PublicPage({ user }: PublicPageProps) {
   const [clickedLinks, setClickedLinks] = useState<Set<string>>(new Set())
   const [visitTracked, setVisitTracked] = useState(false)
   const [showProducts, setShowProducts] = useState(false)
+  const visitTrackedRef = useRef(false)
   
   // Separar links por tipo
   const normalLinks = user.links.filter(link => link.type === 'NORMAL')
@@ -28,7 +29,14 @@ export function PublicPage({ user }: PublicPageProps) {
   // Rastrear visita quando a página é carregada
   useEffect(() => {
     const trackVisit = async () => {
-      if (visitTracked) return
+      // Proteção dupla contra execuções múltiplas
+      if (visitTracked || visitTrackedRef.current) {
+        console.log('🚫 Visita já foi rastreada, ignorando...')
+        return
+      }
+      
+      // Marcar como rastreada imediatamente para evitar duplicação
+      visitTrackedRef.current = true
       
       console.log('👁️ Rastreando visita da página...')
       
@@ -51,14 +59,18 @@ export function PublicPage({ user }: PublicPageProps) {
           console.log('🎉 Visita da página registrada com sucesso!')
         } else {
           console.log('❌ Erro ao registrar visita:', result.error)
+          // Reset em caso de erro para permitir nova tentativa
+          visitTrackedRef.current = false
         }
       } catch (error) {
         console.error('❌ Erro ao registrar visita:', error)
+        // Reset em caso de erro para permitir nova tentativa
+        visitTrackedRef.current = false
       }
     }
 
     trackVisit()
-  }, [user.id, visitTracked])
+  }, [user.id]) // Removido visitTracked das dependências
 
   const handleLinkClick = async (linkId: string) => {
     console.log('🖱️ Clique detectado no link:', linkId)

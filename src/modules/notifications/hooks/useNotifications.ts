@@ -36,7 +36,12 @@ export function useNotifications() {
       const response = await fetch('/api/user/notifications')
       const data = await response.json()
       if (data.success && data.data) {
-        setNotificationSettings(data.data)
+        // Mesclar dados do servidor com valores padrão para garantir que todos os campos existam
+        const mergedSettings = {
+          ...DEFAULT_NOTIFICATION_SETTINGS,
+          ...data.data
+        }
+        setNotificationSettings(mergedSettings)
       } else {
         setNotificationSettings(DEFAULT_NOTIFICATION_SETTINGS)
       }
@@ -51,17 +56,23 @@ export function useNotifications() {
   const saveNotificationSettings = async (newSettings: NotificationSettings) => {
     setIsSaving(true)
     try {
+      // Garantir que todos os campos obrigatórios estejam presentes
+      const completeSettings = {
+        ...DEFAULT_NOTIFICATION_SETTINGS,
+        ...newSettings
+      }
+      
       const response = await fetch('/api/user/notifications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newSettings),
+        body: JSON.stringify(completeSettings),
       })
 
       const result = await response.json()
       if (result.success) {
-        setNotificationSettings(newSettings)
+        setNotificationSettings(completeSettings)
         return { success: true }
       } else {
         return { success: false, error: result.error }

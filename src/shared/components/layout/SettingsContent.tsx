@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
 import { useIntegrations } from '@/modules/integrations/hooks/useIntegrations'
+import { useNotifications } from '@/modules/notifications/hooks/useNotifications'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
@@ -11,6 +12,7 @@ import { Label } from '@/shared/components/ui/Label'
 import { Switch } from '@/shared/components/ui/Switch'
 import { WebhookEventsInfo } from '@/shared/components/ui/WebhookEventsInfo'
 import { ThemeEditorContent } from './ThemeEditorContent'
+import { toast } from 'react-hot-toast'
 // import { Textarea } from '@/shared/components/ui/Textarea' // Componente não existe
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/Select' // Componente não existe
 // Ícones removidos - agora usando sidebar principal
@@ -28,6 +30,14 @@ export function SettingsContent() {
     updateIntegrationSetting,
     testWebhook 
   } = useIntegrations()
+
+  const {
+    notificationSettings,
+    isLoading: notificationsLoading,
+    isSaving: notificationsSaving,
+    saveNotificationSettings,
+    updateNotificationSetting
+  } = useNotifications()
   
   // Determinar a seção ativa baseada na navegação
   const getActiveSection = (): SettingsSection => {
@@ -55,21 +65,12 @@ export function SettingsContent() {
   const [profileData, setProfileData] = useState({
     name: session?.user?.name || '',
     email: session?.user?.email || '',
-    username: session?.user?.username || '',
+    username: (session?.user as any)?.username || '',
     bio: '',
-    website: '',
-    location: ''
+    title: ''
   })
 
-  // Notifications state
-  const [notifications, setNotifications] = useState({
-    email: true,
-    push: false,
-    weekly: true,
-    newLeads: true,
-    linkClicks: false,
-    formSubmissions: true
-  })
+  // Notifications state - agora gerenciado pelo hook useNotifications
 
   // Appearance state
   const [appearance, setAppearance] = useState({
@@ -130,10 +131,9 @@ export function SettingsContent() {
       setProfileData({
         name: session.user.name || '',
         email: session.user.email || '',
-        username: session.user.username || '',
+        username: (session.user as any)?.username || '',
         bio: '',
-        website: '',
-        location: ''
+        title: ''
       })
     }
   }, [session])
@@ -143,25 +143,77 @@ export function SettingsContent() {
     setActiveSection(getActiveSection())
   }, [currentSection])
 
+  // Carregar dados do perfil quando o componente for montado
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        const result = await response.json()
+        
+        if (result.success && result.data) {
+          setProfileData({
+            name: result.data.name || '',
+            email: result.data.email || '',
+            username: result.data.username || '',
+            bio: result.data.bio || '',
+            title: result.data.title || ''
+          })
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do perfil:', error)
+      }
+    }
+
+    if ((session?.user as any)?.id) {
+      loadProfileData()
+    }
+  }, [(session?.user as any)?.id])
+
   const handleSaveProfile = async () => {
     try {
-      // Implementar salvamento do perfil
       console.log('Salvando perfil:', profileData)
-      alert('Perfil salvo com sucesso!')
+      
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: profileData.name,
+          username: profileData.username,
+          bio: profileData.bio,
+          title: profileData.title
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        console.log('✅ Perfil salvo com sucesso:', result.data)
+        toast.success('Perfil salvo com sucesso!')
+      } else {
+        console.error('❌ Erro ao salvar perfil:', result.error)
+        toast.error(`Erro ao salvar perfil: ${result.error}`)
+      }
     } catch (error) {
-      console.error('Erro ao salvar perfil:', error)
-      alert('Erro ao salvar perfil')
+      console.error('❌ Erro ao salvar perfil:', error)
+      toast.error('Erro ao salvar perfil')
     }
   }
 
   const handleSaveNotifications = async () => {
     try {
-      // Implementar salvamento das notificações
-      console.log('Salvando notificações:', notifications)
-      alert('Configurações de notificação salvas!')
+      console.log('Salvando notificações:', notificationSettings)
+      const result = await saveNotificationSettings(notificationSettings)
+      
+      if (result.success) {
+        toast.success('Configurações de notificação salvas!')
+      } else {
+        toast.error(result.error || 'Erro ao salvar notificações')
+      }
     } catch (error) {
       console.error('Erro ao salvar notificações:', error)
-      alert('Erro ao salvar notificações')
+      toast.error('Erro ao salvar notificações')
     }
   }
 
@@ -169,27 +221,27 @@ export function SettingsContent() {
     try {
       // Implementar salvamento da aparência
       console.log('Salvando aparência:', appearance)
-      alert('Configurações de aparência salvas!')
+      toast.success('Configurações de aparência salvas!')
     } catch (error) {
       console.error('Erro ao salvar aparência:', error)
-      alert('Erro ao salvar aparência')
+      toast.error('Erro ao salvar aparência')
     }
   }
 
   const handleChangePassword = async () => {
     if (security.newPassword !== security.confirmPassword) {
-      alert('As senhas não coincidem')
+      toast.error('As senhas não coincidem')
       return
     }
-    
+
     try {
       // Implementar alteração de senha
       console.log('Alterando senha')
-      alert('Senha alterada com sucesso!')
+      toast.success('Senha alterada com sucesso!')
       setSecurity({ ...security, currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (error) {
       console.error('Erro ao alterar senha:', error)
-      alert('Erro ao alterar senha')
+      toast.error('Erro ao alterar senha')
     }
   }
 
@@ -205,7 +257,7 @@ export function SettingsContent() {
     if (confirm('Tem certeza que deseja deletar sua conta? Esta ação é irreversível!')) {
       // Implementar exclusão da conta
       console.log('Deletando conta')
-      alert('Conta deletada com sucesso!')
+      toast.success('Conta deletada com sucesso!')
     }
   }
 
@@ -248,21 +300,12 @@ export function SettingsContent() {
           />
         </div>
         <div>
-          <Label htmlFor="website">Website</Label>
+          <Label htmlFor="title">Título</Label>
           <Input
-            id="website"
-            value={profileData.website}
-            onChange={(e) => setProfileData({...profileData, website: e.target.value})}
-            placeholder="https://seusite.com"
-          />
-        </div>
-        <div>
-          <Label htmlFor="location">Localização</Label>
-          <Input
-            id="location"
-            value={profileData.location}
-            onChange={(e) => setProfileData({...profileData, location: e.target.value})}
-            placeholder="São Paulo, SP"
+            id="title"
+            value={profileData.title}
+            onChange={(e) => setProfileData({...profileData, title: e.target.value})}
+            placeholder="Desenvolvedor, Designer, Empreendedor..."
           />
         </div>
       </div>
@@ -290,81 +333,146 @@ export function SettingsContent() {
         <p className="text-gray-600">Configure como você quer ser notificado</p>
       </div>
       
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="email-notifications">Notificações por Email</Label>
-            <p className="text-sm text-gray-500">Receba emails sobre atividades importantes</p>
-          </div>
-          <Switch
-            id="email-notifications"
-            checked={notifications.email}
-            onCheckedChange={(checked) => setNotifications({...notifications, email: checked})}
-          />
+      {notificationsLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="push-notifications">Notificações Push</Label>
-            <p className="text-sm text-gray-500">Receba notificações no navegador</p>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="email-notifications">Notificações por Email</Label>
+              <p className="text-sm text-gray-500">Receba emails sobre atividades importantes</p>
+            </div>
+            <Switch
+              id="email-notifications"
+              checked={notificationSettings.emailNotifications}
+              onCheckedChange={(checked) => updateNotificationSetting('emailNotifications', checked)}
+            />
           </div>
-          <Switch
-            id="push-notifications"
-            checked={notifications.push}
-            onCheckedChange={(checked) => setNotifications({...notifications, push: checked})}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="weekly-reports">Relatórios Semanais</Label>
-            <p className="text-sm text-gray-500">Receba um resumo semanal do desempenho</p>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="push-notifications">Notificações Push</Label>
+              <p className="text-sm text-gray-500">Receba notificações no navegador</p>
+            </div>
+            <Switch
+              id="push-notifications"
+              checked={notificationSettings.pushNotifications}
+              onCheckedChange={(checked) => updateNotificationSetting('pushNotifications', checked)}
+            />
           </div>
-          <Switch
-            id="weekly-reports"
-            checked={notifications.weekly}
-            onCheckedChange={(checked) => setNotifications({...notifications, weekly: checked})}
-          />
-        </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="weekly-reports">Relatórios Semanais</Label>
+              <p className="text-sm text-gray-500">Receba um resumo semanal do desempenho</p>
+            </div>
+            <Switch
+              id="weekly-reports"
+              checked={notificationSettings.weeklyReport}
+              onCheckedChange={(checked) => updateNotificationSetting('weeklyReport', checked)}
+            />
+          </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="new-leads">Novos Leads</Label>
-            <p className="text-sm text-gray-500">Seja notificado quando novos leads forem capturados</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="new-followers">Novos Seguidores</Label>
+              <p className="text-sm text-gray-500">Seja notificado quando alguém seguir seu perfil</p>
+            </div>
+            <Switch
+              id="new-followers"
+              checked={notificationSettings.newFollower}
+              onCheckedChange={(checked) => updateNotificationSetting('newFollower', checked)}
+            />
           </div>
-          <Switch
-            id="new-leads"
-            checked={notifications.newLeads}
-            onCheckedChange={(checked) => setNotifications({...notifications, newLeads: checked})}
-          />
-        </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="link-clicks">Cliques em Links</Label>
-            <p className="text-sm text-gray-500">Seja notificado sobre cliques nos seus links</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="link-clicks">Cliques em Links</Label>
+              <p className="text-sm text-gray-500">Seja notificado sobre cliques nos seus links</p>
+            </div>
+            <Switch
+              id="link-clicks"
+              checked={notificationSettings.linkClick}
+              onCheckedChange={(checked) => updateNotificationSetting('linkClick', checked)}
+            />
           </div>
-          <Switch
-            id="link-clicks"
-            checked={notifications.linkClicks}
-            onCheckedChange={(checked) => setNotifications({...notifications, linkClicks: checked})}
-          />
-        </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="form-submissions">Submissões de Formulário</Label>
-            <p className="text-sm text-gray-500">Seja notificado sobre novas submissões</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="profile-views">Visualizações do Perfil</Label>
+              <p className="text-sm text-gray-500">Seja notificado sobre visualizações do seu perfil</p>
+            </div>
+            <Switch
+              id="profile-views"
+              checked={notificationSettings.profileView}
+              onCheckedChange={(checked) => updateNotificationSetting('profileView', checked)}
+            />
           </div>
-          <Switch
-            id="form-submissions"
-            checked={notifications.formSubmissions}
-            onCheckedChange={(checked) => setNotifications({...notifications, formSubmissions: checked})}
-          />
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="system-updates">Atualizações do Sistema</Label>
+              <p className="text-sm text-gray-500">Receba notificações sobre atualizações e novidades</p>
+            </div>
+            <Switch
+              id="system-updates"
+              checked={notificationSettings.systemUpdates}
+              onCheckedChange={(checked) => updateNotificationSetting('systemUpdates', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="marketing-emails">Emails de Marketing</Label>
+              <p className="text-sm text-gray-500">Receba emails promocionais e dicas</p>
+            </div>
+            <Switch
+              id="marketing-emails"
+              checked={notificationSettings.marketingEmails}
+              onCheckedChange={(checked) => updateNotificationSetting('marketingEmails', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="sms-notifications">Notificações SMS</Label>
+              <p className="text-sm text-gray-500">Receba notificações por SMS</p>
+            </div>
+            <Switch
+              id="sms-notifications"
+              checked={notificationSettings.smsNotifications}
+              onCheckedChange={(checked) => updateNotificationSetting('smsNotifications', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="notification-frequency">Frequência de Notificações</Label>
+              <p className="text-sm text-gray-500">Com que frequência você quer receber notificações</p>
+            </div>
+            <select
+              id="notification-frequency"
+              value={notificationSettings.notificationFrequency}
+              onChange={(e) => updateNotificationSetting('notificationFrequency', e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="immediate">Imediato</option>
+              <option value="daily">Diário</option>
+              <option value="weekly">Semanal</option>
+              <option value="never">Nunca</option>
+            </select>
+          </div>
         </div>
-      </div>
+      )}
       
-      <Button onClick={handleSaveNotifications}>Salvar Notificações</Button>
+      <Button 
+        onClick={handleSaveNotifications}
+        disabled={notificationsSaving}
+      >
+        {notificationsSaving ? 'Salvando...' : 'Salvar Notificações'}
+      </Button>
     </div>
   )
 

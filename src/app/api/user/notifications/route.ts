@@ -67,18 +67,42 @@ export async function POST(request: NextRequest) {
     const notificationSettings: NotificationSettings = await request.json()
 
     // Validar dados de notificação
-    if (typeof notificationSettings.emailNotifications !== 'boolean' || 
-        typeof notificationSettings.weeklyReport !== 'boolean' ||
-        typeof notificationSettings.newFollower !== 'boolean' ||
-        typeof notificationSettings.linkClick !== 'boolean' ||
-        typeof notificationSettings.profileView !== 'boolean' ||
-        typeof notificationSettings.systemUpdates !== 'boolean' ||
-        typeof notificationSettings.marketingEmails !== 'boolean' ||
-        typeof notificationSettings.pushNotifications !== 'boolean' ||
-        typeof notificationSettings.smsNotifications !== 'boolean' ||
-        !['immediate', 'daily', 'weekly', 'never'].includes(notificationSettings.notificationFrequency)) {
+    const validationErrors = []
+    
+    if (typeof notificationSettings.emailNotifications !== 'boolean') {
+      validationErrors.push(`emailNotifications deve ser boolean, recebido: ${typeof notificationSettings.emailNotifications}`)
+    }
+    if (typeof notificationSettings.weeklyReport !== 'boolean') {
+      validationErrors.push(`weeklyReport deve ser boolean, recebido: ${typeof notificationSettings.weeklyReport}`)
+    }
+    if (typeof notificationSettings.newFollower !== 'boolean') {
+      validationErrors.push(`newFollower deve ser boolean, recebido: ${typeof notificationSettings.newFollower}`)
+    }
+    if (typeof notificationSettings.linkClick !== 'boolean') {
+      validationErrors.push(`linkClick deve ser boolean, recebido: ${typeof notificationSettings.linkClick}`)
+    }
+    if (typeof notificationSettings.profileView !== 'boolean') {
+      validationErrors.push(`profileView deve ser boolean, recebido: ${typeof notificationSettings.profileView}`)
+    }
+    if (typeof notificationSettings.systemUpdates !== 'boolean') {
+      validationErrors.push(`systemUpdates deve ser boolean, recebido: ${typeof notificationSettings.systemUpdates}`)
+    }
+    if (typeof notificationSettings.marketingEmails !== 'boolean') {
+      validationErrors.push(`marketingEmails deve ser boolean, recebido: ${typeof notificationSettings.marketingEmails}`)
+    }
+    if (typeof notificationSettings.pushNotifications !== 'boolean') {
+      validationErrors.push(`pushNotifications deve ser boolean, recebido: ${typeof notificationSettings.pushNotifications}`)
+    }
+    if (typeof notificationSettings.smsNotifications !== 'boolean') {
+      validationErrors.push(`smsNotifications deve ser boolean, recebido: ${typeof notificationSettings.smsNotifications}`)
+    }
+    if (!['immediate', 'daily', 'weekly', 'never'].includes(notificationSettings.notificationFrequency)) {
+      validationErrors.push(`notificationFrequency deve ser 'immediate', 'daily', 'weekly' ou 'never', recebido: ${notificationSettings.notificationFrequency}`)
+    }
+    
+    if (validationErrors.length > 0) {
       return NextResponse.json(
-        { success: false, error: 'Dados de notificação inválidos' },
+        { success: false, error: `Dados de notificação inválidos: ${validationErrors.join(', ')}` },
         { status: 400 }
       )
     }

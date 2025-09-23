@@ -12,6 +12,7 @@ import { Button } from '@/shared/components/ui/Button'
 import { Plus, Link as LinkIcon, BarChart3, Settings, Eye, FileText, TrendingUp, Activity } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
+import { toast } from 'react-hot-toast'
 
 type DashboardSection = 'overview' | 'links' | 'analytics' | 'performance' | 'activity'
 
@@ -88,10 +89,10 @@ export function DashboardContent() {
   }
 
   const handleViewPublicPage = () => {
-    if (session?.user?.username) {
-      window.open(`/${session.user.username}`, '_blank', 'noopener,noreferrer')
+    if (session?.user && (session.user as any)?.username) {
+      window.open(`/${(session.user as any).username}`, '_blank', 'noopener,noreferrer')
     } else {
-      alert('Nome de usuário não encontrado. Configure seu perfil primeiro.')
+      toast.error('Nome de usuário não encontrado. Configure seu perfil primeiro.')
     }
   }
 
@@ -148,12 +149,12 @@ export function DashboardContent() {
             <Eye className="h-4 w-4 mr-2" />
             Visualizar Página
           </Button>
-          <Button variant="outline" asChild>
+          {/* <Button variant="outline" asChild>
             <a href="/forms">
               <FileText className="h-4 w-4 mr-2" />
               Formulários
             </a>
-          </Button>
+          </Button> */}
         </div>
       </div>
 
