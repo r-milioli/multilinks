@@ -1,26 +1,52 @@
 import { withAuth } from 'next-auth/middleware'
+import { NextResponse } from 'next/server'
 
 export default withAuth(
   function middleware(req) {
-    // Middleware logic here if needed
+    const { pathname } = req.nextUrl
+    const token = req.nextauth.token
+
+    // Se está logado e tenta acessar login/register, redirecionar
+    if (token && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+
+    // Se não está logado e tenta acessar área protegida, redirecionar
+    if (!token && pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Permitir acesso às rotas públicas
-        if (req.nextUrl.pathname.startsWith('/api/auth') ||
-            req.nextUrl.pathname.startsWith('/api/upload') ||
-            req.nextUrl.pathname.startsWith('/api/analytics/click') ||
-            req.nextUrl.pathname.startsWith('/api/analytics/visit') ||
-            req.nextUrl.pathname === '/' ||
-            req.nextUrl.pathname.startsWith('/login') ||
-            req.nextUrl.pathname.startsWith('/register') ||
-            req.nextUrl.pathname.startsWith('/[username]') ||
-            req.nextUrl.pathname.match(/^\/[a-zA-Z0-9_-]+$/)) {
+        const { pathname } = req.nextUrl
+        
+        // Rotas públicas
+        const publicRoutes = [
+          '/',
+          '/login',
+          '/register',
+          '/[username]',
+          '/api/auth',
+          '/api/upload',
+          '/api/analytics/click',
+          '/api/analytics/visit'
+        ]
+
+        // Verificar se é rota pública
+        const isPublicRoute = publicRoutes.some(route => {
+          if (route.includes('[')) {
+            // Para rotas dinâmicas como [username]
+            return pathname.match(/^\/[a-zA-Z0-9_-]+$/)
+          }
+          return pathname.startsWith(route)
+        })
+
+        if (isPublicRoute) {
           return true
         }
 
-        // Requerer autenticação para rotas protegidas
+        // Para rotas protegidas, verificar token
         return !!token
       },
     },
@@ -30,6 +56,8 @@ export default withAuth(
 export const config = {
   matcher: [
     '/dashboard/:path*',
+    '/login',
+    '/register',
     '/api/links/:path*',
     '/api/user/:path*',
     '/api/analytics/:path*'

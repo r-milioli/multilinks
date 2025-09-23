@@ -113,9 +113,9 @@ export function FormsListContent() {
   if (viewMode === 'leads') {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h2 className="text-2xl font-bold">Leads Capturados</h2>
-          <Button onClick={() => setViewMode('list')}>
+          <Button onClick={() => setViewMode('list')} className="w-full sm:w-auto">
             Voltar para Formulários
           </Button>
         </div>
@@ -155,20 +155,21 @@ export function FormsListContent() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">Formulários</h2>
           <p className="text-gray-600">Gerencie seus formulários de captura</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
             variant="outline"
             onClick={() => setViewMode('leads')}
+            className="w-full sm:w-auto"
           >
             <BarChart3 className="h-4 w-4 mr-2" />
             Ver Leads
           </Button>
-          <Button onClick={handleCreateNew}>
+          <Button onClick={handleCreateNew} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Criar Formulário
           </Button>

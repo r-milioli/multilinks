@@ -1,19 +1,32 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { LoginForm } from '@/modules/auth/components/LoginForm'
-import { useRequireGuest } from '@/modules/auth/hooks/useAuth'
 import { LoadingPage } from '@/shared/components/ui/Loading'
 
 export default function LoginPage() {
-  const { isLoading, isAuthenticated } = useRequireGuest()
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
-  if (isLoading) {
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      setIsRedirecting(true)
+      // Redirecionamento imediato com replace
+      router.replace('/dashboard')
+    }
+  }, [status, session, router])
+
+  // Mostrar loading durante verificação ou redirecionamento
+  if (status === 'loading' || isRedirecting) {
     return <LoadingPage />
   }
 
-  if (isAuthenticated) {
-    return null // Redirecionamento será feito pelo hook
+  // Se autenticado, não renderizar nada (redirecionamento em andamento)
+  if (status === 'authenticated') {
+    return <LoadingPage />
   }
 
   return (

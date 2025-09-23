@@ -497,12 +497,12 @@ export function ThemeEditorContent() {
           </Card>
 
           {/* Ações */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               variant="outline"
               onClick={handleReset}
               disabled={isSaving}
-              className="flex-1"
+              className="w-full sm:flex-1"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               Restaurar Padrão
@@ -510,7 +510,7 @@ export function ThemeEditorContent() {
             <Button
               onClick={handleSave}
               disabled={isSaving || !hasChanges}
-              className="flex-1"
+              className="w-full sm:flex-1"
             >
               {isSaving ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

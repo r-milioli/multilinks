@@ -46,9 +46,15 @@ export function useRequireAuth() {
 
 export function useRequireGuest() {
   const { isLoading, isAuthenticated } = useAuth()
+  const router = useRouter()
 
-  // Removido o redirecionamento automático para evitar conflito
-  // com o redirecionamento manual do hook useLogin
+  useEffect(() => {
+    // Só redirecionar se não estiver carregando e estiver autenticado
+    if (!isLoading && isAuthenticated) {
+      // Usar replace para evitar histórico de navegação
+      router.replace('/dashboard')
+    }
+  }, [isLoading, isAuthenticated, router])
 
   return {
     isLoading,

@@ -140,12 +140,12 @@ export function DashboardContent() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <div className="flex flex-wrap gap-4">
-          <Button onClick={() => setIsEditorOpen(true)}>
+        <div className="flex flex-col sm:flex-row flex-wrap gap-4">
+          <Button onClick={() => setIsEditorOpen(true)} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Link
           </Button>
-          <Button variant="outline" onClick={handleViewPublicPage}>
+          <Button variant="outline" onClick={handleViewPublicPage} className="w-full sm:w-auto">
             <Eye className="h-4 w-4 mr-2" />
             Visualizar Página
           </Button>
@@ -197,12 +197,12 @@ export function DashboardContent() {
   const renderLinksSection = () => (
     <>
       <div className="mb-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h3 className="text-lg font-semibold">Meus Links</h3>
             <p className="text-gray-600">Gerencie todos os seus links</p>
           </div>
-          <Button onClick={() => setIsEditorOpen(true)}>
+          <Button onClick={() => setIsEditorOpen(true)} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Link
           </Button>
