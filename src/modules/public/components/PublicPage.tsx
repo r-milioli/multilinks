@@ -6,7 +6,6 @@ import { PublicLinkItem } from './PublicLinkItem'
 import { SocialLinks } from './SocialLinks'
 import { ThemeProvider } from './ThemeProvider'
 import { TrackingScripts, trackEvent } from '@/shared/components/TrackingScripts'
-import { TrackingDebug } from '@/shared/components/TrackingDebug'
 import { getInitials } from '@/lib/utils'
 import { cn } from '@/shared/utils/cn'
 
@@ -369,11 +368,6 @@ export function PublicPage({ user }: PublicPageProps) {
         </div>
       </div>
       
-      {/* Debug de Tracking (apenas em desenvolvimento) */}
-      <TrackingDebug
-        googleAnalytics={integrationSettings.googleAnalytics}
-        facebookPixel={integrationSettings.facebookPixel}
-      />
     </ThemeProvider>
   )
 }
