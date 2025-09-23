@@ -5,11 +5,19 @@ import { Button } from '@/shared/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Label } from '@/shared/components/ui/Label'
 import { Input } from '@/shared/components/ui/Input'
-import { Loader2, Upload, Palette, Type, Layout, Image as ImageIcon, Save, RotateCcw, User } from 'lucide-react'
+import { Loader2, Upload, Palette, Type, Layout, Image as ImageIcon, Save, RotateCcw, User, MousePointer, Settings, Sparkles, Layers, Eye, Link, Share2 } from 'lucide-react'
 import { useTheme } from '@/modules/theme/hooks/useTheme'
 import { ThemePreview } from '@/modules/theme/components/ThemePreview'
 import { toast } from 'react-hot-toast'
 import { PRESET_THEMES, AVAILABLE_FONTS, BUTTON_STYLES, BACKGROUND_TYPES } from '@/shared/utils/constants'
+import { ButtonStylePreview } from '@/modules/theme/components/ButtonStylePreview'
+import { ButtonAnimationEffects } from '@/modules/theme/components/ButtonAnimationEffects'
+import { ButtonColorSettings } from '@/modules/theme/components/ColorPicker'
+import { ImageSettings } from '@/modules/theme/components/ImageSettings'
+import { AvatarSettings } from '@/modules/theme/components/AvatarSettings'
+import { LinkButtonSettings } from '@/modules/theme/components/LinkButtonSettings'
+import { SocialButtonsSettings } from '@/modules/theme/components/SocialButtonsSettings'
+import { CollapsibleSection } from '@/modules/theme/components/CollapsibleSection'
 import { useImageUpload } from '@/modules/profile/hooks/useImageUpload'
 import { AvatarUpload } from '@/modules/profile/components/AvatarUpload'
 import { useSession } from 'next-auth/react'
@@ -169,7 +177,7 @@ export function ThemeEditorContent() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Coluna de Edição */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Foto de Perfil */}
           <Card>
             <CardHeader>
@@ -193,58 +201,48 @@ export function ThemeEditorContent() {
                 </CardContent>
           </Card>
 
-          {/* Temas Predefinidos */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="w-5 h-5" />
-                Temas Predefinidos
-              </CardTitle>
-              <CardDescription>
-                Escolha um tema pronto ou personalize do zero
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3">
-                {Object.entries(PRESET_THEMES).map(([key, preset]) => (
-                  <button
-                    key={key}
-                    onClick={() => handlePresetSelect(key)}
-                    className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
-                      JSON.stringify(localTheme) === JSON.stringify(preset)
-                        ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <div 
-                        className="w-4 h-4 rounded-full border"
-                        style={{ backgroundColor: preset.primaryColor }}
-                      />
-                      <div 
-                        className="w-4 h-4 rounded-full border"
-                        style={{ backgroundColor: preset.secondaryColor }}
-                      />
-                    </div>
-                    <span className="capitalize">{key}</span>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Seção: Temas Predefinidos */}
+          <CollapsibleSection
+            title="Temas Predefinidos"
+            description="Escolha um tema pronto ou personalize do zero"
+            icon={<Palette className="w-5 h-5" />}
+            defaultOpen={true}
+            badge={Object.keys(PRESET_THEMES).length}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              {Object.entries(PRESET_THEMES).map(([key, preset]) => (
+                <button
+                  key={key}
+                  onClick={() => handlePresetSelect(key)}
+                  className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                    JSON.stringify(localTheme) === JSON.stringify(preset)
+                      ? 'border-primary bg-primary/10'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <div 
+                      className="w-4 h-4 rounded-full border"
+                      style={{ backgroundColor: preset.primaryColor }}
+                    />
+                    <div 
+                      className="w-4 h-4 rounded-full border"
+                      style={{ backgroundColor: preset.secondaryColor }}
+                    />
+                  </div>
+                  <span className="capitalize">{key}</span>
+                </button>
+              ))}
+            </div>
+          </CollapsibleSection>
 
-          {/* Cores */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="w-5 h-5" />
-                Cores
-              </CardTitle>
-              <CardDescription>
-                Defina as cores da sua página
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* Seção: Cores */}
+          <CollapsibleSection
+            title="Cores"
+            description="Defina as cores da sua página"
+            icon={<Palette className="w-5 h-5" />}
+            defaultOpen={true}
+          >
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="primaryColor">Cor Primária</Label>
@@ -322,103 +320,143 @@ export function ThemeEditorContent() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+          </CollapsibleSection>
 
-          {/* Tipografia */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Type className="w-5 h-5" />
-                Tipografia
-              </CardTitle>
-              <CardDescription>
-                Escolha a fonte da sua página
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <Label htmlFor="fontFamily">Família da Fonte</Label>
-                  <select
-                    id="fontFamily"
-                    value={localTheme.fontFamily}
-                    onChange={(e) => handleUpdateProperty('fontFamily', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
-                  >
-                  {AVAILABLE_FONTS.map((font) => (
-                    <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
-                      {font.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Estilo dos Botões */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Layout className="w-5 h-5" />
-                Estilo dos Botões
-              </CardTitle>
-              <CardDescription>
-                Como os botões devem aparecer
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {BUTTON_STYLES.map((style) => (
-                  <label
-                    key={style.value}
-                    className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                      localTheme.buttonStyle === style.value
-                        ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="buttonStyle"
-                      value={style.value}
-                      checked={localTheme.buttonStyle === style.value}
-                      onChange={(e) => handleUpdateProperty('buttonStyle', e.target.value)}
-                      className="w-4 h-4 text-primary focus:ring-primary border-gray-300"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium">{style.label}</div>
-                      <div className="text-sm text-gray-500">{style.description}</div>
-                    </div>
-                  </label>
+          {/* Seção: Tipografia */}
+          <CollapsibleSection
+            title="Tipografia"
+            description="Configure a fonte e estilo do texto"
+            icon={<Type className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <div>
+              <Label htmlFor="fontFamily">Família da Fonte</Label>
+                <select
+                  id="fontFamily"
+                  value={localTheme.fontFamily}
+                  onChange={(e) => handleUpdateProperty('fontFamily', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
+                >
+                {AVAILABLE_FONTS.map((font) => (
+                  <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                    {font.label}
+                  </option>
                 ))}
-              </div>
+              </select>
+            </div>
+          </CollapsibleSection>
 
-              <div className="mt-4">
-                <Label htmlFor="borderRadius">Raio da Borda (px)</Label>
-                <Input
-                  id="borderRadius"
-                  type="number"
-                  min="0"
-                  max="50"
-                  value={localTheme.borderRadius}
-                  onChange={(e) => handleUpdateProperty('borderRadius', parseInt(e.target.value))}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          {/* Seção: Estilo dos Botões */}
+          <CollapsibleSection
+            title="Estilo dos Botões"
+            description="Configure o visual dos botões"
+            icon={<Layout className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <ButtonStylePreview
+              selectedStyle={localTheme.buttonStyle || 'rounded'}
+              onStyleSelect={(style) => handleUpdateProperty('buttonStyle', style)}
+              themeSettings={localTheme}
+            />
 
-          {/* Background */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="w-5 h-5" />
-                Background
-              </CardTitle>
-              <CardDescription>
-                Tipo de fundo da página
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <div className="mt-4">
+              <Label htmlFor="borderRadius">Raio da Borda (px)</Label>
+              <Input
+                id="borderRadius"
+                type="number"
+                min="0"
+                max="50"
+                value={localTheme.borderRadius}
+                onChange={(e) => handleUpdateProperty('borderRadius', parseInt(e.target.value))}
+              />
+            </div>
+          </CollapsibleSection>
+
+          {/* Seção: Efeitos de Animação */}
+          <CollapsibleSection
+            title="Efeitos de Animação"
+            description="Configure animações e transições"
+            icon={<Sparkles className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <ButtonAnimationEffects
+              themeSettings={localTheme}
+              onUpdate={handleUpdateProperty}
+            />
+          </CollapsibleSection>
+
+          {/* Seção: Cores dos Botões */}
+          <CollapsibleSection
+            title="Cores dos Botões"
+            description="Personalize as cores dos botões"
+            icon={<Palette className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <ButtonColorSettings
+              themeSettings={localTheme}
+              onUpdate={handleUpdateProperty}
+            />
+          </CollapsibleSection>
+
+          {/* Seção: Configurações da Imagem */}
+          <CollapsibleSection
+            title="Configurações da Imagem"
+            description="Posição e tamanho das imagens"
+            icon={<ImageIcon className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <ImageSettings
+              themeSettings={localTheme}
+              onUpdate={handleUpdateProperty}
+            />
+          </CollapsibleSection>
+
+          {/* Seção: Configurações do Avatar */}
+          <CollapsibleSection
+            title="Configurações do Avatar"
+            description="Tamanho, forma e estilo do avatar"
+            icon={<User className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <AvatarSettings
+              themeSettings={localTheme}
+              onUpdate={handleUpdateProperty}
+            />
+          </CollapsibleSection>
+
+          {/* Seção: Configurações dos Botões de Links */}
+          <CollapsibleSection
+            title="Configurações dos Botões de Links"
+            description="Estilo e comportamento dos botões de links"
+            icon={<Link className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <LinkButtonSettings
+              themeSettings={localTheme}
+              onUpdate={handleUpdateProperty}
+            />
+          </CollapsibleSection>
+
+          {/* Seção: Configurações dos Botões de Redes Sociais */}
+          <CollapsibleSection
+            title="Configurações dos Botões de Redes Sociais"
+            description="Estilo e comportamento dos botões de redes sociais"
+            icon={<Share2 className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <SocialButtonsSettings
+              themeSettings={localTheme}
+              onUpdate={handleUpdateProperty}
+            />
+          </CollapsibleSection>
+
+          {/* Seção: Background */}
+          <CollapsibleSection
+            title="Background"
+            description="Tipo de fundo da página"
+            icon={<Layers className="w-5 h-5" />}
+            defaultOpen={false}
+          >
               <div className="space-y-3">
                 {BACKGROUND_TYPES.map((type) => (
                   <label
@@ -474,30 +512,32 @@ export function ThemeEditorContent() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+          </CollapsibleSection>
         </div>
 
         {/* Coluna de Preview */}
-        <div className="lg:sticky lg:top-4 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Preview ao Vivo</CardTitle>
-              <CardDescription>
-                Veja como sua página ficará com as configurações atuais
-              </CardDescription>
-            </CardHeader>
-                <CardContent>
-                  <ThemePreview 
-                    key={`theme-preview-${currentAvatar || 'no-avatar'}`}
-                    themeSettings={localTheme} 
-                    avatarUrl={currentAvatar} 
-                  />
-                </CardContent>
-          </Card>
+        <div className="lg:sticky lg:top-4 space-y-4">
+          <CollapsibleSection
+            title="Preview"
+            description="Visualize suas alterações em tempo real"
+            icon={<Eye className="w-5 h-5" />}
+            defaultOpen={true}
+          >
+            <ThemePreview 
+              key={`theme-preview-${currentAvatar || 'no-avatar'}`}
+              themeSettings={localTheme} 
+              avatarUrl={currentAvatar} 
+            />
+          </CollapsibleSection>
 
-          {/* Ações */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          {/* Seção: Ações */}
+          <CollapsibleSection
+            title="Ações"
+            description="Salve ou restaure suas configurações"
+            icon={<Settings className="w-5 h-5" />}
+            defaultOpen={true}
+          >
+            <div className="flex flex-col sm:flex-row gap-3">
             <Button
               variant="outline"
               onClick={handleReset}
@@ -519,7 +559,8 @@ export function ThemeEditorContent() {
               )}
               Salvar Alterações
             </Button>
-          </div>
+            </div>
+          </CollapsibleSection>
         </div>
       </div>
     </div>

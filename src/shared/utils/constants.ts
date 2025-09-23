@@ -18,7 +18,54 @@ export const PRESET_THEMES = {
     backgroundType: 'solid' as const,
     fontFamily: 'Inter',
     buttonStyle: 'rounded' as const,
-    borderRadius: 8
+    borderRadius: 8,
+    buttonColors: {
+      background: '#FFFFFF',
+      text: '#1E293B',
+      border: '#E5E7EB',
+      hoverBackground: '#F9FAFB',
+      hoverText: '#1E293B',
+      hoverBorder: '#D1D5DB'
+    },
+    imageSettings: {
+      position: 'left',
+      size: 'medium',
+      borderRadius: 'rounded',
+      spacing: 'normal'
+    },
+    avatarSettings: {
+      size: 'medium',
+      shape: 'circle',
+      borderWidth: 2,
+      borderColor: '#E5E7EB',
+      shadow: 'none',
+      position: 'top'
+    },
+    linkButtonSettings: {
+      style: 'default',
+      size: 'medium',
+      spacing: 'normal',
+      alignment: 'center',
+      showIcons: true,
+      showDescriptions: true,
+      hoverEffect: 'scale',
+      animationSpeed: 300
+    },
+    socialButtonsSettings: {
+      style: 'default',
+      size: 'medium',
+      shape: 'circle',
+      spacing: 'normal',
+      alignment: 'center',
+      showLabels: false,
+      hoverEffect: 'scale',
+      animationSpeed: 300,
+      backgroundColor: '#FFFFFF',
+      iconColor: '#374151',
+      borderColor: '#E5E7EB',
+      hoverBackgroundColor: '#F9FAFB',
+      hoverIconColor: '#1F2937'
+    }
   },
   dark: {
     name: 'Escuro',
@@ -29,7 +76,54 @@ export const PRESET_THEMES = {
     backgroundType: 'solid' as const,
     fontFamily: 'Inter',
     buttonStyle: 'rounded' as const,
-    borderRadius: 8
+    borderRadius: 8,
+    buttonColors: {
+      background: '#1F2937',
+      text: '#F9FAFB',
+      border: '#374151',
+      hoverBackground: '#374151',
+      hoverText: '#F9FAFB',
+      hoverBorder: '#4B5563'
+    },
+    imageSettings: {
+      position: 'left',
+      size: 'medium',
+      borderRadius: 'rounded',
+      spacing: 'normal'
+    },
+    avatarSettings: {
+      size: 'medium',
+      shape: 'circle',
+      borderWidth: 2,
+      borderColor: '#E5E7EB',
+      shadow: 'none',
+      position: 'top'
+    },
+    linkButtonSettings: {
+      style: 'default',
+      size: 'medium',
+      spacing: 'normal',
+      alignment: 'center',
+      showIcons: true,
+      showDescriptions: true,
+      hoverEffect: 'scale',
+      animationSpeed: 300
+    },
+    socialButtonsSettings: {
+      style: 'default',
+      size: 'medium',
+      shape: 'circle',
+      spacing: 'normal',
+      alignment: 'center',
+      showLabels: false,
+      hoverEffect: 'scale',
+      animationSpeed: 300,
+      backgroundColor: '#1F2937',
+      iconColor: '#F9FAFB',
+      borderColor: '#374151',
+      hoverBackgroundColor: '#374151',
+      hoverIconColor: '#F9FAFB'
+    }
   },
   minimal: {
     name: 'Minimalista',
@@ -40,7 +134,15 @@ export const PRESET_THEMES = {
     backgroundType: 'solid' as const,
     fontFamily: 'Helvetica',
     buttonStyle: 'sharp' as const,
-    borderRadius: 0
+    borderRadius: 0,
+    buttonColors: {
+      background: 'transparent',
+      text: '#374151',
+      border: 'transparent',
+      hoverBackground: '#F3F4F6',
+      hoverText: '#374151',
+      hoverBorder: 'transparent'
+    }
   },
   vibrant: {
     name: 'Vibrante',
@@ -51,7 +153,15 @@ export const PRESET_THEMES = {
     backgroundType: 'gradient' as const,
     fontFamily: 'Poppins',
     buttonStyle: 'filled' as const,
-    borderRadius: 12
+    borderRadius: 12,
+    buttonColors: {
+      background: '#FFFFFF',
+      text: '#1F2937',
+      border: '#F3E8FF',
+      hoverBackground: '#F3E8FF',
+      hoverText: '#1F2937',
+      hoverBorder: '#E879F9'
+    }
   },
   ocean: {
     name: 'Oceano',
@@ -62,7 +172,102 @@ export const PRESET_THEMES = {
     backgroundType: 'gradient' as const,
     fontFamily: 'Inter',
     buttonStyle: 'outlined' as const,
-    borderRadius: 16
+    borderRadius: 16,
+    buttonColors: {
+      background: '#0EA5E9',
+      text: '#FFFFFF',
+      border: '#0284C7',
+      hoverBackground: '#0284C7',
+      hoverText: '#FFFFFF',
+      hoverBorder: '#0369A1'
+    }
+  },
+  gradient: {
+    name: 'Gradiente',
+    primaryColor: '#8B5CF6',
+    secondaryColor: '#EC4899',
+    textColor: '#FFFFFF',
+    backgroundColor: '#1F2937',
+    backgroundType: 'gradient' as const,
+    fontFamily: 'Poppins',
+    buttonStyle: 'gradient' as const,
+    borderRadius: 12,
+    buttonColors: {
+      background: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
+      text: '#FFFFFF',
+      border: 'transparent',
+      hoverBackground: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)',
+      hoverText: '#FFFFFF',
+      hoverBorder: 'transparent'
+    }
+  },
+  neon: {
+    name: 'Neon',
+    primaryColor: '#00FFFF',
+    secondaryColor: '#FF00FF',
+    textColor: '#000000',
+    backgroundColor: '#0A0A0A',
+    backgroundType: 'solid' as const,
+    fontFamily: 'Source Code Pro',
+    buttonStyle: 'neon' as const,
+    borderRadius: 8,
+    buttonColors: {
+      background: '#000000',
+      text: '#00FFFF',
+      border: '#00FFFF',
+      hoverBackground: '#00FFFF',
+      hoverText: '#000000',
+      hoverBorder: '#00FFFF'
+    }
+  },
+  glass: {
+    name: 'Vidro',
+    primaryColor: '#3B82F6',
+    secondaryColor: '#8B5CF6',
+    textColor: '#1E293B',
+    backgroundColor: '#F8FAFC',
+    backgroundType: 'gradient' as const,
+    fontFamily: 'Inter',
+    buttonStyle: 'glass' as const,
+    borderRadius: 16,
+    buttonColors: {
+      background: 'rgba(255, 255, 255, 0.1)',
+      text: '#1E293B',
+      border: 'rgba(255, 255, 255, 0.2)',
+      hoverBackground: 'rgba(255, 255, 255, 0.2)',
+      hoverText: '#1E293B',
+      hoverBorder: 'rgba(255, 255, 255, 0.3)'
+    }
+  },
+  modern: {
+    name: 'Moderno',
+    primaryColor: '#000000',
+    secondaryColor: '#6B7280',
+    textColor: '#1F2937',
+    backgroundColor: '#FFFFFF',
+    backgroundType: 'solid' as const,
+    fontFamily: 'Inter',
+    buttonStyle: 'modern' as const,
+    borderRadius: 8,
+    buttonColors: {
+      background: '#FFFFFF',
+      text: '#1F2937',
+      border: '#E5E7EB',
+      hoverBackground: '#F9FAFB',
+      hoverText: '#1F2937',
+      hoverBorder: '#D1D5DB'
+    }
+  },
+  minimal: {
+    name: 'Minimalista',
+    primaryColor: '#374151',
+    secondaryColor: '#9CA3AF',
+    textColor: '#111827',
+    backgroundColor: '#FFFFFF',
+    backgroundType: 'solid' as const,
+    fontFamily: 'Helvetica',
+    buttonStyle: 'minimal' as const,
+    borderRadius: 4
   }
 } as const
 
@@ -84,7 +289,15 @@ export const BUTTON_STYLES = [
   { label: 'Arredondado', value: 'rounded', description: 'Botões com bordas arredondadas' },
   { label: 'Quadrado', value: 'sharp', description: 'Botões com bordas retas' },
   { label: 'Contorno', value: 'outlined', description: 'Botões apenas com borda' },
-  { label: 'Preenchido', value: 'filled', description: 'Botões com fundo preenchido' }
+  { label: 'Preenchido', value: 'filled', description: 'Botões com fundo preenchido' },
+  { label: 'Gradiente', value: 'gradient', description: 'Botões com gradiente de cores' },
+  { label: 'Neon', value: 'neon', description: 'Botões com efeito neon/brilho' },
+  { label: 'Glass', value: 'glass', description: 'Botões com efeito vidro/transparência' },
+  { label: '3D', value: '3d', description: 'Botões com efeito 3D/elevação' },
+  { label: 'Minimal', value: 'minimal', description: 'Botões minimalistas sem bordas' },
+  { label: 'Pill', value: 'pill', description: 'Botões em formato de pílula' },
+  { label: 'Card', value: 'card', description: 'Botões estilo cartão com sombra' },
+  { label: 'Modern', value: 'modern', description: 'Botões modernos com design limpo' }
 ] as const
 
 // Tipos de background

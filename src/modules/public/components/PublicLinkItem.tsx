@@ -74,6 +74,74 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
     }, 100)
   }, [link.url, link.title, form])
 
+  // Cores personalizadas dos botões
+  const buttonColors = themeSettings?.buttonColors || {
+    background: '#FFFFFF',
+    text: '#1E293B',
+    border: '#E5E7EB',
+    hoverBackground: '#F9FAFB',
+    hoverText: '#1E293B',
+    hoverBorder: '#D1D5DB'
+  }
+
+  // Configurações da imagem
+  const imageSettings = themeSettings?.imageSettings || {
+    position: 'left',
+    size: 'medium',
+    borderRadius: 'rounded',
+    spacing: 'normal'
+  }
+
+  // Funções auxiliares para configurações de imagem
+  const getImageSizeClasses = (size: string) => {
+    switch (size) {
+      case 'small':
+        return 'w-6 h-6'
+      case 'medium':
+        return 'w-8 h-8'
+      case 'large':
+        return 'w-12 h-12'
+      default:
+        return 'w-8 h-8'
+    }
+  }
+
+  const getImagePositionClasses = (position: string) => {
+    switch (position) {
+      case 'left':
+        return 'flex-row'
+      case 'right':
+        return 'flex-row-reverse'
+      case 'top':
+        return 'flex-col'
+      case 'bottom':
+        return 'flex-col-reverse'
+      default:
+        return 'flex-row'
+    }
+  }
+
+  const getImageSpacingClasses = (position: string, spacing: string) => {
+    const spacingMap = {
+      tight: { horizontal: 'space-x-2', vertical: 'space-y-1' },
+      normal: { horizontal: 'space-x-3', vertical: 'space-y-2' },
+      loose: { horizontal: 'space-x-4', vertical: 'space-y-3' }
+    }
+    
+    const currentSpacing = spacingMap[spacing as keyof typeof spacingMap] || spacingMap.normal
+    
+    switch (position) {
+      case 'left':
+      case 'right':
+        return currentSpacing.horizontal
+      case 'top':
+      case 'bottom':
+        return currentSpacing.vertical
+      default:
+        return currentSpacing.horizontal
+    }
+  }
+
   const getButtonStyle = () => {
     if (!themeSettings) {
       return cn(
@@ -85,21 +153,101 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
       )
     }
 
-    const base = 'w-full p-4 border-2 border-transparent transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 group'
+    const animationSpeed = themeSettings.animationSpeed || 300
+    const hoverEffect = themeSettings.hoverEffect || 'scale'
+    const enableGlow = themeSettings.enableGlow || false
+    const enablePulse = themeSettings.enablePulse || false
+    
+    const base = `w-full p-4 transition-all duration-300 focus:outline-none group relative overflow-hidden ${
+      hoverEffect === 'scale' ? 'hover:scale-[1.02]' :
+      hoverEffect === 'lift' ? 'hover:shadow-lg hover:-translate-y-1' :
+      hoverEffect === 'slide' ? 'hover:translate-x-2' :
+      hoverEffect === 'rotate' ? 'hover:rotate-1' :
+      hoverEffect === 'glow' ? 'hover:shadow-blue-500/50 hover:shadow-lg' :
+      ''
+    } ${enableGlow ? 'hover:shadow-blue-400/50' : ''} ${enablePulse ? 'animate-pulse' : ''}`
+    
+    // Função para obter a classe de border radius correta
+    const getBorderRadiusClass = (radius: number) => {
+      if (radius === 0) return 'rounded-none'
+      if (radius <= 2) return 'rounded-sm'
+      if (radius <= 4) return 'rounded'
+      if (radius <= 6) return 'rounded-md'
+      if (radius <= 8) return 'rounded-lg'
+      if (radius <= 12) return 'rounded-xl'
+      if (radius <= 16) return 'rounded-2xl'
+      if (radius <= 20) return 'rounded-3xl'
+      return 'rounded-full'
+    }
+    
     const borderRadius = themeSettings.borderRadius || 8
-    const rounded = `rounded-[${borderRadius}px]`
+    const rounded = getBorderRadiusClass(borderRadius)
+    const primaryColor = themeSettings.primaryColor || '#3B82F6'
+    const secondaryColor = themeSettings.secondaryColor || '#64748B'
 
     switch (themeSettings.buttonStyle) {
       case 'rounded':
-        return cn(base, rounded, 'bg-white dark:bg-gray-800 shadow-sm hover:shadow-md')
+        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2')
+      
       case 'sharp':
-        return cn(base, 'rounded-none', 'bg-white dark:bg-gray-800 shadow-sm hover:shadow-md')
+        return cn(base, 'rounded-none border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2')
+      
       case 'outlined':
-        return cn(base, rounded, 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700')
+        return cn(base, rounded, 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-offset-2')
+      
       case 'filled':
-        return cn(base, rounded, 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl')
+        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2')
+      
+      case 'gradient':
+        return cn(
+          base, rounded, 'border-0 text-white font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
+          'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
+        )
+      
+      case 'neon':
+        return cn(
+          base, rounded, 'border-2 border-cyan-400 bg-black text-cyan-400 font-medium shadow-lg hover:shadow-cyan-400/50 focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2',
+          'hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] hover:border-cyan-300'
+        )
+      
+      case 'glass':
+        return cn(
+          base, rounded, 'border border-white/20 bg-white/10 backdrop-blur-md text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
+          'hover:bg-white/20 dark:hover:bg-white/20'
+        )
+      
+      case '3d':
+        return cn(
+          base, rounded, 'border-2 border-transparent bg-gradient-to-b from-white to-gray-200 dark:from-gray-700 dark:to-gray-900 text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
+          'hover:from-gray-50 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-800'
+        )
+      
+      case 'minimal':
+        return cn(
+          base, 'rounded-none border-0 bg-transparent text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2',
+          'hover:shadow-sm'
+        )
+      
+      case 'pill':
+        return cn(
+          base, 'rounded-full border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2',
+          'hover:bg-gray-50 dark:hover:bg-gray-700'
+        )
+      
+      case 'card':
+        return cn(
+          base, rounded, 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg focus:ring-2 focus:ring-offset-2',
+          'hover:border-gray-300 dark:hover:border-gray-600'
+        )
+      
+      case 'modern':
+        return cn(
+          base, rounded, 'border-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
+          'hover:bg-gray-800 dark:hover:bg-gray-100'
+        )
+      
       default:
-        return cn(base, rounded, 'bg-white dark:bg-gray-800 shadow-sm hover:shadow-md')
+        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2')
     }
   }
 
@@ -109,29 +257,41 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
       onClick={handleClick}
       className={getButtonStyle()}
       style={{
-        borderColor: themeSettings?.primaryColor || undefined,
-        focusRingColor: themeSettings?.primaryColor || undefined
+        backgroundColor: buttonColors.background,
+        color: buttonColors.text,
+        borderColor: buttonColors.border,
+        borderRadius: themeSettings?.borderRadius ? `${themeSettings.borderRadius}px` : undefined
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = buttonColors.hoverBackground
+        e.currentTarget.style.color = buttonColors.hoverText
+        e.currentTarget.style.borderColor = buttonColors.hoverBorder
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = buttonColors.background
+        e.currentTarget.style.color = buttonColors.text
+        e.currentTarget.style.borderColor = buttonColors.border
       }}
     >
-      <div className="flex items-center space-x-4">
+      <div className={`flex items-center ${getImagePositionClasses(imageSettings.position)} ${getImageSpacingClasses(imageSettings.position, imageSettings.spacing)}`}>
         {/* Imagem do Link ou Favicon */}
         <div className="flex-shrink-0">
           {link.image ? (
             <img
               src={link.image}
               alt={link.title}
-              className="h-12 w-12 rounded-lg object-cover"
+              className={`${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius} object-cover`}
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.src = getFaviconUrl(link.url)
-                target.className = "h-6 w-6 rounded"
+                target.className = `${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius}`
               }}
             />
           ) : (
             <img
               src={getFaviconUrl(link.url)}
               alt=""
-              className="h-6 w-6 rounded"
+              className={`${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius}`}
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.src = '/default-favicon.png'

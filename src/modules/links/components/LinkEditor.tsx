@@ -14,6 +14,7 @@ import { linkSchema } from '@/shared/utils/validation'
 import { Link, CreateLinkData, UpdateLinkData } from '@/types/link.types'
 import { formatUrlForDisplay, getFaviconUrl, isValidUrl } from '@/lib/utils'
 import { useForms } from '@/modules/forms/hooks/useForms'
+import { LinkImageUpload } from './LinkImageUpload'
 
 const linkFormSchema = linkSchema
 
@@ -52,7 +53,8 @@ export function LinkEditor({ isOpen, onClose, onSubmit, link, isLoading = false 
     formState: { errors },
     reset,
     watch,
-    setValue
+    setValue,
+    trigger
   } = useForm<LinkFormData>({
     resolver: zodResolver(linkFormSchema),
     defaultValues: {
@@ -231,20 +233,21 @@ export function LinkEditor({ isOpen, onClose, onSubmit, link, isLoading = false 
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="image">URL da Imagem (opcional)</Label>
-            <Input
-              id="image"
-              type="url"
-              placeholder="https://exemplo.com/imagem.jpg"
-              {...register('image')}
+            <LinkImageUpload
+              currentImage={watch('image') || undefined}
+              onImageChange={(imageUrl) => {
+                setValue('image', imageUrl || '')
+                trigger('image')
+              }}
+              onImageRemove={() => {
+                setValue('image', '')
+                trigger('image')
+              }}
               disabled={isLoading}
             />
             {errors.image && (
               <p className="text-sm text-red-500">{errors.image.message}</p>
             )}
-            <div className="text-xs text-gray-500">
-              <p>💡 Imagem quadrada (400x400px) - JPG, PNG, WebP</p>
-            </div>
           </div>
 
           <div className="space-y-1">

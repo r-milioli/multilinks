@@ -15,6 +15,7 @@ import { Label } from '@/shared/components/ui/Label'
 import { Switch } from '@/shared/components/ui/Switch'
 import { WebhookEventsInfo } from '@/shared/components/ui/WebhookEventsInfo'
 import { ThemeEditorContent } from './ThemeEditorContent'
+import { SocialLinksEditor } from '@/modules/profile/components/SocialLinksEditor'
 import { toast } from 'react-hot-toast'
 // import { Textarea } from '@/shared/components/ui/Textarea' // Componente não existe
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/Select' // Componente não existe
@@ -381,6 +382,11 @@ export function SettingsContent() {
       </div>
       
       <Button onClick={handleSaveProfile}>Salvar Perfil</Button>
+      
+      {/* Links Sociais */}
+      <div className="mt-8">
+        <SocialLinksEditor />
+      </div>
     </div>
   )
 

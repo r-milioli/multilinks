@@ -150,23 +150,6 @@ export function PublicPage({ user }: PublicPageProps) {
     return { backgroundColor: themeSettings.backgroundColor || '#FFFFFF' }
   }
 
-  const getButtonStyle = (style: string, borderRadius: number) => {
-    const base = 'w-full p-4 rounded-lg border-2 border-transparent transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 group'
-    const rounded = `rounded-[${borderRadius || 8}px]`
-
-    switch (style) {
-      case 'rounded':
-        return `${base} ${rounded} bg-white dark:bg-gray-800 shadow-sm hover:shadow-md`
-      case 'sharp':
-        return `${base} rounded-none bg-white dark:bg-gray-800 shadow-sm hover:shadow-md`
-      case 'outlined':
-        return `${base} ${rounded} border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700`
-      case 'filled':
-        return `${base} ${rounded} bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl`
-      default:
-        return `${base} ${rounded} bg-white dark:bg-gray-800 shadow-sm hover:shadow-md`
-    }
-  }
 
   return (
     <ThemeProvider themeSettings={themeSettings}>
@@ -236,7 +219,7 @@ export function PublicPage({ user }: PublicPageProps) {
           {/* Social Links */}
           {user.socialLinks && user.socialLinks.length > 0 && privacySettings.showSocialLinks !== false && (
             <div className="mb-8">
-              <SocialLinks socialLinks={user.socialLinks} />
+              <SocialLinks socialLinks={user.socialLinks} themeSettings={themeSettings} />
             </div>
           )}
 

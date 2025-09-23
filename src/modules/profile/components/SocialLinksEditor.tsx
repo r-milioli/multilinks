@@ -90,14 +90,14 @@ export function SocialLinksEditor() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <CardTitle>Links Sociais</CardTitle>
             <CardDescription>
               Adicione seus perfis em redes sociais
             </CardDescription>
           </div>
-          <Button onClick={handleAddLink} size="sm">
+          <Button onClick={handleAddLink} size="sm" className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
@@ -165,7 +165,7 @@ export function SocialLinksEditor() {
             <p className="text-gray-500 dark:text-gray-400 mb-4">
               Adicione seus perfis em redes sociais para que as pessoas possam te encontrar
             </p>
-            <Button onClick={handleAddLink}>
+            <Button onClick={handleAddLink} className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Adicionar primeiro link
             </Button>
