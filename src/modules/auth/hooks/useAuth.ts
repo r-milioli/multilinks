@@ -1,4 +1,4 @@
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
@@ -7,8 +7,16 @@ export function useAuth() {
   const router = useRouter()
 
   const isLoading = status === 'loading'
-  const isAuthenticated = !!session?.user
+  const isAuthenticated = !!session?.user && !!session?.user?.id
   const user = session?.user
+
+  // Verificar se a sessão é válida
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user && !session.user.id) {
+      console.error('❌ Sessão inválida detectada, fazendo logout')
+      signOut({ callbackUrl: '/login' })
+    }
+  }, [status, session])
 
   const requireAuth = () => {
     if (!isLoading && !isAuthenticated) {
@@ -22,12 +30,26 @@ export function useAuth() {
     }
   }
 
+  const forceLogout = async () => {
+    try {
+      // Limpar sessão no servidor
+      await fetch('/api/auth/clear-session', { method: 'POST' })
+      // Fazer logout
+      await signOut({ callbackUrl: '/login' })
+    } catch (error) {
+      console.error('Erro ao fazer logout forçado:', error)
+      // Fallback: logout normal
+      await signOut({ callbackUrl: '/login' })
+    }
+  }
+
   return {
     user,
     isLoading,
     isAuthenticated,
     requireAuth,
-    requireGuest
+    requireGuest,
+    forceLogout
   }
 }
 

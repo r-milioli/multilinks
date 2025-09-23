@@ -519,7 +519,7 @@ export default function HomePage() {
 
           <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400">
-              © 2024 MultiLink. Todos os direitos reservados.
+              © {new Date().getFullYear()} MultiLink. Todos os direitos reservados.
             </p>
             <p className="text-gray-400 mt-4 md:mt-0">
               Feito com <Heart className="inline h-4 w-4 text-red-500" /> no Brasil

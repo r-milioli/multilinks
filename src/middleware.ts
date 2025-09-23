@@ -30,7 +30,9 @@ export default withAuth(
           '/api/auth',
           '/api/upload',
           '/api/analytics/click',
-          '/api/analytics/visit'
+          '/api/analytics/visit',
+          '/api/forms/public',
+          '/api/leads'
         ]
 
         // Verificar se é rota pública
@@ -46,7 +48,12 @@ export default withAuth(
           return true
         }
 
-        // Para rotas protegidas, verificar token
+        // Para rotas de API protegidas, sempre permitir (a autenticação será feita na própria rota)
+        if (pathname.startsWith('/api/')) {
+          return true
+        }
+
+        // Para outras rotas protegidas, verificar token
         return !!token
       },
     },

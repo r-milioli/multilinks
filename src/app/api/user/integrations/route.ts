@@ -70,22 +70,15 @@ export async function POST(request: NextRequest) {
       const pixelValue = integrationSettings.facebookPixel.trim()
       if (!pixelValue.match(/^\d{15,16}$/)) {
         return NextResponse.json(
-          { success: false, error: 'Formato do Facebook Pixel inválido. Use 15-16 dígitos numéricos' },
+          { success: false, error: 'Formato do Facebook Pixel inválido. Use apenas números (15-16 dígitos)' },
           { status: 400 }
         )
       }
     }
 
     if (integrationSettings.webhookUrl && integrationSettings.webhookUrl.trim() !== '') {
-      const webhookValue = integrationSettings.webhookUrl.trim()
       try {
-        new URL(webhookValue)
-        if (!webhookValue.startsWith('http://') && !webhookValue.startsWith('https://')) {
-          return NextResponse.json(
-            { success: false, error: 'URL do webhook deve começar com http:// ou https://' },
-            { status: 400 }
-          )
-        }
+        new URL(integrationSettings.webhookUrl)
       } catch {
         return NextResponse.json(
           { success: false, error: 'URL do webhook inválida' },

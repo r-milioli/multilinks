@@ -126,7 +126,23 @@ export function LinkEditor({ isOpen, onClose, onSubmit, link, isLoading = false 
 
   const handleFormSubmit = async (data: LinkFormData) => {
     try {
-      await onSubmit(data)
+      console.log('📝 LinkEditor - Dados do formulário:', data)
+      
+      // Converter LinkFormData para CreateLinkData/UpdateLinkData
+      const submitData: CreateLinkData | UpdateLinkData = {
+        title: data.title,
+        url: data.url,
+        description: data.description || undefined,
+        image: data.image || undefined,
+        type: data.type,
+        active: data.active,
+        useForm: data.useForm,
+        formId: data.formId || undefined
+      }
+      
+      console.log('📤 LinkEditor - Dados convertidos para envio:', submitData)
+      
+      await onSubmit(submitData)
       onClose()
       reset()
     } catch (error) {

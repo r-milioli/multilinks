@@ -70,11 +70,36 @@ class ApiClient {
   }
 
   async upload<T>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: formData,
-      headers: {}, // Remove Content-Type para permitir que o browser defina
-    })
+    const url = `${this.baseURL}${endpoint}`
+    
+    try {
+      console.log('🔄 Fazendo upload para:', url)
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+        // Não definir Content-Type para permitir que o browser defina com boundary
+      })
+
+      console.log('📡 Resposta recebida:', response.status, response.statusText)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Erro na resposta:', errorText)
+        throw new Error(`Erro ${response.status}: ${errorText}`)
+      }
+
+      const data = await response.json()
+      console.log('✅ Upload bem-sucedido:', data)
+      
+      return data
+    } catch (error) {
+      console.error('💥 Erro no upload:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro no upload'
+      }
+    }
   }
 }
 

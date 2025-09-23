@@ -8,7 +8,7 @@ import { compare } from 'bcryptjs'
 import { emailSchema, passwordSchema } from '@/shared/utils/validation'
 
 export const authOptions: NextAuthOptions = {
-  // adapter: PrismaAdapter(prisma), // Temporariamente desabilitado para testar
+  adapter: PrismaAdapter(prisma), // Habilitado para melhor sincronização
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -107,11 +107,35 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string
-        session.user.username = token.username as string
-        session.user.avatar = token.avatar as string
-        session.user.name = token.name as string
-        session.user.email = token.email as string
+        // Verificar se o usuário ainda existe no banco
+        try {
+          const userExists = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { id: true, email: true }
+          })
+          
+          if (!userExists) {
+            console.error('Usuário não encontrado no banco, limpando sessão:', token.id)
+            // Retornar sessão vazia para forçar logout
+            return {
+              user: { id: '', email: '', name: '', image: '' },
+              expires: new Date().toISOString()
+            }
+          }
+          
+          session.user.id = token.id as string
+          session.user.username = token.username as string
+          session.user.avatar = token.avatar as string
+          session.user.name = token.name as string
+          session.user.email = token.email as string
+        } catch (error) {
+          console.error('Erro ao verificar usuário na sessão:', error)
+          // Em caso de erro, retornar sessão vazia
+          return {
+            user: { id: '', email: '', name: '', image: '' },
+            expires: new Date().toISOString()
+          }
+        }
       }
       return session
     },

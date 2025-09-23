@@ -47,6 +47,14 @@ export async function PUT(request: NextRequest) {
         { status: 401 }
       )
     }
+    
+    // Verificar se o ID do usuário é válido
+    if (typeof session.user.id !== 'string' || session.user.id.trim() === '') {
+      return NextResponse.json(
+        { success: false, error: 'ID do usuário inválido' },
+        { status: 400 }
+      )
+    }
 
     const body: UpdateProfileData = await request.json()
     const result = await ProfileService.updateProfile(session.user.id, body)

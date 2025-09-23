@@ -12,34 +12,27 @@ export function useLogin() {
     setIsLoading(true)
     
     try {
-      console.log('🔐 Iniciando login para:', credentials.email)
-      
       const result = await signIn('credentials', {
         email: credentials.email,
         password: credentials.password,
         redirect: false
       })
 
-      console.log('📋 Resultado do login:', result)
-
       if (result?.error) {
-        console.log('❌ Erro no login:', result.error)
         toast.error('Credenciais inválidas')
         return { success: false, error: result.error }
       }
 
       if (result?.ok) {
-        console.log('✅ Login bem-sucedido, redirecionando...')
         toast.success('Login realizado com sucesso!')
         router.push('/dashboard')
         return { success: true }
       } else {
-        console.log('❌ Login falhou sem erro específico')
         toast.error('Erro ao fazer login')
         return { success: false, error: 'Erro desconhecido' }
       }
     } catch (error) {
-      console.error('💥 Erro no login:', error)
+      console.error('Erro no login:', error)
       toast.error('Erro ao fazer login')
       return { success: false, error: 'Erro interno' }
     } finally {

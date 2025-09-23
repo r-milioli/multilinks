@@ -6,11 +6,19 @@ import { LIMITS } from '@/shared/utils/constants'
 export class LinkService {
   static async createLink(userId: string, data: CreateLinkData) {
     try {
+      console.log('🔗 LinkService.createLink - Dados recebidos:', data)
+      
       // Validar dados
       const validation = linkSchema.safeParse(data)
       if (!validation.success) {
-        return { success: false, error: 'Dados inválidos' }
+        console.error('❌ Validação falhou:', validation.error.issues)
+        return { 
+          success: false, 
+          error: `Dados inválidos: ${validation.error.issues.map(i => i.message).join(', ')}` 
+        }
       }
+      
+      console.log('✅ Validação passou')
 
       // Verificar limite de links
       const linkCount = await prisma.link.count({
@@ -39,14 +47,14 @@ export class LinkService {
         data: {
           title: data.title,
           url: data.url,
-          description: data.description,
-          image: data.image,
+          description: data.description && data.description.trim() !== '' ? data.description : null,
+          image: data.image && data.image.trim() !== '' ? data.image : null,
           type: data.type || 'NORMAL',
           position,
           userId,
           active: data.active ?? true,
           useForm: data.useForm ?? false,
-          formId: data.formId || null
+          formId: data.formId && data.formId.trim() !== '' ? data.formId : null
         }
       })
 

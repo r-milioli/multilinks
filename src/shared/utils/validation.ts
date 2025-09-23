@@ -43,8 +43,8 @@ export const titleSchema = z
 export const linkSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório').max(100, 'Título deve ter no máximo 100 caracteres'),
   url: urlSchema,
-  description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
-  image: z.string().optional().refine((val) => {
+  description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional().or(z.literal('')),
+  image: z.string().optional().or(z.literal('')).refine((val) => {
     if (!val || val === '') return true
     try {
       new URL(val)
@@ -57,7 +57,7 @@ export const linkSchema = z.object({
   position: z.number().int().min(0).optional(),
   active: z.boolean().optional(),
   useForm: z.boolean().optional(),
-  formId: z.string().optional()
+  formId: z.string().optional().or(z.literal(''))
 })
 
 // Validação de social link

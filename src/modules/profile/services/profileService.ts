@@ -6,6 +6,16 @@ import { SOCIAL_PLATFORMS } from '@/shared/utils/constants'
 export class ProfileService {
   static async updateProfile(userId: string, data: UpdateProfileData) {
     try {
+      // Verificar se o usuário existe
+      const existingUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true }
+      })
+      
+      if (!existingUser) {
+        return { success: false, error: 'Usuário não encontrado' }
+      }
+      
       // Validar dados se fornecidos
       if (data.name) {
         const nameValidation = nameSchema.safeParse(data.name)
@@ -64,6 +74,17 @@ export class ProfileService {
       return { success: true, data: user }
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error)
+      
+      // Tratar erros específicos do Prisma
+      if (error && typeof error === 'object' && 'code' in error) {
+        if (error.code === 'P2025') {
+          return { success: false, error: 'Usuário não encontrado no banco de dados' }
+        }
+        if (error.code === 'P2002') {
+          return { success: false, error: 'Username já está em uso' }
+        }
+      }
+      
       return { success: false, error: 'Erro interno do servidor' }
     }
   }

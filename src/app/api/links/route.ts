@@ -49,7 +49,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CreateLinkData = await request.json()
+    console.log('🌐 API /links POST - Dados recebidos:', body)
+    console.log('🌐 API /links POST - User ID:', session.user.id)
+    
     const result = await LinkService.createLink(session.user.id, body)
+    console.log('🌐 API /links POST - Resultado:', result)
     
     if (!result.success) {
       return NextResponse.json(
