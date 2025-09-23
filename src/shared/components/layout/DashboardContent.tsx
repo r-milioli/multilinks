@@ -246,47 +246,63 @@ export function DashboardContent() {
         <p className="text-gray-600">Análise detalhada do desempenho dos seus links</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12.5%</div>
-            <p className="text-xs text-muted-foreground">+2.3% este mês</p>
-          </CardContent>
-        </Card>
+      {links.length === 0 ? (
+        <div className="text-center py-12">
+          <BarChart3 className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+          <h3 className="text-xl font-medium text-gray-900 mb-2">Nenhum dado de analytics</h3>
+          <p className="text-gray-500 mb-6">Crie links para começar a ver analytics</p>
+          <Button onClick={() => setIsEditorOpen(true)} size="lg">
+            <Plus className="h-5 w-5 mr-2" />
+            Criar Primeiro Link
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Total de Cliques</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{links.reduce((sum, link) => sum + link.clickCount, 0)}</div>
+              <p className="text-xs text-muted-foreground">Todos os links</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">CTR Médio</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8.7%</div>
-            <p className="text-xs text-muted-foreground">+1.2% este mês</p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Links Ativos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{links.filter(link => link.active).length}</div>
+              <p className="text-xs text-muted-foreground">de {links.length} total</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Tempo Médio</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2.3s</div>
-            <p className="text-xs text-muted-foreground">-0.4s este mês</p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Link Mais Popular</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {links.length > 0 ? Math.max(...links.map(link => link.clickCount)) : 0}
+              </div>
+              <p className="text-xs text-muted-foreground">cliques no top link</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Bounce Rate</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">34.2%</div>
-            <p className="text-xs text-muted-foreground">-5.1% este mês</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Taxa de Ativação</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {links.length > 0 ? Math.round((links.filter(link => link.active).length / links.length) * 100) : 0}%
+              </div>
+              <p className="text-xs text-muted-foreground">links ativos</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
@@ -294,19 +310,35 @@ export function DashboardContent() {
             <CardTitle>Top Links por Cliques</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {links.slice(0, 5).map((link, index) => (
-                <div key={link.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-primary">{index + 1}</span>
+            {links.length > 0 ? (
+              <div className="space-y-4">
+                {links
+                  .sort((a, b) => b.clickCount - a.clickCount)
+                  .slice(0, 5)
+                  .map((link, index) => (
+                    <div key={link.id} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-medium text-primary">{index + 1}</span>
+                        </div>
+                        <div>
+                          <span className="font-medium">{link.title}</span>
+                          <p className="text-sm text-gray-500">{link.url}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-bold text-lg">{link.clickCount}</span>
+                        <p className="text-xs text-gray-500">cliques</p>
+                      </div>
                     </div>
-                    <span className="font-medium">{link.title}</span>
-                  </div>
-                  <span className="text-sm text-gray-500">{link.clickCount} cliques</span>
-                </div>
-              ))}
-            </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <BarChart3 className="mx-auto h-8 w-8 mb-2" />
+                <p className="text-sm">Nenhum link para mostrar</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -332,46 +364,60 @@ export function DashboardContent() {
         <p className="text-gray-600">Métricas de performance e otimização</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Crescimento
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600">+24%</div>
-            <p className="text-sm text-gray-600">Crescimento mensal</p>
-          </CardContent>
-        </Card>
+      {links.length === 0 ? (
+        <div className="text-center py-12">
+          <TrendingUp className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+          <h3 className="text-xl font-medium text-gray-900 mb-2">Nenhuma métrica de performance</h3>
+          <p className="text-gray-500 mb-6">Crie links para começar a ver métricas de performance</p>
+          <Button onClick={() => setIsEditorOpen(true)} size="lg">
+            <Plus className="h-5 w-5 mr-2" />
+            Criar Primeiro Link
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Total de Cliques
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{links.reduce((sum, link) => sum + link.clickCount, 0)}</div>
+              <p className="text-sm text-gray-600">Todos os links</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Velocidade
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-600">98ms</div>
-            <p className="text-sm text-gray-600">Tempo de resposta</p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Links Ativos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">{links.filter(link => link.active).length}</div>
+              <p className="text-sm text-gray-600">de {links.length} total</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Uptime
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-600">99.9%</div>
-            <p className="text-sm text-gray-600">Disponibilidade</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Taxa de Ativação
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">
+                {links.length > 0 ? Math.round((links.filter(link => link.active).length / links.length) * 100) : 0}%
+              </div>
+              <p className="text-sm text-gray-600">Links ativos</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
@@ -379,20 +425,29 @@ export function DashboardContent() {
             <CardTitle>Métricas de Performance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span>Velocidade de carregamento</span>
-                <span className="font-medium">2.1s</span>
+            {links.length > 0 ? (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span>Total de cliques</span>
+                  <span className="font-medium">{links.reduce((sum, link) => sum + link.clickCount, 0)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Links ativos</span>
+                  <span className="font-medium text-green-600">{links.filter(link => link.active).length}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Taxa de ativação</span>
+                  <span className="font-medium">
+                    {links.length > 0 ? Math.round((links.filter(link => link.active).length / links.length) * 100) : 0}%
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span>Taxa de erro</span>
-                <span className="font-medium text-green-600">0.02%</span>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <BarChart3 className="mx-auto h-8 w-8 mb-2" />
+                <p className="text-sm">Nenhuma métrica disponível</p>
               </div>
-              <div className="flex justify-between items-center">
-                <span>Cache hit rate</span>
-                <span className="font-medium">94%</span>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -401,14 +456,30 @@ export function DashboardContent() {
             <CardTitle>Otimizações Sugeridas</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="p-3 bg-yellow-50 rounded-lg">
-                <p className="text-sm text-yellow-800">Considere otimizar imagens para melhorar a velocidade</p>
+            {links.length > 0 ? (
+              <div className="space-y-3">
+                {links.filter(link => !link.active).length > 0 && (
+                  <div className="p-3 bg-yellow-50 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      Você tem {links.filter(link => !link.active).length} link(s) inativo(s). Considere ativá-los.
+                    </p>
+                  </div>
+                )}
+                <div className="p-3 bg-green-50 rounded-lg">
+                  <p className="text-sm text-green-800">
+                    {links.filter(link => link.active).length > 0 
+                      ? `Você tem ${links.filter(link => link.active).length} link(s) ativo(s)!`
+                      : 'Crie seu primeiro link para começar!'
+                    }
+                  </p>
+                </div>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-800">Seus links estão performando bem!</p>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Settings className="mx-auto h-8 w-8 mb-2" />
+                <p className="text-sm">Nenhuma sugestão disponível</p>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -432,29 +503,31 @@ export function DashboardContent() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium">Novo link criado</p>
-                  <p className="text-xs text-gray-500">GitHub - há 2 horas</p>
-                </div>
+            {links.length > 0 ? (
+              <div className="space-y-4">
+                {links.slice(0, 3).map((link, index) => (
+                  <div key={link.id} className="flex items-start gap-4">
+                    <div className={`w-2 h-2 rounded-full mt-2 ${
+                      index === 0 ? 'bg-blue-500' : 
+                      index === 1 ? 'bg-green-500' : 'bg-purple-500'
+                    }`}></div>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {index === 0 ? 'Link criado' : 
+                         index === 1 ? (link.active ? 'Link ativo' : 'Link inativo') : 
+                         `${link.clickCount} cliques registrados`}
+                      </p>
+                      <p className="text-xs text-gray-500">{link.title}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium">Link ativado</p>
-                  <p className="text-xs text-gray-500">LinkedIn - há 5 horas</p>
-                </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Activity className="mx-auto h-8 w-8 mb-2" />
+                <p className="text-sm">Nenhuma atividade recente</p>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium">10 cliques registrados</p>
-                  <p className="text-xs text-gray-500">Meu Produto Digital - há 1 dia</p>
-                </div>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -475,20 +548,27 @@ export function DashboardContent() {
               <CardTitle>Estatísticas de Hoje</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span>Cliques hoje</span>
-                  <span className="font-medium">23</span>
+              {links.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span>Total de cliques</span>
+                    <span className="font-medium">{links.reduce((sum, link) => sum + link.clickCount, 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Links ativos</span>
+                    <span className="font-medium">{links.filter(link => link.active).length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Links inativos</span>
+                    <span className="font-medium">{links.filter(link => !link.active).length}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Links visitados</span>
-                  <span className="font-medium">15</span>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <BarChart3 className="mx-auto h-8 w-8 mb-2" />
+                  <p className="text-sm">Nenhuma estatística disponível</p>
                 </div>
-                <div className="flex justify-between">
-                  <span>Novos usuários</span>
-                  <span className="font-medium">8</span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>

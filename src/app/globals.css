@@ -58,6 +58,38 @@
   }
 }
 
+/* Form elements styling */
+select,
+input[type="radio"],
+input[type="checkbox"] {
+  @apply cursor-pointer;
+}
+
+/* Ensure select dropdowns are visible */
+select {
+  @apply appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+}
+
+/* Style for select dropdown arrow */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Radio button styling */
+input[type="radio"] {
+  @apply appearance-none w-4 h-4 border-2 border-gray-300 rounded-full bg-white checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+
+input[type="radio"]:checked {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

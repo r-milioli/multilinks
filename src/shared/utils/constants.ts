@@ -68,30 +68,30 @@ export const PRESET_THEMES = {
 
 // Fontes disponíveis
 export const AVAILABLE_FONTS = [
-  { name: 'Inter', value: 'Inter', category: 'Sans-serif' },
-  { name: 'Roboto', value: 'Roboto', category: 'Sans-serif' },
-  { name: 'Poppins', value: 'Poppins', category: 'Sans-serif' },
-  { name: 'Open Sans', value: 'Open Sans', category: 'Sans-serif' },
-  { name: 'Lato', value: 'Lato', category: 'Sans-serif' },
-  { name: 'Playfair Display', value: 'Playfair Display', category: 'Serif' },
-  { name: 'Merriweather', value: 'Merriweather', category: 'Serif' },
-  { name: 'Source Code Pro', value: 'Source Code Pro', category: 'Monospace' },
-  { name: 'Fira Code', value: 'Fira Code', category: 'Monospace' }
+  { label: 'Inter', value: 'Inter', category: 'Sans-serif' },
+  { label: 'Roboto', value: 'Roboto', category: 'Sans-serif' },
+  { label: 'Poppins', value: 'Poppins', category: 'Sans-serif' },
+  { label: 'Open Sans', value: 'Open Sans', category: 'Sans-serif' },
+  { label: 'Lato', value: 'Lato', category: 'Sans-serif' },
+  { label: 'Playfair Display', value: 'Playfair Display', category: 'Serif' },
+  { label: 'Merriweather', value: 'Merriweather', category: 'Serif' },
+  { label: 'Source Code Pro', value: 'Source Code Pro', category: 'Monospace' },
+  { label: 'Fira Code', value: 'Fira Code', category: 'Monospace' }
 ] as const
 
 // Estilos de botão
 export const BUTTON_STYLES = [
-  { name: 'Arredondado', value: 'rounded' },
-  { name: 'Quadrado', value: 'sharp' },
-  { name: 'Contorno', value: 'outlined' },
-  { name: 'Preenchido', value: 'filled' }
+  { label: 'Arredondado', value: 'rounded', description: 'Botões com bordas arredondadas' },
+  { label: 'Quadrado', value: 'sharp', description: 'Botões com bordas retas' },
+  { label: 'Contorno', value: 'outlined', description: 'Botões apenas com borda' },
+  { label: 'Preenchido', value: 'filled', description: 'Botões com fundo preenchido' }
 ] as const
 
 // Tipos de background
 export const BACKGROUND_TYPES = [
-  { name: 'Cor Sólida', value: 'solid' },
-  { name: 'Gradiente', value: 'gradient' },
-  { name: 'Imagem', value: 'image' }
+  { label: 'Cor Sólida', value: 'solid', description: 'Fundo com cor única' },
+  { label: 'Gradiente', value: 'gradient', description: 'Fundo com transição de cores' },
+  { label: 'Imagem', value: 'image', description: 'Fundo com imagem personalizada' }
 ] as const
 
 // Plataformas sociais

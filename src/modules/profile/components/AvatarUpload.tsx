@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Camera, Upload, X } from 'lucide-react'
+import { Camera, Upload } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { Modal, ModalContent, ModalHeader, ModalTitle } from '@/shared/components/ui/Modal'
 import { cn } from '@/shared/utils/cn'
@@ -58,30 +58,48 @@ export function AvatarUpload({ onUpload, isUploading = false, currentAvatar }: A
 
   return (
     <>
-      <div className="flex space-x-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-        >
-          <Camera className="h-4 w-4 mr-2" />
-          {currentAvatar ? 'Alterar' : 'Adicionar'}
-        </Button>
+      <div className="space-y-4">
+        {/* Preview da imagem atual */}
+        {currentAvatar ? (
+          <div className="flex flex-col items-center space-y-2">
+            <div className="relative">
+              <img
+                src={currentAvatar}
+                alt="Avatar atual"
+                className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 shadow-md"
+              />
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs">✓</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 text-center">
+              Foto atual
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center space-y-2">
+            <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
+              <Camera className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-sm text-gray-500 text-center">
+              Nenhuma foto selecionada
+            </p>
+          </div>
+        )}
         
-        {currentAvatar && (
+        <div className="flex space-x-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => onUpload(new File([], ''), null)}
+            onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
           >
-            <X className="h-4 w-4 mr-2" />
-            Remover
+            <Camera className="h-4 w-4 mr-2" />
+            {currentAvatar ? 'Alterar' : 'Adicionar'}
           </Button>
-        )}
+          
+        </div>
       </div>
 
       <input
@@ -101,13 +119,25 @@ export function AvatarUpload({ onUpload, isUploading = false, currentAvatar }: A
           <div className="space-y-4">
             {preview && (
               <div className="relative">
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="w-full h-64 object-cover rounded-lg"
-                />
-                {/* Aqui você pode adicionar um componente de crop mais sofisticado */}
-                <div className="absolute inset-0 border-2 border-primary border-dashed rounded-lg pointer-events-none" />
+                <div className="flex justify-center">
+                  <img
+                    src={preview}
+                    alt="Preview da nova imagem"
+                    className="w-48 h-48 object-cover rounded-lg border-2 border-gray-200"
+                  />
+                </div>
+                <div className="mt-2 text-center">
+                  <p className="text-sm text-gray-600">
+                    Preview da nova foto de perfil
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    A imagem será redimensionada automaticamente para 400x400px
+                  </p>
+                </div>
+                {/* Overlay indicando área de crop */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-32 h-32 border-2 border-primary border-dashed rounded-full" />
+                </div>
               </div>
             )}
 

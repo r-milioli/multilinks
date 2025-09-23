@@ -7,21 +7,18 @@ export function useForms(shouldLoadImmediately = true) {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchForms = useCallback(async () => {
-    console.log('useForms: fetchForms chamado');
     try {
       setLoading(true);
       setError(null);
       const response = await fetch('/api/forms');
-      console.log('useForms: Response status:', response.status);
       if (!response.ok) {
         throw new Error('Erro ao buscar formulários');
       }
       const data = await response.json();
-      console.log('useForms: Data recebida:', data);
       setForms(data);
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error('Erro desconhecido');
-      console.error('useForms: Erro ao buscar formulários:', errorObj);
+      console.error('Erro ao buscar formulários:', errorObj);
       setError(errorObj);
     } finally {
       setLoading(false);
@@ -99,12 +96,10 @@ export function useForms(shouldLoadImmediately = true) {
   }, [forms]);
 
   useEffect(() => {
-    console.log('useForms: useEffect executado, shouldLoadImmediately:', shouldLoadImmediately);
-    if (shouldLoadImmediately && forms.length === 0 && !loading) {
-      console.log('useForms: Chamando fetchForms');
+    if (shouldLoadImmediately) {
       fetchForms();
     }
-  }, [shouldLoadImmediately, forms.length, loading, fetchForms]);
+  }, [shouldLoadImmediately]);
 
   return {
     forms,

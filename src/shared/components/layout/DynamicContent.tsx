@@ -8,14 +8,10 @@ import { AnalyticsContent } from './AnalyticsContent'
 import { SettingsContent } from './SettingsContent'
 
 export function DynamicContent() {
-  console.log('🚀 DynamicContent: Componente sendo renderizado')
-  
   let currentSection
   try {
     const navigation = useNavigation()
     currentSection = navigation.currentSection
-    console.log('🎯 DynamicContent: Renderizando seção', currentSection)
-    console.log('🎯 DynamicContent: Tipo da seção', typeof currentSection)
   } catch (error) {
     console.error('❌ DynamicContent: Erro ao usar useNavigation', error)
     return <div>Erro: useNavigation não encontrado</div>
@@ -48,7 +44,6 @@ export function DynamicContent() {
       return <SettingsContent />
     
     default:
-      console.log('⚠️ DynamicContent: Seção desconhecida, usando dashboard')
       return <DashboardContent />
   }
 }

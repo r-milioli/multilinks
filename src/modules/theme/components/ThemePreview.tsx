@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 interface ThemePreviewProps {
   themeSettings: ThemeSettings
   className?: string
+  avatarUrl?: string
 }
 
-export function ThemePreview({ themeSettings, className = '' }: ThemePreviewProps) {
+export function ThemePreview({ themeSettings, className = '', avatarUrl }: ThemePreviewProps) {
   const getBackgroundStyle = () => {
     switch (themeSettings.backgroundType) {
       case 'gradient':
@@ -58,13 +59,33 @@ export function ThemePreview({ themeSettings, className = '' }: ThemePreviewProp
       >
         <div className="text-center space-y-4">
           {/* Avatar placeholder */}
-          <div 
-            className="w-16 h-16 rounded-full mx-auto border-2"
-            style={{ 
-              backgroundColor: themeSettings.primaryColor,
-              borderColor: themeSettings.textColor 
-            }}
-          />
+          {avatarUrl ? (
+            <div className="relative">
+              <img 
+                src={avatarUrl} 
+                alt="Avatar" 
+                className="w-20 h-20 rounded-full mx-auto border-3 object-cover shadow-lg"
+                style={{ 
+                  borderColor: themeSettings.primaryColor 
+                }}
+              />
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white text-xs">✓</span>
+              </div>
+            </div>
+          ) : (
+            <div 
+              className="w-20 h-20 rounded-full mx-auto border-3 flex items-center justify-center shadow-lg"
+              style={{ 
+                backgroundColor: themeSettings.primaryColor,
+                borderColor: themeSettings.textColor 
+              }}
+            >
+              <span className="text-3xl font-bold" style={{ color: 'white' }}>
+                U
+              </span>
+            </div>
+          )}
           
           {/* Nome e título */}
           <div>

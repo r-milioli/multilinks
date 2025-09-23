@@ -51,6 +51,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             image: user.avatar,
+            avatar: user.avatar,
             username: user.username
           }
         } catch (error) {
@@ -80,13 +81,35 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.username = (user as any).username
+        token.avatar = (user as any).avatar || (user as any).image
+        token.name = (user as any).name
+        token.email = (user as any).email
       }
+      
+      // Buscar avatar atualizado do banco se necessário
+      if (token.id && !token.avatar) {
+        try {
+          const user = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { avatar: true }
+          })
+          if (user?.avatar) {
+            token.avatar = user.avatar
+          }
+        } catch (error) {
+          console.error('Erro ao buscar avatar:', error)
+        }
+      }
+      
       return token
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string
         session.user.username = token.username as string
+        session.user.avatar = token.avatar as string
+        session.user.name = token.name as string
+        session.user.email = token.email as string
       }
       return session
     }

@@ -10,6 +10,7 @@ import { Input } from '@/shared/components/ui/Input'
 import { Label } from '@/shared/components/ui/Label'
 import { Switch } from '@/shared/components/ui/Switch'
 import { WebhookEventsInfo } from '@/shared/components/ui/WebhookEventsInfo'
+import { ThemeEditorContent } from './ThemeEditorContent'
 // import { Textarea } from '@/shared/components/ui/Textarea' // Componente não existe
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/Select' // Componente não existe
 // Ícones removidos - agora usando sidebar principal
@@ -75,7 +76,42 @@ export function SettingsContent() {
     theme: 'light',
     language: 'pt-BR',
     timezone: 'America/Sao_Paulo',
-    dateFormat: 'DD/MM/YYYY'
+    dateFormat: 'DD/MM/YYYY',
+    // Configurações de fonte
+    fontFamily: 'Inter',
+    fontSize: 'medium',
+    fontWeight: 'normal',
+    // Configurações de cores
+    primaryColor: '#3B82F6',
+    secondaryColor: '#6B7280',
+    accentColor: '#10B981',
+    backgroundColor: '#FFFFFF',
+    textColor: '#111827',
+    // Configurações de layout
+    sidebarWidth: 'default',
+    headerHeight: 'default',
+    borderRadius: 'medium',
+    spacing: 'comfortable',
+    // Configurações de animações
+    animations: true,
+    transitions: true,
+    // Templates
+    template: 'modern',
+    // Configurações avançadas
+    customCSS: '',
+    customJS: '',
+    // Configurações de páginas públicas
+    publicPageStyle: 'default',
+    publicPageColors: {
+      primary: '#3B82F6',
+      secondary: '#6B7280',
+      background: '#FFFFFF',
+      text: '#111827'
+    },
+    publicPageFont: {
+      family: 'Inter',
+      size: 'medium'
+    }
   })
 
   // Security state
@@ -332,74 +368,9 @@ export function SettingsContent() {
     </div>
   )
 
-  const renderAppearanceSection = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold">Configurações de Aparência</h3>
-        <p className="text-gray-600">Personalize a aparência do seu painel</p>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="theme">Tema</Label>
-          <select
-            id="theme"
-            value={appearance.theme}
-            onChange={(e) => setAppearance({...appearance, theme: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          >
-            <option value="light">Claro</option>
-            <option value="dark">Escuro</option>
-            <option value="system">Sistema</option>
-          </select>
-        </div>
-        
-        <div>
-          <Label htmlFor="language">Idioma</Label>
-          <select
-            id="language"
-            value={appearance.language}
-            onChange={(e) => setAppearance({...appearance, language: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          >
-            <option value="pt-BR">Português (Brasil)</option>
-            <option value="en-US">English (US)</option>
-            <option value="es-ES">Español</option>
-          </select>
-        </div>
-        
-        <div>
-          <Label htmlFor="timezone">Fuso Horário</Label>
-          <select
-            id="timezone"
-            value={appearance.timezone}
-            onChange={(e) => setAppearance({...appearance, timezone: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          >
-            <option value="America/Sao_Paulo">São Paulo (GMT-3)</option>
-            <option value="America/New_York">Nova York (GMT-5)</option>
-            <option value="Europe/London">Londres (GMT+0)</option>
-          </select>
-        </div>
-        
-        <div>
-          <Label htmlFor="date-format">Formato de Data</Label>
-          <select
-            id="date-format"
-            value={appearance.dateFormat}
-            onChange={(e) => setAppearance({...appearance, dateFormat: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          >
-            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-          </select>
-        </div>
-      </div>
-      
-      <Button onClick={handleSaveAppearance}>Salvar Aparência</Button>
-    </div>
-  )
+  const renderAppearanceSection = () => {
+    return <ThemeEditorContent />
+  }
 
   const renderSecuritySection = () => (
     <div className="space-y-6">

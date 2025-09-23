@@ -45,8 +45,10 @@ export function useFormStats(formIds: string[]) {
   }, [formIds]);
 
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+    if (formIds.length > 0) {
+      fetchStats();
+    }
+  }, [formIds]);
 
   const refreshStats = useCallback(() => {
     fetchStats();
