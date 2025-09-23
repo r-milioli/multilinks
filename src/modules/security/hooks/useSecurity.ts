@@ -67,6 +67,15 @@ export function useSecurity() {
 
   const getActiveSessions = async (): Promise<ActiveSession[]> => {
     try {
+      // Primeiro, atualizar o userAgent da sessão atual
+      await fetch('/api/user/update-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      // Depois, buscar as sessões
       const response = await fetch('/api/user/sessions')
       const result = await response.json()
 

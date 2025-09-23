@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
 import { useIntegrations } from '@/modules/integrations/hooks/useIntegrations'
 import { useNotifications } from '@/modules/notifications/hooks/useNotifications'
+import { useSecurity } from '@/modules/security/hooks/useSecurity'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
@@ -38,6 +39,14 @@ export function SettingsContent() {
     saveNotificationSettings,
     updateNotificationSetting
   } = useNotifications()
+
+  const {
+    changePassword,
+    getActiveSessions,
+    terminateSession,
+    isLoading: securityLoading,
+    error: securityError
+  } = useSecurity()
   
   // Determinar a seção ativa baseada na navegação
   const getActiveSection = (): SettingsSection => {
@@ -123,6 +132,10 @@ export function SettingsContent() {
     twoFactor: false
   })
 
+  // Active sessions state
+  const [activeSessions, setActiveSessions] = useState<any[]>([])
+  const [sessionsLoading, setSessionsLoading] = useState(false)
+
   // Integrations state - agora gerenciado pelo hook useIntegrations
 
   useEffect(() => {
@@ -142,6 +155,13 @@ export function SettingsContent() {
     // Atualizar seção ativa quando a navegação mudar
     setActiveSection(getActiveSection())
   }, [currentSection])
+
+  useEffect(() => {
+    // Carregar sessões ativas quando a seção de segurança for ativada
+    if (activeSection === 'security') {
+      loadActiveSessions()
+    }
+  }, [activeSection])
 
   // Carregar dados do perfil quando o componente for montado
   useEffect(() => {
@@ -229,19 +249,17 @@ export function SettingsContent() {
   }
 
   const handleChangePassword = async () => {
-    if (security.newPassword !== security.confirmPassword) {
-      toast.error('As senhas não coincidem')
-      return
-    }
+    const result = await changePassword({
+      currentPassword: security.currentPassword,
+      newPassword: security.newPassword,
+      confirmPassword: security.confirmPassword
+    })
 
-    try {
-      // Implementar alteração de senha
-      console.log('Alterando senha')
+    if (result.success) {
       toast.success('Senha alterada com sucesso!')
       setSecurity({ ...security, currentPassword: '', newPassword: '', confirmPassword: '' })
-    } catch (error) {
-      console.error('Erro ao alterar senha:', error)
-      toast.error('Erro ao alterar senha')
+    } else {
+      toast.error(result.error || 'Erro ao alterar senha')
     }
   }
 
@@ -258,6 +276,31 @@ export function SettingsContent() {
       // Implementar exclusão da conta
       console.log('Deletando conta')
       toast.success('Conta deletada com sucesso!')
+    }
+  }
+
+  const loadActiveSessions = async () => {
+    setSessionsLoading(true)
+    try {
+      const sessions = await getActiveSessions()
+      setActiveSessions(sessions)
+    } catch (error) {
+      console.error('Erro ao carregar sessões:', error)
+      toast.error('Erro ao carregar sessões ativas')
+    } finally {
+      setSessionsLoading(false)
+    }
+  }
+
+  const handleTerminateSession = async (sessionId: string) => {
+    if (confirm('Tem certeza que deseja encerrar esta sessão?')) {
+      const result = await terminateSession(sessionId)
+      if (result.success) {
+        toast.success('Sessão encerrada com sucesso!')
+        loadActiveSessions() // Recarregar lista
+      } else {
+        toast.error(result.error || 'Erro ao encerrar sessão')
+      }
     }
   }
 
@@ -487,53 +530,151 @@ export function SettingsContent() {
         <p className="text-gray-600">Gerencie a segurança da sua conta</p>
       </div>
       
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="current-password">Senha Atual</Label>
-          <Input
-            id="current-password"
-            type="password"
-            value={security.currentPassword}
-            onChange={(e) => setSecurity({...security, currentPassword: e.target.value})}
-            placeholder="Digite sua senha atual"
-          />
-        </div>
-        <div>
-          <Label htmlFor="new-password">Nova Senha</Label>
-          <Input
-            id="new-password"
-            type="password"
-            value={security.newPassword}
-            onChange={(e) => setSecurity({...security, newPassword: e.target.value})}
-            placeholder="Digite sua nova senha"
-          />
-        </div>
-        <div>
-          <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
-          <Input
-            id="confirm-password"
-            type="password"
-            value={security.confirmPassword}
-            onChange={(e) => setSecurity({...security, confirmPassword: e.target.value})}
-            placeholder="Confirme sua nova senha"
-          />
-        </div>
-        <Button onClick={handleChangePassword} variant="outline">Alterar Senha</Button>
-      </div>
-      
-      <div className="border-t pt-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="two-factor">Autenticação de Dois Fatores</Label>
-            <p className="text-sm text-gray-500">Adicione uma camada extra de segurança</p>
+      {/* Alteração de Senha */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Alterar Senha</CardTitle>
+          <CardDescription>
+            Mantenha sua conta segura com uma senha forte
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="current-password">Senha Atual</Label>
+              <Input
+                id="current-password"
+                type="password"
+                value={security.currentPassword}
+                onChange={(e) => setSecurity({...security, currentPassword: e.target.value})}
+                placeholder="Digite sua senha atual"
+              />
+            </div>
+            <div>
+              <Label htmlFor="new-password">Nova Senha</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={security.newPassword}
+                onChange={(e) => setSecurity({...security, newPassword: e.target.value})}
+                placeholder="Digite sua nova senha"
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={security.confirmPassword}
+                onChange={(e) => setSecurity({...security, confirmPassword: e.target.value})}
+                placeholder="Confirme sua nova senha"
+              />
+            </div>
+            <Button 
+              onClick={handleChangePassword} 
+              variant="outline"
+              disabled={securityLoading}
+            >
+              {securityLoading ? 'Alterando...' : 'Alterar Senha'}
+            </Button>
           </div>
-          <Switch
-            id="two-factor"
-            checked={security.twoFactor}
-            onCheckedChange={(checked) => setSecurity({...security, twoFactor: checked})}
-          />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
+      
+      {/* Sessões Ativas */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Sessões Ativas</CardTitle>
+          <CardDescription>
+            Gerencie suas sessões ativas em diferentes dispositivos
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {sessionsLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activeSessions.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">Nenhuma sessão ativa encontrada</p>
+              ) : (
+                activeSessions.map((session) => (
+                  <div key={session.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{session.device}</span>
+                        {session.isCurrent && (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            Atual
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        {session.browser} • {session.location}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Última atividade: {new Date(session.lastActivity).toLocaleString('pt-BR')}
+                      </p>
+                    </div>
+                    {!session.isCurrent && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTerminateSession(session.id)}
+                        className="text-red-600 border-red-300 hover:bg-red-50"
+                      >
+                        Encerrar
+                      </Button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Autenticação de Dois Fatores */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Autenticação de Dois Fatores</CardTitle>
+          <CardDescription>
+            Adicione uma camada extra de segurança à sua conta
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="two-factor">2FA Ativado</Label>
+              <p className="text-sm text-gray-500">
+                {security.twoFactor 
+                  ? 'Autenticação de dois fatores está ativada' 
+                  : 'Autenticação de dois fatores está desativada'
+                }
+              </p>
+            </div>
+            <Switch
+              id="two-factor"
+              checked={security.twoFactor}
+              onCheckedChange={(checked) => {
+                setSecurity({...security, twoFactor: checked})
+                toast('Funcionalidade de 2FA em desenvolvimento', {
+                  icon: 'ℹ️',
+                  duration: 3000
+                })
+              }}
+            />
+          </div>
+          {!security.twoFactor && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>Recomendado:</strong> Ative a autenticação de dois fatores para proteger sua conta contra acessos não autorizados.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 

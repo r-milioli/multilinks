@@ -35,18 +35,14 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Buscar sessões ativas do usuário
-    const sessions = await prisma.session.findMany({
-      where: {
-        userId: session.user.id,
-        expires: {
-          gt: new Date()
-        }
-      },
-      orderBy: {
-        expires: 'desc'
-      }
-    })
+    // Com JWT, não temos sessões no banco, então vamos simular uma sessão atual
+    const sessions = [{
+      id: 'current-session',
+      sessionToken: 'jwt-session',
+      userId: session.user.id,
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
+      userAgent: request.headers.get('user-agent') || 'Unknown'
+    }]
 
     // Formatar dados das sessões
     const activeSessions = sessions.map(sessionData => {
@@ -62,7 +58,7 @@ export async function GET(request: NextRequest) {
         browser,
         location,
         lastActivity: sessionData.expires.toISOString(),
-        isCurrent: sessionData.id === session.sessionToken
+        isCurrent: true // Com JWT, sempre é a sessão atual
       }
     })
 

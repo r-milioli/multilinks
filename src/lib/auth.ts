@@ -2,11 +2,13 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import GitHubProvider from 'next-auth/providers/github'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { prisma } from './db'
 import { compare } from 'bcryptjs'
 import { emailSchema, passwordSchema } from '@/shared/utils/validation'
 
 export const authOptions: NextAuthOptions = {
+  // adapter: PrismaAdapter(prisma), // Temporariamente desabilitado para testar
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -112,6 +114,25 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email as string
       }
       return session
+    },
+    async signIn({ user, account, profile, email, credentials }) {
+      return true
+    },
+    async redirect({ url, baseUrl }) {
+      // Se a URL é relativa, usar baseUrl
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Se a URL é do mesmo domínio, permitir
+      else if (new URL(url).origin === baseUrl) return url
+      // Caso contrário, redirecionar para dashboard
+      return `${baseUrl}/dashboard`
+    }
+  },
+  events: {
+    async createSession({ session, user }) {
+      console.log('🔍 Nova sessão criada:', { sessionId: session.id, userId: user.id })
+    },
+    async signIn({ user, account, profile, isNewUser }) {
+      console.log('🔍 Usuário fez login:', { userId: user.id, email: user.email, isNewUser })
     }
   },
   pages: {
