@@ -5,30 +5,24 @@ FROM node:18-alpine AS base
 RUN apk add --no-cache libc6-compat openssl bind-tools iputils
 WORKDIR /app
 
-# Instalar dependências
-FROM base AS deps
-COPY package.json package-lock.json* ./
-
-# Configurar Prisma para usar engines binários
-ENV PRISMA_CLI_BINARY_TARGETS=linux-musl-openssl-3.0.x
-
-RUN npm ci --only=production
-
 # Build da aplicação
 FROM base AS builder
 WORKDIR /app
+
+# Copiar arquivos de dependências
 COPY package.json package-lock.json* ./
 
-# Instalar todas as dependências para o build
+# Instalar todas as dependências
 RUN npm ci
 
+# Copiar código fonte
 COPY . .
 
 # Gerar cliente Prisma
 RUN npx prisma generate
 
 # Build da aplicação Next.js
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Imagem de produção
@@ -43,15 +37,12 @@ RUN adduser --system --uid 1001 nextjs
 
 # Copiar arquivos de build
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
 # Copiar schema do Prisma
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-
-# Copiar node_modules do builder (incluindo prisma)
-COPY --from=builder /app/node_modules ./node_modules
 
 # Copiar arquivos de configuração
 COPY --from=builder /app/next.config.js ./
@@ -63,8 +54,8 @@ COPY --from=builder /app/tsconfig.json ./
 COPY docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
 
-# Ajustar permissões dos node_modules
-RUN chown -R nextjs:nodejs ./node_modules
+# Ajustar permissões
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
@@ -74,4 +65,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
