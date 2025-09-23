@@ -65,18 +65,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function UserPage({ params }: PageProps) {
   const { username } = params
   
+  console.log('🔍 Tentando carregar página do usuário:', username)
+  
   try {
     const result = await ProfileService.getPublicProfile(username)
     
     if (!result.success || !result.data) {
+      console.log('❌ Usuário não encontrado:', username, result.error)
       notFound()
     }
 
     const user = result.data
     const privacySettings = user.privacySettings as any || {}
     
+    console.log('✅ Usuário encontrado:', user.username, user.name)
+    
     // Verificar se a página é privada
     if (privacySettings.isPublic === false) {
+      console.log('🔒 Página privada para usuário:', username)
       notFound()
     }
 

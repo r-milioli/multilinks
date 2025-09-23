@@ -50,10 +50,6 @@ COPY --from=builder /app/tailwind.config.ts ./
 COPY --from=builder /app/postcss.config.js ./
 COPY --from=builder /app/tsconfig.json ./
 
-# Copiar script de entrypoint
-COPY docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
-
 # Ajustar permissões
 RUN chown -R nextjs:nodejs /app
 
@@ -64,5 +60,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["npm", "start"]
+CMD ["sh", "-c", "echo '🚀 Iniciando aplicação MultiLink...' && npm start"]
