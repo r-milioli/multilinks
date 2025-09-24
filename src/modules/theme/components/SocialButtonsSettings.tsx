@@ -211,7 +211,7 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
             <Layout className="w-4 h-4" />
             Estilo dos Botões
           </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[
               { value: 'default', label: 'Padrão', description: 'Fundo branco com borda' },
               { value: 'minimal', label: 'Minimalista', description: 'Transparente com borda' },
@@ -223,14 +223,14 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
               <button
                 key={style.value}
                 onClick={() => handleStyleChange(style.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-left ${
+                className={`p-3 rounded-lg border-2 transition-all text-left min-w-0 ${
                   socialButtonsSettings.style === style.value
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <div className="font-medium text-sm mb-1">{style.label}</div>
-                <div className="text-xs text-gray-500">{style.description}</div>
+                <div className="font-medium text-sm mb-1 truncate">{style.label}</div>
+                <div className="text-xs text-gray-500 truncate">{style.description}</div>
               </button>
             ))}
           </div>
@@ -242,7 +242,7 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
             <Maximize2 className="w-4 h-4" />
             Tamanho dos Botões
           </Label>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { value: 'small', label: 'Pequeno', size: 'w-8 h-8' },
               { value: 'medium', label: 'Médio', size: 'w-10 h-10' },
@@ -252,7 +252,7 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
               <button
                 key={size.value}
                 onClick={() => handleSizeChange(size.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-center ${
+                className={`p-3 rounded-lg border-2 transition-all text-center min-w-0 ${
                   socialButtonsSettings.size === size.value
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 hover:border-gray-300'
@@ -260,11 +260,11 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
               >
                 <div className="flex justify-center mb-2">
                   <div 
-                    className={`${size.size} bg-gray-300 dark:bg-gray-600 rounded-full`}
+                    className={`${size.size} bg-gray-300 dark:bg-gray-600 rounded-full flex-shrink-0`}
                   />
                 </div>
-                <div className="font-medium text-sm">{size.label}</div>
-                <div className="text-xs text-gray-500">
+                <div className="font-medium text-sm truncate">{size.label}</div>
+                <div className="text-xs text-gray-500 truncate">
                   {size.value === 'small' && '32x32px'}
                   {size.value === 'medium' && '40x40px'}
                   {size.value === 'large' && '48x48px'}

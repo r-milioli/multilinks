@@ -109,23 +109,23 @@ export function SocialLinksEditor() {
             {profile.socialLinks.map((link) => (
               <div
                 key={link.id}
-                className="flex items-center justify-between p-3 border rounded-lg"
+                className="flex items-center justify-between p-3 border rounded-lg min-w-0"
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 min-w-0 flex-1">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white flex-shrink-0"
                     style={{ backgroundColor: getPlatformColor(link.platform) }}
                   >
                     <SocialIcon platform={link.platform} className="w-4 h-4" />
                   </div>
-                  <div>
-                    <p className="font-medium">{link.platform}</p>
-                    <p className="text-sm text-gray-500 truncate max-w-xs">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{link.platform}</p>
+                    <p className="text-sm text-gray-500 truncate">
                       {link.url}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
                   <Button
                     variant="ghost"
                     size="icon"

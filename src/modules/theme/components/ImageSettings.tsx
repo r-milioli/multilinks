@@ -99,17 +99,17 @@ export function ImageSettings({ themeSettings, onUpdate }: ImageSettingsProps) {
               <button
                 key={position.value}
                 onClick={() => handleImagePositionChange(position.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-left ${
+                className={`p-3 rounded-lg border-2 transition-all text-left min-w-0 ${
                   imageSettings.position === position.value
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">{position.icon}</span>
-                  <span className="font-medium">{position.label}</span>
+                  <span className="text-lg flex-shrink-0">{position.icon}</span>
+                  <span className="font-medium truncate">{position.label}</span>
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 truncate">
                   {position.value === 'left' && 'Imagem à esquerda do texto'}
                   {position.value === 'right' && 'Imagem à direita do texto'}
                   {position.value === 'top' && 'Imagem acima do texto'}

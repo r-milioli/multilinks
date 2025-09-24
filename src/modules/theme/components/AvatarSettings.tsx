@@ -129,7 +129,7 @@ export function AvatarSettings({ themeSettings, onUpdate }: AvatarSettingsProps)
             <Maximize2 className="w-4 h-4" />
             Tamanho do Avatar
           </Label>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { value: 'small', label: 'Pequeno', size: 'w-16 h-16' },
               { value: 'medium', label: 'Médio', size: 'w-20 h-20' },
@@ -139,7 +139,7 @@ export function AvatarSettings({ themeSettings, onUpdate }: AvatarSettingsProps)
               <button
                 key={size.value}
                 onClick={() => handleAvatarSizeChange(size.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-center ${
+                className={`p-3 rounded-lg border-2 transition-all text-center min-w-0 ${
                   avatarSettings.size === size.value
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 hover:border-gray-300'
@@ -147,11 +147,11 @@ export function AvatarSettings({ themeSettings, onUpdate }: AvatarSettingsProps)
               >
                 <div className="flex justify-center mb-2">
                   <div 
-                    className={`${size.size} bg-gray-300 dark:bg-gray-600 rounded-full`}
+                    className={`${size.size} bg-gray-300 dark:bg-gray-600 rounded-full flex-shrink-0`}
                   />
                 </div>
-                <div className="font-medium text-sm">{size.label}</div>
-                <div className="text-xs text-gray-500">
+                <div className="font-medium text-sm truncate">{size.label}</div>
+                <div className="text-xs text-gray-500 truncate">
                   {size.value === 'small' && '64x64px'}
                   {size.value === 'medium' && '80x80px'}
                   {size.value === 'large' && '96x96px'}
@@ -168,7 +168,7 @@ export function AvatarSettings({ themeSettings, onUpdate }: AvatarSettingsProps)
             <Layers className="w-4 h-4" />
             Forma do Avatar
           </Label>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { value: 'circle', label: 'Circular', shape: 'rounded-full' },
               { value: 'square', label: 'Quadrado', shape: 'rounded-lg' },
@@ -178,7 +178,7 @@ export function AvatarSettings({ themeSettings, onUpdate }: AvatarSettingsProps)
               <button
                 key={shape.value}
                 onClick={() => handleAvatarShapeChange(shape.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-center ${
+                className={`p-3 rounded-lg border-2 transition-all text-center min-w-0 ${
                   avatarSettings.shape === shape.value
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 hover:border-gray-300'
@@ -186,10 +186,10 @@ export function AvatarSettings({ themeSettings, onUpdate }: AvatarSettingsProps)
               >
                 <div className="flex justify-center mb-2">
                   <div 
-                    className={`w-12 h-12 bg-gray-300 dark:bg-gray-600 ${shape.shape}`}
+                    className={`w-12 h-12 bg-gray-300 dark:bg-gray-600 ${shape.shape} flex-shrink-0`}
                   />
                 </div>
-                <div className="font-medium text-sm">{shape.label}</div>
+                <div className="font-medium text-sm truncate">{shape.label}</div>
               </button>
             ))}
           </div>
