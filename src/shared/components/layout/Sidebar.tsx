@@ -41,7 +41,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { currentSection, setCurrentSection } = useNavigation()
-  const [expandedItems, setExpandedItems] = useState<string[]>(['dashboard', 'forms', 'settings'])
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   console.log('🔧 Sidebar: currentSection =', currentSection, 'setCurrentSection =', setCurrentSection)
 
