@@ -6,6 +6,7 @@ import { FormsListContent } from './FormsListContent'
 import { FormsCreateContent } from './FormsCreateContent'
 import { AnalyticsContent } from './AnalyticsContent'
 import { SettingsContent } from './SettingsContent'
+import { AdminContent } from './AdminContent'
 
 export function DynamicContent() {
   let currentSection
@@ -42,6 +43,11 @@ export function DynamicContent() {
     case 'settings-integrations':
     case 'settings-danger':
       return <SettingsContent />
+    
+    case 'admin-dashboard':
+    case 'admin-users':
+    case 'admin-settings':
+      return <AdminContent />
     
     default:
       return <DashboardContent />

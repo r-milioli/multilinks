@@ -20,7 +20,10 @@ import {
   BarChart,
   TrendingUp,
   Eye,
-  Activity
+  Activity,
+  Crown,
+  Users,
+  Cog
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
@@ -148,6 +151,31 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           label: 'Zona de Perigo',
           icon: AlertTriangle,
           section: 'settings-danger'
+        }
+      ]
+    },
+    {
+      id: 'admin',
+      label: 'Administração',
+      icon: Crown,
+      children: [
+        {
+          id: 'admin-dashboard',
+          label: 'Dashboard Admin',
+          icon: BarChart3,
+          section: 'admin-dashboard'
+        },
+        {
+          id: 'admin-users',
+          label: 'Usuários',
+          icon: Users,
+          section: 'admin-users'
+        },
+        {
+          id: 'admin-settings',
+          label: 'Configurações',
+          icon: Cog,
+          section: 'admin-settings'
         }
       ]
     }
