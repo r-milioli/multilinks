@@ -65,6 +65,12 @@ export const PRESET_THEMES = {
       borderColor: '#E5E7EB',
       hoverBackgroundColor: '#F9FAFB',
       hoverIconColor: '#1F2937'
+    },
+    backgroundSettings: {
+      position: 'center',
+      size: 'cover',
+      repeat: 'no-repeat',
+      attachment: 'scroll'
     }
   },
   dark: {

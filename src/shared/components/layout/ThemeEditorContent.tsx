@@ -17,6 +17,7 @@ import { ImageSettings } from '@/modules/theme/components/ImageSettings'
 import { AvatarSettings } from '@/modules/theme/components/AvatarSettings'
 import { LinkButtonSettings } from '@/modules/theme/components/LinkButtonSettings'
 import { SocialButtonsSettings } from '@/modules/theme/components/SocialButtonsSettings'
+import { BackgroundSettings } from '@/modules/theme/components/BackgroundSettings'
 import { CollapsibleSection } from '@/modules/theme/components/CollapsibleSection'
 import { useImageUpload } from '@/modules/profile/hooks/useImageUpload'
 import { AvatarUpload } from '@/modules/profile/components/AvatarUpload'
@@ -484,33 +485,10 @@ export function ThemeEditorContent() {
               </div>
 
               {localTheme.backgroundType === 'image' && (
-                <div>
-                  <Label htmlFor="backgroundImage">Imagem de Fundo</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="backgroundImage"
-                      type="text"
-                      value={localTheme.backgroundImage || ''}
-                      onChange={(e) => handleUpdateProperty('backgroundImage', e.target.value)}
-                      placeholder="URL da imagem"
-                      className="flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => document.getElementById('imageUpload')?.click()}
-                    >
-                      <Upload className="w-4 h-4" />
-                    </Button>
-                    <input
-                      id="imageUpload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </div>
-                </div>
+                <BackgroundSettings
+                  themeSettings={localTheme}
+                  onUpdate={handleUpdateProperty}
+                />
               )}
           </CollapsibleSection>
         </div>

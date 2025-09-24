@@ -155,7 +155,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: response
+      imageUrl: result.secure_url,
+      publicId: result.public_id,
+      width: result.width,
+      height: result.height
     })
   } catch (error) {
     console.error('💥 Erro no upload:', error)

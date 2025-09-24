@@ -141,10 +141,19 @@ export function PublicPage({ user }: PublicPageProps) {
       }
     }
     if (themeSettings.backgroundType === 'image' && themeSettings.backgroundImage) {
+      const backgroundSettings = themeSettings.backgroundSettings || {
+        position: 'center',
+        size: 'cover',
+        repeat: 'no-repeat',
+        attachment: 'scroll'
+      }
+      
       return {
         backgroundImage: `url(${themeSettings.backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: backgroundSettings.position,
+        backgroundSize: backgroundSettings.size,
+        backgroundRepeat: backgroundSettings.repeat,
+        backgroundAttachment: backgroundSettings.attachment,
       }
     }
     return { backgroundColor: themeSettings.backgroundColor || '#FFFFFF' }
