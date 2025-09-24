@@ -57,27 +57,27 @@ export function Header({ onMenuToggle }: HeaderProps) {
         </Button>
 
         {/* Logo e Título */}
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+        <div className="flex items-center space-x-3 min-w-0 flex-1">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">ML</span>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
             {title}
           </h1>
         </div>
       </div>
 
       {/* Lado Direito - Perfil do Usuário */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-2 flex-shrink-0">
         {session?.user ? (
           <div className="relative" ref={dropdownRef}>
             <Button
               variant="ghost"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-0"
             >
               {/* Avatar */}
-              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
                 {session.user.image ? (
                   <img
                     src={session.user.image}
@@ -90,11 +90,11 @@ export function Header({ onMenuToggle }: HeaderProps) {
               </div>
 
               {/* Nome e Email */}
-              <div className="hidden sm:block text-left">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <div className="hidden sm:block text-left min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {session.user.name || 'Usuário'}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {session.user.email}
                 </p>
               </div>
@@ -102,7 +102,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
               {/* Ícone dropdown */}
               <ChevronDown 
                 className={cn(
-                  "w-4 h-4 text-gray-500 transition-transform",
+                  "w-4 h-4 text-gray-500 transition-transform flex-shrink-0",
                   isDropdownOpen && "rotate-180"
                 )} 
               />
@@ -110,13 +110,13 @@ export function Header({ onMenuToggle }: HeaderProps) {
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+              <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
                 <button
                   onClick={handleSettings}
                   className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <Settings className="w-4 h-4" />
-                  <span>Configurações</span>
+                  <Settings className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Configurações</span>
                 </button>
                 
                 <hr className="my-1 border-gray-200 dark:border-gray-700" />
@@ -125,8 +125,8 @@ export function Header({ onMenuToggle }: HeaderProps) {
                   onClick={handleLogout}
                   className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sair</span>
+                  <LogOut className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Sair</span>
                 </button>
               </div>
             )}
