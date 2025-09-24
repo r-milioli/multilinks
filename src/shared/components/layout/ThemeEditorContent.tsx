@@ -177,8 +177,8 @@ export function ThemeEditorContent() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Coluna de Edição */}
-        <div className="space-y-4">
+        {/* Coluna de Configurações - Scrollável no Desktop */}
+        <div className="space-y-4 lg:max-h-screen lg:overflow-y-auto lg:pr-4 lg:pb-8">
           {/* Foto de Perfil */}
           <Card>
             <CardHeader>
@@ -581,8 +581,9 @@ export function ThemeEditorContent() {
           </CollapsibleSection>
         </div>
 
-        {/* Coluna de Preview */}
-        <div className="lg:sticky lg:top-4 space-y-4">
+        {/* Coluna de Preview - Fixa no Desktop, Normal no Mobile */}
+        <div className="lg:sticky lg:top-4 lg:h-screen lg:overflow-hidden space-y-4">
+          <div className="lg:h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-2">
           <CollapsibleSection
             title="Preview"
             description="Visualize suas alterações em tempo real"
@@ -627,6 +628,7 @@ export function ThemeEditorContent() {
             </Button>
             </div>
           </CollapsibleSection>
+          </div>
         </div>
       </div>
     </div>
