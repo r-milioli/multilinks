@@ -1,135 +1,124 @@
-#!/usr/bin/env node
-
 const { PrismaClient } = require('@prisma/client');
-const { execSync } = require('child_process');
 
 const prisma = new PrismaClient();
 
-async function checkDatabaseExists() {
-  try {
-    // Tentar conectar e fazer uma query simples
-    await prisma.$queryRaw`SELECT 1`;
-    return true;
-  } catch (error) {
-    console.log('⚠️ Banco de dados não está acessível:', error.message);
-    return false;
-  }
-}
-
-async function checkTableExists(tableName) {
-  try {
-    const result = await prisma.$queryRaw`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = ${tableName}
-      );
-    `;
-    return result[0].exists;
-  } catch (error) {
-    console.log(`⚠️ Erro ao verificar tabela ${tableName}:`, error.message);
-    return false;
-  }
-}
-
-async function checkColumnExists(tableName, columnName) {
-  try {
-    const result = await prisma.$queryRaw`
-      SELECT column_name 
-      FROM information_schema.columns 
-      WHERE table_schema = 'public'
-      AND table_name = ${tableName} 
-      AND column_name = ${columnName}
-    `;
-    return result.length > 0;
-  } catch (error) {
-    console.log(`⚠️ Erro ao verificar coluna ${columnName} na tabela ${tableName}:`, error.message);
-    return false;
-  }
-}
-
 async function initializeDatabase() {
+  console.log('🔄 Inicializando banco de dados...');
+  
   try {
-    console.log('🚀 Inicializando banco de dados MultiLink...');
+    // Verificar se as configurações padrão do sistema existem
+    const systemSettings = await prisma.systemSettings.findMany();
     
-    // Verificar se o banco está acessível
-    if (!await checkDatabaseExists()) {
-      console.log('❌ Não foi possível conectar ao banco de dados');
-      process.exit(1);
+    if (systemSettings.length === 0) {
+      console.log('📝 Criando configurações padrão do sistema...');
+      
+      // Criar configurações padrão
+      await prisma.systemSettings.createMany({
+        data: [
+          {
+            id: 'social_links',
+            key: 'social_links',
+            value: {
+              instagram: '',
+              facebook: '',
+              twitter: '',
+              linkedin: ''
+            },
+            description: 'Links das redes sociais do sistema',
+            category: 'contact',
+            isPublic: false
+          },
+          {
+            id: 'contact_info',
+            key: 'contact_info',
+            value: {
+              email: '',
+              phone: '',
+              address: ''
+            },
+            description: 'Informações de contato do sistema',
+            category: 'contact',
+            isPublic: false
+          },
+          {
+            id: 'plans',
+            key: 'plans',
+            value: [],
+            description: 'Planos disponíveis no sistema',
+            category: 'billing',
+            isPublic: false
+          }
+        ]
+      });
+      
+      console.log('✅ Configurações padrão criadas');
     }
     
-    console.log('✅ Conexão com banco de dados estabelecida');
+    // Verificar se os planos padrão existem
+    const plans = await prisma.plan.findMany();
     
-    // Verificar se as tabelas principais existem
-    const hasUserTable = await checkTableExists('User');
-    
-    if (!hasUserTable) {
-      console.log('📝 Tabelas não encontradas. Aplicando schema completo...');
-      try {
-        execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
-        console.log('✅ Schema aplicado com sucesso!');
-        
-        // Executar seed se disponível
-        try {
-          console.log('🌱 Executando seed do banco de dados...');
-          execSync('npx prisma db seed', { stdio: 'inherit' });
-          console.log('✅ Seed executado com sucesso!');
-        } catch (seedError) {
-          console.log('⚠️ Seed não executado (normal se não configurado):', seedError.message);
-        }
-      } catch (error) {
-        console.error('❌ Erro ao aplicar schema:', error.message);
-        throw error;
-      }
-    } else {
-      console.log('✅ Tabelas principais encontradas');
+    if (plans.length === 0) {
+      console.log('📋 Criando planos padrão...');
       
-      // Verificar se a coluna legalLinksSettings existe
-      const hasLegalLinksSettings = await checkColumnExists('User', 'legalLinksSettings');
+      await prisma.plan.createMany({
+        data: [
+          {
+            id: 'plan_free',
+            name: 'Gratuito',
+            description: 'Plano gratuito com funcionalidades básicas',
+            price: 0,
+            currency: 'BRL',
+            billingCycle: 'monthly',
+            features: ['5 links', '1 formulário', 'Analytics básico'],
+            limits: { links: 5, forms: 1, clicks: 1000 },
+            active: true
+          },
+          {
+            id: 'plan_pro',
+            name: 'Pro',
+            description: 'Plano profissional com funcionalidades avançadas',
+            price: 29.90,
+            currency: 'BRL',
+            billingCycle: 'monthly',
+            features: ['Links ilimitados', 'Formulários ilimitados', 'Analytics avançado', 'Suporte prioritário'],
+            limits: { links: -1, forms: -1, clicks: -1 },
+            active: true
+          },
+          {
+            id: 'plan_business',
+            name: 'Business',
+            description: 'Plano empresarial para equipes',
+            price: 99.90,
+            currency: 'BRL',
+            billingCycle: 'monthly',
+            features: ['Tudo do Pro', 'Múltiplos usuários', 'API access', 'Suporte 24/7'],
+            limits: { links: -1, forms: -1, clicks: -1, users: 10 },
+            active: true
+          }
+        ]
+      });
       
-      if (!hasLegalLinksSettings) {
-        console.log('📝 Coluna legalLinksSettings não encontrada. Aplicando migração...');
-        try {
-          execSync('npx prisma db push', { stdio: 'inherit' });
-          console.log('✅ Migração aplicada com sucesso!');
-        } catch (error) {
-          console.error('❌ Erro ao aplicar migração:', error.message);
-          throw error;
-        }
-      } else {
-        console.log('✅ Coluna legalLinksSettings já existe');
-      }
-      
-      // Verificar se há outras migrações pendentes
-      try {
-        execSync('npx prisma migrate status', { stdio: 'pipe' });
-        console.log('✅ Todas as migrações estão atualizadas');
-      } catch (error) {
-        console.log('⚠️ Verificando migrações pendentes...');
-        try {
-          execSync('npx prisma migrate deploy', { stdio: 'inherit' });
-          console.log('✅ Migrações pendentes aplicadas com sucesso!');
-        } catch (migrateError) {
-          console.log('⚠️ Erro ao aplicar migrações. Sincronizando schema...');
-          execSync('npx prisma db push', { stdio: 'inherit' });
-          console.log('✅ Schema sincronizado com sucesso!');
-        }
-      }
+      console.log('✅ Planos padrão criados');
     }
     
-    console.log('🎉 Inicialização do banco de dados concluída!');
+    console.log('🎉 Inicialização do banco concluída com sucesso!');
     
   } catch (error) {
-    console.error('❌ Erro durante a inicialização:', error.message);
-    process.exit(1);
+    console.error('❌ Erro na inicialização do banco:', error);
+    throw error;
   } finally {
     await prisma.$disconnect();
   }
 }
 
-// Executar inicialização se este script for chamado diretamente
+// Executar se chamado diretamente
 if (require.main === module) {
-  initializeDatabase();
+  initializeDatabase()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
 }
 
 module.exports = { initializeDatabase };

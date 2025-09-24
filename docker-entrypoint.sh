@@ -61,11 +61,27 @@ while [ $attempt -le $max_attempts ]; do
   attempt=$((attempt + 1))
 done
 
-# Executar inicialização inteligente do banco
-echo "🔄 Executando inicialização inteligente do banco de dados..."
-node scripts/init-db.js
+# Executar migration segura
+echo "🔄 Executando migration segura do banco de dados..."
 
-echo "✅ Inicialização concluída com sucesso!"
+# Verificar se estamos em produção
+if [ "$NODE_ENV" = "production" ]; then
+    echo "⚠️  Ambiente de produção detectado - aplicando migration segura..."
+    
+    # Aplicar migration segura que preserva dados existentes
+    if [ -f "prisma/migrations/production-safe.sql" ]; then
+        echo "📋 Aplicando migration segura..."
+        psql $DATABASE_URL -f prisma/migrations/production-safe.sql
+    else
+        echo "⚠️  Arquivo de migration segura não encontrado, usando migration padrão..."
+        ./node_modules/.bin/prisma migrate deploy
+    fi
+else
+    echo "🔧 Ambiente de desenvolvimento - aplicando migration padrão..."
+    ./node_modules/.bin/prisma migrate deploy
+fi
+
+echo "✅ Migration concluída com sucesso!"
 
 # Iniciar a aplicação
 echo "🚀 Iniciando servidor Next.js..."
