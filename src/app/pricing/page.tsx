@@ -236,9 +236,10 @@ export default function PricingPage() {
                 key={index} 
                 className={`relative border border-gray-700 backdrop-blur-sm transition-all duration-300 hover:shadow-xl ${
                   plan.popular 
-                    ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 ring-2 ring-orange-400' 
+                    ? 'ring-2 ring-orange-400' 
                     : 'bg-black'
                 }`}
+                style={plan.popular ? { backgroundColor: '#10151C' } : {}}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">

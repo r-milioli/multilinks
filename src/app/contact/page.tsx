@@ -220,26 +220,6 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
 
-              {/* Quick Links */}
-              <Card className="border border-gray-700 backdrop-blur-sm bg-black">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white">Links Úteis</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Link href="/faq" className="block text-orange-400 hover:text-orange-300">
-                    Perguntas Frequentes
-                  </Link>
-                  <Link href="/help" className="block text-orange-400 hover:text-orange-300">
-                    Central de Ajuda
-                  </Link>
-                  <Link href="/status" className="block text-orange-400 hover:text-orange-300">
-                    Status do Sistema
-                  </Link>
-                  <Link href="/privacy" className="block text-orange-400 hover:text-orange-300">
-                    Política de Privacidade
-                  </Link>
-                </CardContent>
-              </Card>
             </div>
           </div>
 

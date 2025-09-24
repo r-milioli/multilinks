@@ -1,35 +1,52 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import Link from 'next/link'
 import { Button } from '@/shared/components/ui/Button'
-import { LoginForm } from '@/modules/auth/components/LoginForm'
-import { LoadingPage } from '@/shared/components/ui/Loading'
-import { ArrowLeft, LinkIcon, Heart } from 'lucide-react'
+import { Input } from '@/shared/components/ui/Input'
+import { Label } from '@/shared/components/ui/Label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
+import { ArrowLeft, LinkIcon, Heart, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { passwordSchema } from '@/shared/utils/validation'
 
-export default function LoginPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [isRedirecting, setIsRedirecting] = useState(false)
+const resetPasswordSchema = z.object({
+  password: passwordSchema,
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Senhas não coincidem",
+  path: ["confirmPassword"],
+})
 
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      setIsRedirecting(true)
-      // Redirecionamento imediato com replace
-      router.replace('/dashboard')
+type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
+
+export default function ResetPasswordPage() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema)
+  })
+
+  const onSubmit = async (data: ResetPasswordFormData) => {
+    setIsLoading(true)
+    try {
+      // Simular reset da senha
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setIsSuccess(true)
+    } catch (error) {
+      console.error('Erro ao resetar senha:', error)
+    } finally {
+      setIsLoading(false)
     }
-  }, [status, session, router])
-
-  // Mostrar loading durante verificação ou redirecionamento
-  if (status === 'loading' || isRedirecting) {
-    return <LoadingPage />
-  }
-
-  // Se autenticado, não renderizar nada (redirecionamento em andamento)
-  if (status === 'authenticated') {
-    return <LoadingPage />
   }
 
   return (
@@ -53,9 +70,9 @@ export default function LoginPage() {
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             <Button variant="ghost" asChild className="text-white hover:bg-gray-800 text-sm sm:text-base px-2 sm:px-4">
-              <Link href="/">
+              <Link href="/login">
                 <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Voltar ao início</span>
+                <span className="hidden sm:inline">Voltar ao login</span>
                 <span className="sm:hidden">Voltar</span>
               </Link>
             </Button>
@@ -66,12 +83,120 @@ export default function LoginPage() {
       <main className="flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-white">MultiLink</h1>
+            <h1 className="text-3xl font-bold text-white">Redefinir Senha</h1>
             <p className="mt-2 text-sm text-gray-300">
-              Seus links em um só lugar
+              Digite sua nova senha
             </p>
           </div>
-          <LoginForm />
+
+          <Card className="w-full max-w-md mx-auto border-orange-400" style={{ backgroundColor: '#10151C' }}>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl text-white">Nova Senha</CardTitle>
+              <CardDescription className="text-gray-300">
+                {isSuccess 
+                  ? 'Senha redefinida com sucesso!'
+                  : 'Crie uma nova senha segura'
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!isSuccess ? (
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-white">Nova Senha</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Sua nova senha"
+                        className="border-gray-600 focus:border-orange-400 focus:ring-orange-400"
+                        {...register('password')}
+                        disabled={isLoading}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </Button>
+                    </div>
+                    {errors.password && (
+                      <p className="text-sm text-red-500">{errors.password.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-white">Confirmar Nova Senha</Label>
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder="Confirme sua nova senha"
+                        className="border-gray-600 focus:border-orange-400 focus:ring-orange-400"
+                        {...register('confirmPassword')}
+                        disabled={isLoading}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </Button>
+                    </div>
+                    {errors.confirmPassword && (
+                      <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+                    )}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-500 hover:to-pink-600"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Redefinindo...' : 'Redefinir Senha'}
+                  </Button>
+                </form>
+              ) : (
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Senha Redefinida!</h3>
+                    <p className="text-gray-300 text-sm">
+                      Sua senha foi redefinida com sucesso. Agora você pode fazer login com sua nova senha.
+                    </p>
+                  </div>
+                  <Button asChild className="w-full bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-500 hover:to-pink-600">
+                    <Link href="/login">
+                      Fazer Login
+                    </Link>
+                  </Button>
+                </div>
+              )}
+
+              <div className="text-center text-sm">
+                <span className="text-gray-400">Lembrou da senha? </span>
+                <Button variant="link" className="p-0 h-auto text-orange-400 hover:text-orange-300" asChild>
+                  <Link href="/login">Fazer login</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 
