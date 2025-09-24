@@ -317,17 +317,17 @@ export function DashboardContent() {
                   .sort((a, b) => b.clickCount - a.clickCount)
                   .slice(0, 5)
                   .map((link, index) => (
-                    <div key={link.id} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                    <div key={link.id} className="flex items-center justify-between min-w-0">
+                      <div className="flex items-center space-x-3 min-w-0 flex-1">
+                        <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-xs font-medium text-primary">{index + 1}</span>
                         </div>
-                        <div>
-                          <span className="font-medium">{link.title}</span>
-                          <p className="text-sm text-gray-500">{link.url}</p>
+                        <div className="min-w-0 flex-1">
+                          <span className="font-medium truncate block">{link.title}</span>
+                          <p className="text-sm text-gray-500 truncate">{link.url}</p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0 ml-2">
                         <span className="font-bold text-lg">{link.clickCount}</span>
                         <p className="text-xs text-gray-500">cliques</p>
                       </div>

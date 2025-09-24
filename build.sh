@@ -1,28 +1,46 @@
 #!/bin/bash
+
+# Script genérico para build e deploy da aplicação MultiLink
+
 set -e
 
-echo "🐳 Build da imagem Multi-Link..."
+echo "🚀 Iniciando build e deploy da aplicação MultiLink..."
 
-# Verificar se Docker está rodando
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker não está rodando. Por favor, inicie o Docker primeiro."
-    exit 1
+# Configuração
+DOCKER_REPOSITORY="automacaodebaixocusto/multi-link"
+DOCKER_TAG=${DOCKER_TAG:-latest}
+
+# Verificar se a versão foi especificada
+if [ "$DOCKER_TAG" = "latest" ]; then
+    echo "⚠️ Usando tag 'latest'. Para especificar uma versão:"
+    echo "   export DOCKER_TAG=v1.2.3"
+    echo "   ou"
+    echo "   DOCKER_TAG=v1.2.3 ./build.sh"
+    echo ""
+    read -p "Continuar com 'latest'? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "❌ Build cancelado"
+        exit 1
+    fi
 fi
 
-# Definir variáveis
-IMAGE_NAME="automacaodebaixocusto/multi-link"
-TAG=${1:-latest}
+# Construir a imagem
+echo "🔨 Construindo imagem Docker..."
+echo "📦 Repositório: ${DOCKER_REPOSITORY}"
+echo "🏷️ Tag: ${DOCKER_TAG}"
+docker build -t ${DOCKER_REPOSITORY}:${DOCKER_TAG} .
 
-echo "🔨 Construindo imagem: $IMAGE_NAME:$TAG"
+# Fazer push para o Docker Hub
+echo "📤 Enviando imagem para Docker Hub..."
+docker push ${DOCKER_REPOSITORY}:${DOCKER_TAG}
 
-# Build da imagem
-docker build -t $IMAGE_NAME:$TAG .
-
-echo "✅ Build concluído!"
-echo "📦 Imagem criada: $IMAGE_NAME:$TAG"
+echo "✅ Build e deploy concluídos com sucesso!"
+echo "📦 Imagem disponível em: ${DOCKER_REPOSITORY}:${DOCKER_TAG}"
 echo ""
-echo "🚀 Para fazer push:"
-echo "   docker push $IMAGE_NAME:$TAG"
-echo ""
-echo "🧪 Para testar localmente:"
-echo "   docker run -p 3000:3000 $IMAGE_NAME:$TAG"
+echo "🚀 Para executar em produção:"
+echo "docker run -d --name multilink-app -p 3000:3000 \\"
+echo "  -e DATABASE_URL=\"sua-url-aqui\" \\"
+echo "  -e NEXTAUTH_URL=\"https://seudominio.com\" \\"
+echo "  -e NEXTAUTH_SECRET=\"sua-chave\" \\"
+echo "  ${DOCKER_REPOSITORY}:${DOCKER_TAG}"

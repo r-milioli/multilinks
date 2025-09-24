@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { User, Link, SocialLink } from '@prisma/client'
 import { PublicLinkItem } from './PublicLinkItem'
 import { SocialLinks } from './SocialLinks'
+import { LegalFooter } from './LegalFooter'
 import { ThemeProvider } from './ThemeProvider'
 import { TrackingScripts, trackEvent } from '@/shared/components/TrackingScripts'
 import { getInitials } from '@/lib/utils'
@@ -469,20 +470,34 @@ export function PublicPage({ user }: PublicPageProps) {
             )}
           </div>
 
-          {/* Footer */}
-          <div className="mt-12 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Criado com{' '}
-              <a
-                href="/"
-                className="text-primary hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                MultiLink
-              </a>
-            </p>
-          </div>
+          {/* Footer com Links Legais */}
+          <LegalFooter 
+            settings={user.legalLinksSettings || {
+              showLegalLinks: false,
+              showPrivacyPolicy: false,
+              showTermsOfService: false,
+              showContact: false,
+              linksPosition: 'bottom'
+            }}
+            themeSettings={user.themeSettings}
+          />
+          
+          {/* Footer Padrão (apenas se links legais não estão ativos) */}
+          {(!user.legalLinksSettings?.showLegalLinks || user.legalLinksSettings?.linksPosition === 'hidden') && (
+            <div className="mt-12 text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Criado com{' '}
+                <a
+                  href="/"
+                  className="text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  MultiLink
+                </a>
+              </p>
+            </div>
+          )}
         </div>
       </div>
       

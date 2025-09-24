@@ -95,6 +95,27 @@ export interface ThemeSettings {
     repeat: string
     attachment: string
   }
+  // Configurações do modal de formulário
+  formModalSettings?: {
+    backgroundColor: string
+    textColor: string
+    borderColor: string
+    borderRadius: number
+    shadow: string
+    backdropBlur: boolean
+    inputBackgroundColor: string
+    inputBorderColor: string
+    inputTextColor: string
+    inputFocusBorderColor: string
+    buttonBackgroundColor: string
+    buttonTextColor: string
+    buttonHoverBackgroundColor: string
+    buttonHoverTextColor: string
+    titleColor: string
+    descriptionColor: string
+    errorColor: string
+    successColor: string
+  }
 }
 
 export interface PrivacySettings {

@@ -86,12 +86,32 @@ export async function GET() {
         shadow: 'none',
         position: 'top'
       },
-      backgroundSettings: {
-        position: 'center',
-        size: 'cover',
-        repeat: 'no-repeat',
-        attachment: 'scroll'
-      }
+    backgroundSettings: {
+      position: 'center',
+      size: 'cover',
+      repeat: 'no-repeat',
+      attachment: 'scroll'
+    },
+    formModalSettings: {
+      backgroundColor: '#FFFFFF',
+      textColor: '#1E293B',
+      borderColor: '#E5E7EB',
+      borderRadius: 8,
+      shadow: 'lg',
+      backdropBlur: true,
+      inputBackgroundColor: '#FFFFFF',
+      inputBorderColor: '#E5E7EB',
+      inputTextColor: '#1E293B',
+      inputFocusBorderColor: '#3B82F6',
+      buttonBackgroundColor: '#3B82F6',
+      buttonTextColor: '#FFFFFF',
+      buttonHoverBackgroundColor: '#2563EB',
+      buttonHoverTextColor: '#FFFFFF',
+      titleColor: '#1E293B',
+      descriptionColor: '#64748B',
+      errorColor: '#EF4444',
+      successColor: '#10B981'
+    }
     }
 
     return NextResponse.json({

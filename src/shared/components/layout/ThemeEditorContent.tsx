@@ -5,7 +5,7 @@ import { Button } from '@/shared/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Label } from '@/shared/components/ui/Label'
 import { Input } from '@/shared/components/ui/Input'
-import { Loader2, Upload, Palette, Type, Layout, Image as ImageIcon, Save, RotateCcw, User, MousePointer, Settings, Sparkles, Layers, Eye, Link, Share2 } from 'lucide-react'
+import { Loader2, Upload, Palette, Type, Layout, Image as ImageIcon, Save, RotateCcw, User, MousePointer, Settings, Sparkles, Layers, Eye, Link, Share2, FileText } from 'lucide-react'
 import { useTheme } from '@/modules/theme/hooks/useTheme'
 import { ThemePreview } from '@/modules/theme/components/ThemePreview'
 import { toast } from 'react-hot-toast'
@@ -18,6 +18,8 @@ import { AvatarSettings } from '@/modules/theme/components/AvatarSettings'
 import { LinkButtonSettings } from '@/modules/theme/components/LinkButtonSettings'
 import { SocialButtonsSettings } from '@/modules/theme/components/SocialButtonsSettings'
 import { BackgroundSettings } from '@/modules/theme/components/BackgroundSettings'
+import { FormModalSettings } from '@/modules/theme/components/FormModalSettings'
+import { FormPreview } from '@/modules/theme/components/FormPreview'
 import { CollapsibleSection } from '@/modules/theme/components/CollapsibleSection'
 import { useImageUpload } from '@/modules/profile/hooks/useImageUpload'
 import { AvatarUpload } from '@/modules/profile/components/AvatarUpload'
@@ -69,6 +71,12 @@ export function ThemeEditorContent() {
   }, [session?.user?.id])
 
   const handleUpdateProperty = (property: string, value: any) => {
+    const updatedTheme = { ...localTheme, [property]: value }
+    setLocalTheme(updatedTheme)
+    setHasChanges(true)
+  }
+
+  const handleThemeUpdate = (property: string, value: any) => {
     const updatedTheme = { ...localTheme, [property]: value }
     setLocalTheme(updatedTheme)
     setHasChanges(true)
@@ -579,6 +587,32 @@ export function ThemeEditorContent() {
                 />
               )}
           </CollapsibleSection>
+
+          {/* Configurações dos Botões de Links */}
+          <CollapsibleSection
+            title="Configurações dos Botões de Links"
+            description="Personalize a aparência dos botões de links"
+            icon={<Link className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <LinkButtonSettings 
+              themeSettings={localTheme} 
+              onUpdate={handleThemeUpdate} 
+            />
+          </CollapsibleSection>
+
+          {/* Configurações do Modal de Formulário */}
+          <CollapsibleSection
+            title="Configurações do Modal de Formulário"
+            description="Personalize a aparência dos formulários"
+            icon={<FileText className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <FormModalSettings 
+              themeSettings={localTheme} 
+              onUpdate={handleThemeUpdate} 
+            />
+          </CollapsibleSection>
         </div>
 
         {/* Coluna de Preview - Fixa no Desktop, Normal no Mobile */}
@@ -595,6 +629,16 @@ export function ThemeEditorContent() {
               themeSettings={localTheme} 
               avatarUrl={currentAvatar} 
             />
+          </CollapsibleSection>
+
+          {/* Preview do Formulário */}
+          <CollapsibleSection
+            title="Preview do Formulário"
+            description="Visualize como ficará o modal de formulário"
+            icon={<FileText className="w-5 h-5" />}
+            defaultOpen={true}
+          >
+            <FormPreview themeSettings={localTheme} />
           </CollapsibleSection>
 
           {/* Seção: Ações */}

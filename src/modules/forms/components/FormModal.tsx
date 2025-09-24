@@ -163,11 +163,28 @@ export function FormModal({
   const getThemeStyles = () => {
     if (!themeSettings) return {};
     
+    const formModalSettings = themeSettings.formModalSettings || {};
+    
     return {
-      backgroundColor: themeSettings.backgroundColor || '#ffffff',
-      textColor: themeSettings.textColor || '#000000',
-      primaryColor: themeSettings.primaryColor || '#3b82f6',
-      borderColor: themeSettings.borderColor || '#e5e7eb',
+      backgroundColor: formModalSettings.backgroundColor || themeSettings.backgroundColor || '#ffffff',
+      textColor: formModalSettings.textColor || themeSettings.textColor || '#000000',
+      primaryColor: formModalSettings.buttonBackgroundColor || themeSettings.primaryColor || '#3b82f6',
+      borderColor: formModalSettings.borderColor || themeSettings.borderColor || '#e5e7eb',
+      borderRadius: formModalSettings.borderRadius || themeSettings.borderRadius || 8,
+      shadow: formModalSettings.shadow || 'lg',
+      backdropBlur: formModalSettings.backdropBlur !== undefined ? formModalSettings.backdropBlur : true,
+      inputBackgroundColor: formModalSettings.inputBackgroundColor || '#ffffff',
+      inputBorderColor: formModalSettings.inputBorderColor || '#e5e7eb',
+      inputTextColor: formModalSettings.inputTextColor || '#000000',
+      inputFocusBorderColor: formModalSettings.inputFocusBorderColor || '#3b82f6',
+      buttonBackgroundColor: formModalSettings.buttonBackgroundColor || themeSettings.primaryColor || '#3b82f6',
+      buttonTextColor: formModalSettings.buttonTextColor || '#ffffff',
+      buttonHoverBackgroundColor: formModalSettings.buttonHoverBackgroundColor || themeSettings.primaryColor || '#2563eb',
+      buttonHoverTextColor: formModalSettings.buttonHoverTextColor || '#ffffff',
+      titleColor: formModalSettings.titleColor || themeSettings.textColor || '#000000',
+      descriptionColor: formModalSettings.descriptionColor || themeSettings.secondaryColor || '#6b7280',
+      errorColor: formModalSettings.errorColor || '#ef4444',
+      successColor: formModalSettings.successColor || '#10b981'
     };
   };
 
@@ -181,21 +198,34 @@ export function FormModal({
           style={{
             backgroundColor: themeStyles.backgroundColor,
             color: themeStyles.textColor,
+            borderRadius: themeStyles.borderRadius ? `${themeStyles.borderRadius}px` : undefined,
+            fontFamily: themeSettings?.fontFamily || 'Inter'
           }}
         >
         <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-2">{form.title}</h2>
+          <h2 
+            className="text-2xl font-bold mb-2"
+            style={{ color: themeStyles.titleColor }}
+          >
+            {form.title}
+          </h2>
           {form.description && (
-            <p className="text-gray-600">{form.description}</p>
+            <p style={{ color: themeStyles.descriptionColor }}>{form.description}</p>
           )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {activeFields.map((field) => (
             <div key={field.id}>
-              <Label htmlFor={field.id} className="block mb-2">
+              <Label 
+                htmlFor={field.id} 
+                className="block mb-2"
+                style={{ color: themeStyles.textColor }}
+              >
                 {field.label}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
+                {field.required && (
+                  <span style={{ color: themeStyles.errorColor }} className="ml-1">*</span>
+                )}
               </Label>
               <Input
                 id={field.id}
@@ -203,20 +233,29 @@ export function FormModal({
                 value={formData[field.id] || ''}
                 onChange={(e) => handleFieldChange(field.id, e.target.value)}
                 placeholder={getFieldPlaceholder(field)}
-                className={errors[field.id] ? 'border-red-500' : ''}
                 style={{
-                  borderColor: errors[field.id] ? '#ef4444' : themeStyles.borderColor,
+                  backgroundColor: themeStyles.inputBackgroundColor,
+                  borderColor: errors[field.id] ? themeStyles.errorColor : themeStyles.inputBorderColor,
+                  color: themeStyles.inputTextColor,
+                  borderRadius: themeStyles.borderRadius ? `${Math.min(themeStyles.borderRadius, 8)}px` : undefined,
                 }}
               />
               {errors[field.id] && (
-                <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>
+                <p style={{ color: themeStyles.errorColor }} className="text-sm mt-1">{errors[field.id]}</p>
               )}
             </div>
           ))}
 
           {errors.submit && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-600 text-sm">{errors.submit}</p>
+            <div 
+              className="p-3 rounded-md"
+              style={{
+                backgroundColor: `${themeStyles.errorColor}10`,
+                borderColor: themeStyles.errorColor,
+                border: '1px solid'
+              }}
+            >
+              <p style={{ color: themeStyles.errorColor }} className="text-sm">{errors.submit}</p>
             </div>
           )}
 
@@ -227,6 +266,12 @@ export function FormModal({
               onClick={onClose}
               disabled={isSubmitting}
               className="flex-1"
+              style={{
+                backgroundColor: 'transparent',
+                borderColor: themeStyles.borderColor,
+                color: themeStyles.textColor,
+                borderRadius: themeStyles.borderRadius ? `${Math.min(themeStyles.borderRadius, 8)}px` : undefined,
+              }}
             >
               Cancelar
             </Button>
@@ -235,8 +280,10 @@ export function FormModal({
               disabled={isSubmitting || !form.buttonActive}
               className="flex-1"
               style={{
-                backgroundColor: themeStyles.primaryColor,
-                borderColor: themeStyles.primaryColor,
+                backgroundColor: themeStyles.buttonBackgroundColor,
+                color: themeStyles.buttonTextColor,
+                border: 'none',
+                borderRadius: themeStyles.borderRadius ? `${Math.min(themeStyles.borderRadius, 8)}px` : undefined,
               }}
             >
               {isSubmitting ? (

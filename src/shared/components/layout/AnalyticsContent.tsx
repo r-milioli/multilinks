@@ -196,17 +196,17 @@ export function AnalyticsContent() {
           {analytics?.topLinks && analytics.topLinks.length > 0 ? (
             <div className="space-y-4">
               {analytics.topLinks.slice(0, 5).map((link, index) => (
-                <div key={link.linkId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                <div key={link.linkId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg min-w-0">
+                  <div className="flex items-center space-x-3 min-w-0 flex-1">
+                    <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-primary">{index + 1}</span>
                     </div>
-                    <div>
-                      <p className="font-medium">{link.title}</p>
-                      <p className="text-sm text-gray-500">ID: {link.linkId}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">{link.title}</p>
+                      <p className="text-sm text-gray-500 truncate">ID: {link.linkId}</p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex-shrink-0 ml-2">
                     <p className="font-bold text-lg">{link.clicks}</p>
                     <p className="text-xs text-gray-500">cliques</p>
                   </div>
@@ -246,7 +246,7 @@ export function AnalyticsContent() {
                         <div 
                           className="bg-primary h-2 rounded-full" 
                           style={{ 
-                            width: `${(country.clicks / analytics.topCountries[0].clicks) * 100}%` 
+                            width: `${Math.min((country.clicks / analytics.topCountries[0].clicks) * 100, 100)}%` 
                           }}
                         ></div>
                       </div>
@@ -277,23 +277,23 @@ export function AnalyticsContent() {
             {analytics?.deviceBreakdown && analytics.deviceBreakdown.length > 0 ? (
               <div className="space-y-3">
                 {analytics.deviceBreakdown.map((device, index) => (
-                  <div key={device.device} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
+                  <div key={device.device} className="flex items-center justify-between min-w-0">
+                    <div className="flex items-center space-x-2 min-w-0 flex-1">
                       {device.device === 'Mobile' ? (
-                        <Smartphone className="h-4 w-4 text-gray-500" />
+                        <Smartphone className="h-4 w-4 text-gray-500 flex-shrink-0" />
                       ) : (
-                        <Monitor className="h-4 w-4 text-gray-500" />
+                        <Monitor className="h-4 w-4 text-gray-500 flex-shrink-0" />
                       )}
-                      <span className="text-sm font-medium">{device.device}</span>
+                      <span className="text-sm font-medium truncate">{device.device}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                    <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
+                      <div className="w-16 sm:w-20 bg-gray-200 rounded-full h-2">
                         <div 
                           className="bg-primary h-2 rounded-full" 
-                          style={{ width: `${device.percentage}%` }}
+                          style={{ width: `${Math.min(device.percentage, 100)}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm font-medium w-12 text-right">{device.clicks}</span>
+                      <span className="text-sm font-medium w-10 sm:w-12 text-right">{device.clicks}</span>
                     </div>
                   </div>
                 ))}

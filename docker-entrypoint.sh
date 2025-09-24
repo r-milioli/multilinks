@@ -61,11 +61,11 @@ while [ $attempt -le $max_attempts ]; do
   attempt=$((attempt + 1))
 done
 
-# Executar migrations
-echo "🔄 Executando migrations..."
-./node_modules/.bin/prisma db push --accept-data-loss
+# Executar inicialização inteligente do banco
+echo "🔄 Executando inicialização inteligente do banco de dados..."
+node scripts/init-db.js
 
-echo "✅ Migrations executadas com sucesso!"
+echo "✅ Inicialização concluída com sucesso!"
 
 # Iniciar a aplicação
 echo "🚀 Iniciando servidor Next.js..."

@@ -9,6 +9,16 @@ export interface UpdateProfileData {
   avatar?: string
   themeSettings?: ThemeSettings
   privacySettings?: PrivacySettings
+  legalLinksSettings?: LegalLinksSettings
+}
+
+export interface LegalLinksSettings {
+  showLegalLinks: boolean
+  showPrivacyPolicy: boolean
+  showTermsOfService: boolean
+  showContact: boolean
+  customFooterText?: string
+  linksPosition: 'bottom' | 'top' | 'hidden'
 }
 
 export interface CreateSocialLinkData {

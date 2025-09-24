@@ -35,28 +35,29 @@ model Session {
 }
 
 model User {
-  id              String       @id @default(cuid())
-  name            String?
-  email           String       @unique
-  emailVerified   DateTime?
-  image           String?
-  username        String?      @unique
-  bio             String?
-  title           String?
-  avatar          String?
-  password        String?
-  themeSettings   Json?        @default("{}")
-  privacySettings Json?        @default("{}")
-  notificationSettings Json?   @default("{}")
-  integrationSettings Json?    @default("{}")
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  accounts        Account[]
-  analytics       Analytics[]
-  links           Link[]
-  sessions        Session[]
-  socialLinks     SocialLink[]
-  forms           Form[]
+  id                 String       @id @default(cuid())
+  name               String?
+  email              String       @unique
+  emailVerified      DateTime?
+  image              String?
+  username           String?      @unique
+  bio                String?
+  title              String?
+  avatar             String?
+  password           String?
+  themeSettings      Json?        @default("{}")
+  privacySettings    Json?        @default("{}")
+  notificationSettings Json?      @default("{}")
+  integrationSettings Json?       @default("{}")
+  legalLinksSettings Json?        @default("{}")
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  accounts           Account[]
+  analytics          Analytics[]
+  links              Link[]
+  sessions           Session[]
+  socialLinks        SocialLink[]
+  forms              Form[]
 }
 
 model VerificationToken {

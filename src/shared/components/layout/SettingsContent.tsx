@@ -17,6 +17,8 @@ import { Textarea } from '@/shared/components/ui/Textarea'
 import { WebhookEventsInfo } from '@/shared/components/ui/WebhookEventsInfo'
 import { ThemeEditorContent } from './ThemeEditorContent'
 import { SocialLinksEditor } from '@/modules/profile/components/SocialLinksEditor'
+import { LegalLinksSettingsComponent } from '@/modules/profile/components/LegalLinksSettings'
+import { LegalLinksSettings } from '@/types/profile.types'
 import { toast } from 'react-hot-toast'
 // import { Textarea } from '@/shared/components/ui/Textarea' // Componente não existe
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/Select' // Componente não existe
@@ -87,6 +89,16 @@ export function SettingsContent() {
     username: (session?.user as any)?.username || '',
     bio: '',
     title: ''
+  })
+
+  // Legal Links state
+  const [legalLinksSettings, setLegalLinksSettings] = useState<LegalLinksSettings>({
+    showLegalLinks: false,
+    showPrivacyPolicy: true,
+    showTermsOfService: true,
+    showContact: true,
+    customFooterText: '',
+    linksPosition: 'bottom'
   })
 
   // Notifications state - agora gerenciado pelo hook useNotifications
@@ -180,8 +192,11 @@ export function SettingsContent() {
   useEffect(() => {
     const loadProfileData = async () => {
       try {
+        console.log('🔄 Carregando dados do perfil...')
         const response = await fetch('/api/user/profile')
         const result = await response.json()
+        
+        console.log('📥 Resposta da API:', result)
         
         if (result.success && result.data) {
           setProfileData({
@@ -191,9 +206,17 @@ export function SettingsContent() {
             bio: result.data.bio || '',
             title: result.data.title || ''
           })
+          
+          // Carregar configurações de links legais se existirem
+          if (result.data.legalLinksSettings) {
+            console.log('🔗 Carregando configurações de links legais:', result.data.legalLinksSettings)
+            setLegalLinksSettings(result.data.legalLinksSettings)
+          } else {
+            console.log('⚠️ Nenhuma configuração de links legais encontrada')
+          }
         }
       } catch (error) {
-        console.error('Erro ao carregar dados do perfil:', error)
+        console.error('❌ Erro ao carregar dados do perfil:', error)
       }
     }
 
@@ -205,6 +228,7 @@ export function SettingsContent() {
   const handleSaveProfile = async () => {
     try {
       console.log('Salvando perfil:', profileData)
+      console.log('Salvando configurações de links legais:', legalLinksSettings)
       
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
@@ -215,7 +239,8 @@ export function SettingsContent() {
           name: profileData.name,
           username: profileData.username,
           bio: profileData.bio,
-          title: profileData.title
+          title: profileData.title,
+          legalLinksSettings
         })
       })
 
@@ -387,6 +412,16 @@ export function SettingsContent() {
       {/* Links Sociais */}
       <div className="mt-8">
         <SocialLinksEditor />
+      </div>
+      
+      {/* Links Legais */}
+      <div className="mt-8">
+        <LegalLinksSettingsComponent 
+          settings={legalLinksSettings}
+          onUpdate={(settings) => {
+            setLegalLinksSettings(settings)
+          }}
+        />
       </div>
     </div>
   )

@@ -67,7 +67,8 @@ export class ProfileService {
           ...(data.title && { title: data.title }),
           ...(data.avatar && { avatar: data.avatar }),
           ...(data.themeSettings && { themeSettings: data.themeSettings }),
-          ...(data.privacySettings && { privacySettings: data.privacySettings })
+          ...(data.privacySettings && { privacySettings: data.privacySettings }),
+          ...(data.legalLinksSettings && { legalLinksSettings: data.legalLinksSettings })
         }
       })
 
@@ -129,6 +130,7 @@ export class ProfileService {
           themeSettings: true,
           privacySettings: true,
           integrationSettings: true,
+          legalLinksSettings: true,
           createdAt: true,
           updatedAt: true,
           links: {
