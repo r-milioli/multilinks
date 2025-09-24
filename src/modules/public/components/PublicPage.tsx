@@ -13,6 +13,7 @@ interface PublicPageProps {
   user: User & {
     links: Link[]
     socialLinks: SocialLink[]
+    integrationSettings?: any
   }
 }
 
@@ -359,6 +360,15 @@ export function PublicPage({ user }: PublicPageProps) {
           </div>
         </div>
       </div>
+      
+      {/* Scripts Customizados */}
+      {user.integrationSettings?.customScripts && (
+        <div 
+          dangerouslySetInnerHTML={{ 
+            __html: user.integrationSettings.customScripts 
+          }} 
+        />
+      )}
       
     </ThemeProvider>
   )

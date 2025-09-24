@@ -6,7 +6,8 @@ import { IntegrationSettings } from '@/types/integrations.types'
 const DEFAULT_INTEGRATION_SETTINGS: IntegrationSettings = {
   googleAnalytics: '',
   facebookPixel: '',
-  webhookUrl: ''
+  webhookUrl: '',
+  customScripts: ''
 }
 
 export function useIntegrations() {

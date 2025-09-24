@@ -128,6 +128,7 @@ export class ProfileService {
           avatar: true,
           themeSettings: true,
           privacySettings: true,
+          integrationSettings: true,
           createdAt: true,
           updatedAt: true,
           links: {

@@ -7,6 +7,7 @@ interface PublicPageWrapperProps {
   user: User & {
     links: Link[]
     socialLinks: SocialLink[]
+    integrationSettings?: any
   }
 }
 

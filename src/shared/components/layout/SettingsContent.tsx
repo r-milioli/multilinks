@@ -13,6 +13,7 @@ import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { Label } from '@/shared/components/ui/Label'
 import { Switch } from '@/shared/components/ui/Switch'
+import { Textarea } from '@/shared/components/ui/Textarea'
 import { WebhookEventsInfo } from '@/shared/components/ui/WebhookEventsInfo'
 import { ThemeEditorContent } from './ThemeEditorContent'
 import { SocialLinksEditor } from '@/modules/profile/components/SocialLinksEditor'
@@ -808,6 +809,45 @@ export function SettingsContent() {
           {/* Informações sobre Webhooks */}
           <WebhookEventsInfo />
 
+          {/* Scripts Customizados */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Scripts Customizados</CardTitle>
+              <CardDescription>
+                Adicione HTML, CSS ou JavaScript customizado à sua página pública
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="custom-scripts">Código Customizado</Label>
+                  <Textarea
+                    id="custom-scripts"
+                    value={integrationSettings.customScripts || ''}
+                    onChange={(e) => updateIntegrationSetting('customScripts', e.target.value)}
+                    placeholder="<!-- Exemplo: Botão do WhatsApp -->
+<a href='https://wa.me/5511999999999' target='_blank' style='position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px; border-radius: 50px; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;'>
+  <i class='fab fa-whatsapp'></i> WhatsApp
+</a>"
+                    rows={8}
+                    className="font-mono text-sm"
+                  />
+                  <div className="text-sm text-gray-500 space-y-1">
+                    <p><strong>Exemplos de uso:</strong></p>
+                    <ul className="list-disc list-inside ml-4 space-y-1">
+                      <li>Botões do WhatsApp, Telegram, etc.</li>
+                      <li>Widgets de chat (Intercom, Zendesk)</li>
+                      <li>Scripts de analytics adicionais</li>
+                      <li>Elementos HTML customizados</li>
+                    </ul>
+                    <p className="mt-2 text-xs text-amber-600">
+                      ⚠️ Use com cuidado: scripts maliciosos podem afetar a segurança
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Botões de Ação */}
           <div className="flex gap-4 pt-4">

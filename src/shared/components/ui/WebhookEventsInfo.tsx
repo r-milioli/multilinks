@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './Card'
 import { Badge } from './Badge'
+import { CollapsibleSection } from '@/modules/theme/components/CollapsibleSection'
 import { 
   FileText, 
   MousePointer, 
@@ -137,17 +138,14 @@ interface WebhookEventsInfoProps {
 
 export function WebhookEventsInfo({ className }: WebhookEventsInfoProps) {
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5" />
-          Eventos de Webhook Disponíveis
-        </CardTitle>
-        <CardDescription>
-          O sistema envia automaticamente estes eventos para seu webhook quando configurado
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CollapsibleSection
+      title="Eventos de Webhook Disponíveis"
+      description="O sistema envia automaticamente estes eventos para seu webhook quando configurado"
+      icon={<BarChart3 className="h-5 w-5" />}
+      defaultOpen={false}
+      className={className}
+    >
+      <div className="space-y-4">
         {WEBHOOK_EVENTS.map((event) => (
           <div key={event.type} className="border rounded-lg p-4 space-y-3">
             <div className="flex items-start justify-between">
@@ -208,7 +206,7 @@ export function WebhookEventsInfo({ className }: WebhookEventsInfoProps) {
             <li>• Headers incluem identificação do evento e usuário</li>
           </ul>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </CollapsibleSection>
   )
 }
