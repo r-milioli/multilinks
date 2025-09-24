@@ -32,6 +32,69 @@ export interface ThemeSettings {
   fontFamily: string
   buttonStyle: 'rounded' | 'sharp' | 'outlined' | 'filled'
   borderRadius: number
+  // Cores individuais para textos
+  nameColor?: string
+  titleColor?: string
+  bioColor?: string
+  // Configurações de cores dos botões
+  buttonColors?: {
+    background: string
+    text: string
+    border: string
+    hoverBackground: string
+    hoverText: string
+    hoverBorder: string
+  }
+  // Configurações dos botões de links
+  linkButtonSettings?: {
+    style: string
+    size: string
+    spacing: string
+    alignment: string
+    showIcons: boolean
+    showDescriptions: boolean
+    hoverEffect: string
+    animationSpeed: number
+  }
+  // Configurações dos botões sociais
+  socialButtonsSettings?: {
+    style: string
+    size: string
+    shape: string
+    spacing: string
+    alignment: string
+    showLabels: boolean
+    hoverEffect: string
+    animationSpeed: number
+    backgroundColor: string
+    iconColor: string
+    borderColor: string
+    hoverBackgroundColor: string
+    hoverIconColor: string
+  }
+  // Configurações de imagens
+  imageSettings?: {
+    position: string
+    size: string
+    borderRadius: string
+    spacing: string
+  }
+  // Configurações do avatar
+  avatarSettings?: {
+    size: string
+    shape: string
+    borderWidth: number
+    borderColor: string
+    shadow: string
+    position: string
+  }
+  // Configurações de background
+  backgroundSettings?: {
+    position: string
+    size: string
+    repeat: string
+    attachment: string
+  }
 }
 
 export interface PrivacySettings {

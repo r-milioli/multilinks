@@ -35,7 +35,63 @@ export async function GET() {
       backgroundType: 'solid',
       fontFamily: 'Inter',
       buttonStyle: 'rounded',
-      borderRadius: 8
+      borderRadius: 8,
+      nameColor: '#1E293B',
+      titleColor: '#64748B',
+      bioColor: '#1E293B',
+      buttonColors: {
+        background: '#FFFFFF',
+        text: '#1E293B',
+        border: '#E5E7EB',
+        hoverBackground: '#F9FAFB',
+        hoverText: '#1E293B',
+        hoverBorder: '#D1D5DB'
+      },
+      linkButtonSettings: {
+        style: 'default',
+        size: 'medium',
+        spacing: 'normal',
+        alignment: 'center',
+        showIcons: true,
+        showDescriptions: true,
+        hoverEffect: 'scale',
+        animationSpeed: 300
+      },
+      socialButtonsSettings: {
+        style: 'default',
+        size: 'medium',
+        shape: 'circle',
+        spacing: 'normal',
+        alignment: 'center',
+        showLabels: false,
+        hoverEffect: 'scale',
+        animationSpeed: 300,
+        backgroundColor: '#FFFFFF',
+        iconColor: '#374151',
+        borderColor: '#E5E7EB',
+        hoverBackgroundColor: '#F9FAFB',
+        hoverIconColor: '#1F2937'
+      },
+      imageSettings: {
+        position: 'left',
+        size: 'medium',
+        borderRadius: 'rounded',
+        spacing: 'normal'
+      },
+      avatarSettings: {
+        size: 'medium',
+        shape: 'circle',
+        borderWidth: 2,
+        borderColor: '#E5E7EB',
+        shadow: 'none',
+        position: 'top'
+      },
+      backgroundSettings: {
+        position: 'center',
+        size: 'cover',
+        repeat: 'no-repeat',
+        attachment: 'scroll'
+      }
     }
 
     return NextResponse.json({

@@ -244,83 +244,171 @@ export function ThemeEditorContent() {
             icon={<Palette className="w-5 h-5" />}
             defaultOpen={true}
           >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="primaryColor" className="text-sm font-medium">
+                      Cor Primária
+                    </Label>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Usada para gradientes e elementos de destaque
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        id="primaryColor"
+                        type="color"
+                        value={localTheme.primaryColor}
+                        onChange={(e) => handleUpdateProperty('primaryColor', e.target.value)}
+                        className="h-10 w-20"
+                      />
+                      <Input
+                        type="text"
+                        value={localTheme.primaryColor}
+                        onChange={(e) => handleUpdateProperty('primaryColor', e.target.value)}
+                        className="flex-1"
+                        placeholder="#3B82F6"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="secondaryColor" className="text-sm font-medium">
+                      Cor Secundária
+                    </Label>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Usada para gradientes e elementos secundários
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        id="secondaryColor"
+                        type="color"
+                        value={localTheme.secondaryColor}
+                        onChange={(e) => handleUpdateProperty('secondaryColor', e.target.value)}
+                        className="h-10 w-20"
+                      />
+                      <Input
+                        type="text"
+                        value={localTheme.secondaryColor}
+                        onChange={(e) => handleUpdateProperty('secondaryColor', e.target.value)}
+                        className="flex-1"
+                        placeholder="#64748B"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="backgroundColor" className="text-sm font-medium">
+                      Cor de Fundo Sólida
+                    </Label>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Cor de fundo quando usar fundo sólido
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        id="backgroundColor"
+                        type="color"
+                        value={localTheme.backgroundColor}
+                        onChange={(e) => handleUpdateProperty('backgroundColor', e.target.value)}
+                        className="h-10 w-20"
+                      />
+                      <Input
+                        type="text"
+                        value={localTheme.backgroundColor}
+                        onChange={(e) => handleUpdateProperty('backgroundColor', e.target.value)}
+                        className="flex-1"
+                        placeholder="#FFFFFF"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </CollapsibleSection>
+
+          {/* Seção: Cores de Texto Individual */}
+          <CollapsibleSection
+            title="Cores de Texto Individual"
+            description="Configure cores específicas para cada tipo de texto"
+            icon={<Type className="w-5 h-5" />}
+            defaultOpen={false}
+          >
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="primaryColor">Cor Primária</Label>
+                  <Label htmlFor="nameColor" className="text-sm font-medium">
+                    Cor do Nome
+                  </Label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Cor do nome principal do usuário
+                  </p>
                   <div className="flex gap-2">
                     <Input
-                      id="primaryColor"
+                      id="nameColor"
                       type="color"
-                      value={localTheme.primaryColor}
-                      onChange={(e) => handleUpdateProperty('primaryColor', e.target.value)}
+                      value={localTheme.nameColor || localTheme.textColor || '#1E293B'}
+                      onChange={(e) => handleUpdateProperty('nameColor', e.target.value)}
                       className="h-10 w-20"
                     />
                     <Input
                       type="text"
-                      value={localTheme.primaryColor}
-                      onChange={(e) => handleUpdateProperty('primaryColor', e.target.value)}
+                      value={localTheme.nameColor || localTheme.textColor || '#1E293B'}
+                      onChange={(e) => handleUpdateProperty('nameColor', e.target.value)}
                       className="flex-1"
+                      placeholder="#1E293B"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="secondaryColor">Cor Secundária</Label>
+                  <Label htmlFor="titleColor" className="text-sm font-medium">
+                    Cor do Título
+                  </Label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Cor do título/subtítulo do usuário
+                  </p>
                   <div className="flex gap-2">
                     <Input
-                      id="secondaryColor"
+                      id="titleColor"
                       type="color"
-                      value={localTheme.secondaryColor}
-                      onChange={(e) => handleUpdateProperty('secondaryColor', e.target.value)}
+                      value={localTheme.titleColor || localTheme.secondaryColor || '#64748B'}
+                      onChange={(e) => handleUpdateProperty('titleColor', e.target.value)}
                       className="h-10 w-20"
                     />
                     <Input
                       type="text"
-                      value={localTheme.secondaryColor}
-                      onChange={(e) => handleUpdateProperty('secondaryColor', e.target.value)}
+                      value={localTheme.titleColor || localTheme.secondaryColor || '#64748B'}
+                      onChange={(e) => handleUpdateProperty('titleColor', e.target.value)}
                       className="flex-1"
+                      placeholder="#64748B"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="textColor">Cor do Texto</Label>
+                  <Label htmlFor="bioColor" className="text-sm font-medium">
+                    Cor da Biografia
+                  </Label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Cor do texto da biografia/descrição
+                  </p>
                   <div className="flex gap-2">
                     <Input
-                      id="textColor"
+                      id="bioColor"
                       type="color"
-                      value={localTheme.textColor}
-                      onChange={(e) => handleUpdateProperty('textColor', e.target.value)}
+                      value={localTheme.bioColor || localTheme.textColor || '#1E293B'}
+                      onChange={(e) => handleUpdateProperty('bioColor', e.target.value)}
                       className="h-10 w-20"
                     />
                     <Input
                       type="text"
-                      value={localTheme.textColor}
-                      onChange={(e) => handleUpdateProperty('textColor', e.target.value)}
+                      value={localTheme.bioColor || localTheme.textColor || '#1E293B'}
+                      onChange={(e) => handleUpdateProperty('bioColor', e.target.value)}
                       className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="backgroundColor">Cor de Fundo</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="backgroundColor"
-                      type="color"
-                      value={localTheme.backgroundColor}
-                      onChange={(e) => handleUpdateProperty('backgroundColor', e.target.value)}
-                      className="h-10 w-20"
-                    />
-                    <Input
-                      type="text"
-                      value={localTheme.backgroundColor}
-                      onChange={(e) => handleUpdateProperty('backgroundColor', e.target.value)}
-                      className="flex-1"
+                      placeholder="#1E293B"
                     />
                   </div>
                 </div>
               </div>
+            </div>
           </CollapsibleSection>
 
           {/* Seção: Tipografia */}

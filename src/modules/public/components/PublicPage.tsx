@@ -134,11 +134,166 @@ export function PublicPage({ user }: PublicPageProps) {
   const privacySettings = user.privacySettings as any || {}
   const integrationSettings = user.integrationSettings as any || {}
 
+  // Configurações do avatar
+  const avatarSettings = themeSettings?.avatarSettings || {
+    size: 'medium',
+    shape: 'circle',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    shadow: 'none',
+    position: 'top'
+  }
+
+  // Funções auxiliares para configurações do avatar
+  const getAvatarSizeClasses = (size: string) => {
+    switch (size) {
+      case 'small':
+        return 'w-16 h-16'
+      case 'medium':
+        return 'w-20 h-20'
+      case 'large':
+        return 'w-24 h-24'
+      case 'xlarge':
+        return 'w-32 h-32'
+      default:
+        return 'w-20 h-20'
+    }
+  }
+
+  const getAvatarShapeClasses = (shape: string) => {
+    switch (shape) {
+      case 'circle':
+        return 'rounded-full'
+      case 'square':
+        return 'rounded-lg'
+      case 'rounded':
+        return 'rounded-2xl'
+      case 'hexagon':
+        return 'rounded-none'
+      default:
+        return 'rounded-full'
+    }
+  }
+
+  const getAvatarShadowClasses = (shadow: string) => {
+    switch (shadow) {
+      case 'none':
+        return ''
+      case 'sm':
+        return 'shadow-sm'
+      case 'md':
+        return 'shadow-md'
+      case 'lg':
+        return 'shadow-lg'
+      case 'xl':
+        return 'shadow-xl'
+      case 'glow':
+        return 'shadow-lg shadow-blue-500/25'
+      default:
+        return 'shadow-lg'
+    }
+  }
+
+  const getAvatarPositionClasses = (position: string) => {
+    switch (position) {
+      case 'top':
+        return 'flex-col items-center text-center'
+      case 'center':
+        return 'flex-col-reverse items-center text-center'
+      default:
+        return 'flex-col items-center text-center'
+    }
+  }
+
+  const renderAvatar = () => (
+    <div className="relative mb-4">
+      {user.avatar ? (
+        <img
+          src={user.avatar}
+          alt={user.name || 'Avatar'}
+          className={cn(
+            getAvatarSizeClasses(avatarSettings.size),
+            getAvatarShapeClasses(avatarSettings.shape),
+            getAvatarShadowClasses(avatarSettings.shadow),
+            'mx-auto object-cover'
+          )}
+          style={{
+            borderWidth: `${avatarSettings.borderWidth}px`,
+            borderColor: avatarSettings.borderColor,
+            borderStyle: 'solid'
+          }}
+        />
+      ) : (
+        <div 
+          className={cn(
+            getAvatarSizeClasses(avatarSettings.size),
+            getAvatarShapeClasses(avatarSettings.shape),
+            getAvatarShadowClasses(avatarSettings.shadow),
+            'mx-auto bg-primary/10 flex items-center justify-center'
+          )}
+          style={{
+            borderWidth: `${avatarSettings.borderWidth}px`,
+            borderColor: avatarSettings.borderColor,
+            borderStyle: 'solid'
+          }}
+        >
+          <span 
+            className="text-2xl font-semibold"
+            style={{ color: themeSettings.primaryColor || '#3B82F6' }}
+          >
+            {getInitials(user.name || user.email)}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+
+  const renderProfileInfo = () => (
+    <div>
+      {/* Name and Title */}
+      <h1 
+        className="text-2xl font-bold mb-2"
+        style={{ color: themeSettings.nameColor || themeSettings.textColor || '#1E293B' }}
+      >
+        {user.name || user.username}
+      </h1>
+      
+      {user.title && (
+        <p 
+          className="text-lg mb-4"
+          style={{ color: themeSettings.titleColor || themeSettings.secondaryColor || '#64748B' }}
+        >
+          {user.title}
+        </p>
+      )}
+
+      {/* Email - only show if privacy allows */}
+      {privacySettings.showEmail && user.email && (
+        <p 
+          className="text-sm mb-4"
+          style={{ color: themeSettings.titleColor || themeSettings.secondaryColor || '#64748B', opacity: 0.7 }}
+        >
+          {user.email}
+        </p>
+      )}
+
+      {/* Bio */}
+      {user.bio && (
+        <p 
+          className="leading-relaxed"
+          style={{ color: themeSettings.bioColor || themeSettings.textColor || '#1E293B' }}
+        >
+          {user.bio}
+        </p>
+      )}
+    </div>
+  )
+
   // Aplicar estilos do tema diretamente
   const getBackgroundStyle = () => {
     if (themeSettings.backgroundType === 'gradient') {
       return {
-        background: `linear-gradient(135deg, ${themeSettings.backgroundColor || '#FFFFFF'}, ${themeSettings.secondaryColor || '#64748B'})`
+        background: `linear-gradient(135deg, ${themeSettings.primaryColor || '#3B82F6'}, ${themeSettings.secondaryColor || '#64748B'})`
       }
     }
     if (themeSettings.backgroundType === 'image' && themeSettings.backgroundImage) {
@@ -182,47 +337,17 @@ export function PublicPage({ user }: PublicPageProps) {
       >
         <div className="container mx-auto px-4 py-8 max-w-md">
           {/* Profile Header */}
-          <div className="text-center mb-8">
-            {/* Avatar */}
-            <div className="relative mb-4">
-              {user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.name || 'Avatar'}
-                  className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-white shadow-lg"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full mx-auto bg-primary/10 flex items-center justify-center border-4 border-white shadow-lg">
-                  <span className="text-2xl font-semibold text-primary">
-                    {getInitials(user.name || user.email)}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Name and Title */}
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {user.name || user.username}
-            </h1>
-            
-            {user.title && (
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
-                {user.title}
-              </p>
-            )}
-
-            {/* Email - only show if privacy allows */}
-            {privacySettings.showEmail && user.email && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                {user.email}
-              </p>
-            )}
-
-            {/* Bio */}
-            {user.bio && (
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                {user.bio}
-              </p>
+          <div className={cn("mb-8", getAvatarPositionClasses(avatarSettings.position))}>
+            {avatarSettings.position === 'top' ? (
+              <>
+                {renderAvatar()}
+                {renderProfileInfo()}
+              </>
+            ) : (
+              <>
+                {renderProfileInfo()}
+                {renderAvatar()}
+              </>
             )}
           </div>
 

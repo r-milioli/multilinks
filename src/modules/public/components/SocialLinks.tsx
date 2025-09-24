@@ -205,7 +205,14 @@ export function SocialLinks({ socialLinks, themeSettings }: SocialLinksProps) {
               className={getIconSizeClasses(socialButtonsSettings.size)}
             />
             {socialButtonsSettings.showLabels && (
-              <span className="ml-2 text-xs font-medium hidden sm:inline">
+              <span 
+                className="ml-2 text-xs font-medium hidden sm:inline"
+                style={{ 
+                  color: socialButtonsSettings.style === 'filled' ? '#FFFFFF' : 
+                         socialButtonsSettings.style === 'outlined' ? platformData.color :
+                         socialButtonsSettings.iconColor || '#374151'
+                }}
+              >
                 {socialLink.platform}
               </span>
             )}

@@ -19,6 +19,10 @@ export const PRESET_THEMES = {
     fontFamily: 'Inter',
     buttonStyle: 'rounded' as const,
     borderRadius: 8,
+    // Cores individuais para textos
+    nameColor: '#1E293B',
+    titleColor: '#64748B',
+    bioColor: '#1E293B',
     buttonColors: {
       background: '#FFFFFF',
       text: '#1E293B',
@@ -83,6 +87,10 @@ export const PRESET_THEMES = {
     fontFamily: 'Inter',
     buttonStyle: 'rounded' as const,
     borderRadius: 8,
+    // Cores individuais para textos
+    nameColor: '#F8FAFC',
+    titleColor: '#94A3B8',
+    bioColor: '#F8FAFC',
     buttonColors: {
       background: '#1F2937',
       text: '#F9FAFB',
