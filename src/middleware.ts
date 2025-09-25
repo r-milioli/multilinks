@@ -69,7 +69,8 @@ export const config = {
     '/register',
     '/api/links/:path*',
     '/api/user/:path*',
-    '/api/analytics/:path*'
+    '/api/analytics/:path*',
+    '/api/admin/:path*'
   ]
 }
 

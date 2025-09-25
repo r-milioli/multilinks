@@ -1,4 +1,5 @@
 import { ApiResponse } from '@/types/common.types'
+import { getSession } from 'next-auth/react'
 
 class ApiClient {
   private baseURL: string
@@ -13,11 +14,21 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`
     
+    // Buscar token de autenticação
+    const session = await getSession()
+    const authHeaders: Record<string, string> = {}
+    
+    if (session?.accessToken) {
+      authHeaders['Authorization'] = `Bearer ${session.accessToken}`
+    }
+    
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...options.headers,
       },
+      credentials: 'include', // Incluir cookies de autenticação
       ...options,
     }
 

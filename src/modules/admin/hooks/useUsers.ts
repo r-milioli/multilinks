@@ -70,7 +70,7 @@ export function useUsers(filters?: UserFilters) {
       if (currentFilters.sortBy) queryParams.append('sortBy', currentFilters.sortBy)
       if (currentFilters.sortOrder) queryParams.append('sortOrder', currentFilters.sortOrder)
 
-      const response = await apiClient.get(`/api/admin/users?${queryParams.toString()}`)
+      const response = await apiClient.get(`/admin/users?${queryParams.toString()}`)
 
       if (response.success && response.data) {
         setUsers(response.data.users || [])
@@ -90,7 +90,7 @@ export function useUsers(filters?: UserFilters) {
 
   const updateUser = async (userId: string, userData: Partial<User>) => {
     try {
-      const response = await apiClient.put(`/api/admin/users/${userId}`, userData)
+      const response = await apiClient.put(`/admin/users/${userId}`, userData)
 
       if (response.success) {
         // Recarregar a lista de usuários
@@ -107,7 +107,7 @@ export function useUsers(filters?: UserFilters) {
 
   const deleteUser = async (userId: string) => {
     try {
-      const response = await apiClient.delete(`/api/admin/users/${userId}`)
+      const response = await apiClient.delete(`/admin/users/${userId}`)
 
       if (response.success) {
         // Recarregar a lista de usuários
