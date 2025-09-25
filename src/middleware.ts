@@ -32,7 +32,9 @@ export default withAuth(
           '/api/analytics/click',
           '/api/analytics/visit',
           '/api/forms/public',
-          '/api/leads'
+          '/api/leads',
+          '/api/public',
+          '/api/debug'
         ]
 
         // Verificar se é rota pública
