@@ -214,11 +214,18 @@ export class SystemSettingsService {
    */
   static async getFormattedSettings() {
     try {
+      console.log('🔍 SystemSettingsService - Iniciando busca de configurações...')
+      
       const [socialLinksResult, contactInfoResult, plansResult] = await Promise.all([
         this.getSetting('social_links'),
         this.getSetting('contact_info'),
         this.getSetting('plans')
       ])
+
+      console.log('🔍 SystemSettingsService - Resultados das buscas:')
+      console.log('  - Social Links:', JSON.stringify(socialLinksResult, null, 2))
+      console.log('  - Contact Info:', JSON.stringify(contactInfoResult, null, 2))
+      console.log('  - Plans:', JSON.stringify(plansResult, null, 2))
 
       const defaultSettings: SystemSettingsData = {
         socialLinks: {
@@ -239,22 +246,85 @@ export class SystemSettingsService {
         ]
       }
 
-      return {
+      const result = {
         success: true,
         data: {
-          socialLinks: socialLinksResult.success && socialLinksResult.data 
+          socialLinks: socialLinksResult.success && socialLinksResult.data && socialLinksResult.data.value
             ? socialLinksResult.data.value 
             : defaultSettings.socialLinks,
-          contactInfo: contactInfoResult.success && contactInfoResult.data 
+          contactInfo: contactInfoResult.success && contactInfoResult.data && contactInfoResult.data.value
             ? contactInfoResult.data.value 
             : defaultSettings.contactInfo,
-          plans: plansResult.success && plansResult.data 
+          plans: plansResult.success && plansResult.data && plansResult.data.value
             ? plansResult.data.value 
             : defaultSettings.plans
         }
       }
+
+      console.log('✅ SystemSettingsService - Dados finais:', JSON.stringify(result, null, 2))
+
+      return result
     } catch (error) {
-      console.error('Erro ao carregar configurações formatadas:', error)
+      console.error('❌ SystemSettingsService - Erro ao carregar configurações formatadas:', error)
+      return {
+        success: false,
+        error: 'Erro interno do servidor'
+      }
+    }
+  }
+
+  /**
+   * Inicializar configurações padrão se não existirem
+   */
+  static async initializeDefaultSettings() {
+    try {
+      console.log('🔧 SystemSettingsService - Inicializando configurações padrão...')
+      
+      const defaultSettings = [
+        {
+          key: 'social_links',
+          value: {
+            instagram: '',
+            facebook: '',
+            twitter: '',
+            linkedin: ''
+          },
+          description: 'Links das redes sociais do sistema',
+          category: 'social',
+          isPublic: true
+        },
+        {
+          key: 'contact_info',
+          value: {
+            email: '',
+            phone: '',
+            address: ''
+          },
+          description: 'Informações de contato do sistema',
+          category: 'contact',
+          isPublic: true
+        },
+        {
+          key: 'plans',
+          value: [
+            { name: 'Gratuito', price: 0, features: ['5 links', '1 formulário'] },
+            { name: 'Pro', price: 29.90, features: ['Links ilimitados', 'Formulários ilimitados'] },
+            { name: 'Business', price: 99.90, features: ['Tudo do Pro', 'Analytics avançado'] }
+          ],
+          description: 'Planos e preços do sistema',
+          category: 'pricing',
+          isPublic: true
+        }
+      ]
+
+      for (const setting of defaultSettings) {
+        await this.upsertSetting(setting)
+      }
+
+      console.log('✅ SystemSettingsService - Configurações padrão inicializadas')
+      return { success: true }
+    } catch (error) {
+      console.error('❌ SystemSettingsService - Erro ao inicializar configurações padrão:', error)
       return {
         success: false,
         error: 'Erro interno do servidor'
