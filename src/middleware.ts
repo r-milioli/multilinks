@@ -15,6 +15,15 @@ export default withAuth(
     if (!token && pathname.startsWith('/dashboard')) {
       return NextResponse.redirect(new URL('/login', req.url))
     }
+
+    // Verificar permissões de administrador para rotas admin
+    if (pathname.startsWith('/dashboard') && pathname.includes('admin')) {
+      const userRole = (token as any)?.role
+      
+      if (!userRole || (userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN')) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
+    }
   },
   {
     callbacks: {

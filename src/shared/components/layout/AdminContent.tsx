@@ -35,6 +35,7 @@ import { useSystemSettings, SystemSettingsData } from '@/modules/admin/hooks/use
 import { useUsers, User } from '@/modules/admin/hooks/useUsers'
 import { useAdminStats } from '@/modules/admin/hooks/useAdminStats'
 import { UserEditModal } from '@/modules/admin/components/UserEditModal'
+import { AdminGuard } from '@/shared/components/AdminGuard'
 
 export function AdminContent() {
   const { currentSection } = useNavigation()
@@ -927,12 +928,18 @@ export function AdminContent() {
   )
 
   // Renderizar conteúdo baseado na seção atual
-  switch (currentSection) {
-    case 'admin-settings':
-      return renderSystemSettings()
-    case 'admin-users':
-      return renderUserManagement()
-    default:
-      return renderAdminDashboard()
-  }
+  return (
+    <AdminGuard>
+      {(() => {
+        switch (currentSection) {
+          case 'admin-settings':
+            return renderSystemSettings()
+          case 'admin-users':
+            return renderUserManagement()
+          default:
+            return renderAdminDashboard()
+        }
+      })()}
+    </AdminGuard>
+  )
 }

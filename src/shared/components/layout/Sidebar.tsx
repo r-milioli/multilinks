@@ -28,6 +28,7 @@ import {
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
+import { useAdminAuth } from '@/modules/auth/hooks/useAdminAuth'
 
 interface MenuItem {
   id: string
@@ -44,6 +45,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { currentSection, setCurrentSection } = useNavigation()
+  const { isAdmin } = useAdminAuth()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   console.log('🔧 Sidebar: currentSection =', currentSection, 'setCurrentSection =', setCurrentSection)
@@ -181,6 +183,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     }
   ]
 
+  // Filtrar itens do menu baseado nas permissões do usuário
+  const filteredMenuItems = menuItems.filter(item => {
+    // Se não for o menu de administração, sempre mostrar
+    if (item.id !== 'admin') {
+      return true
+    }
+    
+    // Menu de administração só é visível para ADMIN e SUPER_ADMIN
+    return isAdmin
+  })
+
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
       prev.includes(itemId) 
@@ -299,7 +312,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Menu */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {menuItems.map(item => renderMenuItem(item))}
+            {filteredMenuItems.map(item => renderMenuItem(item))}
           </nav>
 
           {/* Footer */}

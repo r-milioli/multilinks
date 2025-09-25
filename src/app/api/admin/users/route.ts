@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { requireAdminAuth } from '@/lib/adminAuth'
+
+// Forçar renderização dinâmica
+export const dynamic = 'force-dynamic'
 
 /**
  * GET /api/admin/users
@@ -7,6 +11,12 @@ import { prisma } from '@/lib/db'
  */
 export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação e permissões de admin
+    const authError = await requireAdminAuth(request)
+    if (authError) {
+      return authError
+    }
+
     console.log('🔍 API Users - Iniciando busca de usuários...')
 
     // Versão ultra simplificada para debug

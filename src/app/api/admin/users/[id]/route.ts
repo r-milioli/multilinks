@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { requireAdminAuth } from '@/lib/adminAuth'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+
+// Forçar renderização dinâmica
+export const dynamic = 'force-dynamic'
 
 /**
  * PUT /api/admin/users/[id]
@@ -12,11 +16,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    // TODO: Verificar autenticação e permissões quando implementarmos
-    // const session = await getServerSession(authOptions)
-    // if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
-    //   return NextResponse.json({ success: false, error: 'Não autorizado' }, { status: 401 })
-    // }
+    // Verificar autenticação e permissões de admin
+    const authError = await requireAdminAuth(request)
+    if (authError) {
+      return authError
+    }
 
     const userId = params.id
     const body = await request.json()
@@ -96,11 +100,11 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // TODO: Verificar autenticação e permissões quando implementarmos
-    // const session = await getServerSession(authOptions)
-    // if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
-    //   return NextResponse.json({ success: false, error: 'Não autorizado' }, { status: 401 })
-    // }
+    // Verificar autenticação e permissões de admin
+    const authError = await requireAdminAuth(request)
+    if (authError) {
+      return authError
+    }
 
     const userId = params.id
 

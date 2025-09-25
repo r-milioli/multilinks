@@ -1,6 +1,7 @@
 'use client'
 
 import { useNavigation } from '@/shared/contexts/NavigationContext'
+import { useAdminAuth } from '@/modules/auth/hooks/useAdminAuth'
 import { DashboardContent } from './DashboardContent'
 import { FormsListContent } from './FormsListContent'
 import { FormsCreateContent } from './FormsCreateContent'
@@ -16,6 +17,15 @@ export function DynamicContent() {
   } catch (error) {
     console.error('❌ DynamicContent: Erro ao usar useNavigation', error)
     return <div>Erro: useNavigation não encontrado</div>
+  }
+
+  // Verificar se é uma seção administrativa e se o usuário tem permissão
+  const { isAdmin } = useAdminAuth()
+  const isAdminSection = currentSection?.startsWith('admin')
+  
+  if (isAdminSection && !isAdmin) {
+    // Redirecionar para dashboard se usuário tentar acessar seção admin sem permissão
+    return <DashboardContent />
   }
 
   switch (currentSection) {

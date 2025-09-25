@@ -54,7 +54,8 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             image: user.avatar,
             avatar: user.avatar,
-            username: user.username
+            username: user.username,
+            role: user.role
           }
         } catch (error) {
           console.error('Erro na autenticação:', error)
@@ -86,6 +87,7 @@ export const authOptions: NextAuthOptions = {
         token.avatar = (user as any).avatar || (user as any).image
         token.name = (user as any).name
         token.email = (user as any).email
+        token.role = (user as any).role
       }
       
       // Buscar avatar atualizado do banco se necessário
@@ -128,6 +130,7 @@ export const authOptions: NextAuthOptions = {
           session.user.avatar = token.avatar as string
           session.user.name = token.name as string
           session.user.email = token.email as string
+          session.user.role = token.role as string
         } catch (error) {
           console.error('Erro ao verificar usuário na sessão:', error)
           // Em caso de erro, retornar sessão vazia

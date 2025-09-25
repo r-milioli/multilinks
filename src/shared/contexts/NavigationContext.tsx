@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, ReactNode } from 'react'
+import { useAdminAuth } from '@/modules/auth/hooks/useAdminAuth'
 
 type NavigationSection = 
   | 'dashboard' 
@@ -18,6 +19,9 @@ type NavigationSection =
   | 'settings-security'
   | 'settings-integrations'
   | 'settings-danger'
+  | 'admin-dashboard'
+  | 'admin-users'
+  | 'admin-settings'
 
 interface NavigationContextType {
   currentSection: NavigationSection
@@ -35,9 +39,17 @@ interface NavigationProviderProps {
 export function NavigationProvider({ children }: NavigationProviderProps) {
   const [currentSection, setCurrentSection] = useState<NavigationSection>('dashboard')
   const [title, setTitle] = useState('Dashboard')
+  const { isAdmin } = useAdminAuth()
 
   const updateSection = (section: NavigationSection) => {
     console.log('🔄 NavigationContext: Mudando seção de', currentSection, 'para', section)
+    
+    // Verificar se é uma seção administrativa e se o usuário tem permissão
+    if (section.startsWith('admin') && !isAdmin) {
+      console.log('🚫 NavigationContext: Usuário não tem permissão para acessar seção admin:', section)
+      return // Não permitir navegação para seções administrativas
+    }
+    
     setCurrentSection(section)
     
     // Atualizar título baseado na seção
@@ -56,7 +68,10 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
       'settings-appearance': 'Aparência',
       'settings-security': 'Segurança',
       'settings-integrations': 'Integrações',
-      'settings-danger': 'Zona de Perigo'
+      'settings-danger': 'Zona de Perigo',
+      'admin-dashboard': 'Dashboard Admin',
+      'admin-users': 'Gerenciar Usuários',
+      'admin-settings': 'Configurações do Sistema'
     }
     
     const newTitle = titles[section]
