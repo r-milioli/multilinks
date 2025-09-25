@@ -16,7 +16,13 @@ import {
   Eye,
   Edit,
   Trash2,
-  Plus
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  UserCheck,
+  UserX,
+  Calendar
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Button } from '@/shared/components/ui/Button'
@@ -25,12 +31,38 @@ import { Input } from '@/shared/components/ui/Input'
 import { Label } from '@/shared/components/ui/Label'
 import { Textarea } from '@/shared/components/ui/Textarea'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
-import { useSystemSettings } from '@/modules/admin/hooks/useSystemSettings'
-import { SystemSettingsData } from '@/modules/admin/services/systemSettingsService'
+import { useSystemSettings, SystemSettingsData } from '@/modules/admin/hooks/useSystemSettings'
+import { useUsers, User } from '@/modules/admin/hooks/useUsers'
+import { UserEditModal } from '@/modules/admin/components/UserEditModal'
 
 export function AdminContent() {
   const { currentSection } = useNavigation()
   const { settings, isLoading, isSaving, saveSocialLinks, saveContactInfo, savePlans } = useSystemSettings()
+  
+  // Estados para gerenciamento de usuários
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedRole, setSelectedRole] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('')
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  
+  const { 
+    users, 
+    total, 
+    page, 
+    totalPages, 
+    isLoading: usersLoading, 
+    error: usersError,
+    loadUsers,
+    updateUser,
+    deleteUser,
+    toggleUserStatus,
+    changeUserRole
+  } = useUsers({
+    search: searchTerm,
+    role: selectedRole,
+    status: selectedStatus
+  })
 
   // Estados para formulários
   const [socialLinksForm, setSocialLinksForm] = useState({
@@ -415,21 +447,123 @@ export function AdminContent() {
         <p className="text-gray-600 dark:text-gray-400">Controle e gerencie todos os usuários do sistema</p>
       </div>
 
+      {/* Estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-blue-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total de Usuários</p>
+                <p className="text-2xl font-bold text-gray-900">{total}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <UserCheck className="h-8 w-8 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Usuários Ativos</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.filter(u => u.status === 'active').length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Shield className="h-8 w-8 text-purple-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Administradores</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.filter(u => ['ADMIN', 'SUPER_ADMIN'].includes(u.role)).length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Activity className="h-8 w-8 text-orange-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Links Criados</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.reduce((acc, user) => acc + (user.stats?.totalLinks || 0), 0)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Filtros e Busca */}
       <Card>
         <CardHeader>
-          <CardTitle>Filtros e Busca</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Filtros e Busca
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Input placeholder="Buscar por nome ou email..." />
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input 
+                  placeholder="Buscar por nome, email ou username..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline">Todos</Button>
-              <Button variant="outline">Ativos</Button>
-              <Button variant="outline">Inativos</Button>
-              <Button variant="outline">Admins</Button>
+              <Button 
+                variant={selectedRole === '' ? 'default' : 'outline'}
+                onClick={() => setSelectedRole('')}
+              >
+                Todos os Roles
+              </Button>
+              <Button 
+                variant={selectedRole === 'USER' ? 'default' : 'outline'}
+                onClick={() => setSelectedRole(selectedRole === 'USER' ? '' : 'USER')}
+              >
+                Usuários
+              </Button>
+              <Button 
+                variant={selectedRole === 'ADMIN' ? 'default' : 'outline'}
+                onClick={() => setSelectedRole(selectedRole === 'ADMIN' ? '' : 'ADMIN')}
+              >
+                Admins
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant={selectedStatus === '' ? 'default' : 'outline'}
+                onClick={() => setSelectedStatus('')}
+              >
+                Todos
+              </Button>
+              <Button 
+                variant={selectedStatus === 'active' ? 'default' : 'outline'}
+                onClick={() => setSelectedStatus(selectedStatus === 'active' ? '' : 'active')}
+              >
+                Ativos
+              </Button>
+              <Button 
+                variant={selectedStatus === 'inactive' ? 'default' : 'outline'}
+                onClick={() => setSelectedStatus(selectedStatus === 'inactive' ? '' : 'inactive')}
+              >
+                Inativos
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -439,48 +573,159 @@ export function AdminContent() {
       <Card>
         <CardHeader>
           <CardTitle>Usuários do Sistema</CardTitle>
-          <CardDescription>Lista completa de usuários com opções de gerenciamento</CardDescription>
+          <CardDescription>
+            {total > 0 ? `${total} usuário(s) encontrado(s)` : 'Nenhum usuário encontrado'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentUsers.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium">
-                      {user.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
-                    <p className="text-xs text-muted-foreground">Cadastrado em: {user.joinedAt}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
-                    {user.role}
-                  </Badge>
-                  <Badge variant={user.status === 'active' ? 'default' : 'outline'}>
-                    {user.status}
-                  </Badge>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+          {usersError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+              {usersError}
+            </div>
+          )}
+          
+          {usersLoading ? (
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="flex items-center space-x-4 p-4 border rounded-lg">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {users.map((user) => (
+                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-medium">
+                        {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{user.name}</p>
+                        {user.emailVerified && (
+                          <Badge variant="outline" className="text-xs">
+                            Verificado
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(user.createdAt).toLocaleDateString('pt-BR')}
+                        </span>
+                        <span>{user.stats?.totalLinks || 0} links</span>
+                        <span>{user.stats?.totalClicks || 0} cliques</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Badge variant={user.role === 'SUPER_ADMIN' ? 'destructive' : user.role === 'ADMIN' ? 'default' : 'secondary'}>
+                      {user.role === 'SUPER_ADMIN' ? 'Super Admin' : user.role === 'ADMIN' ? 'Admin' : 'Usuário'}
+                    </Badge>
+                    <Badge variant={user.status === 'active' ? 'default' : 'outline'}>
+                      {user.status === 'active' ? 'Ativo' : user.status === 'inactive' ? 'Inativo' : 'Suspenso'}
+                    </Badge>
+                    
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => toggleUserStatus(user.id)}
+                        title={user.status === 'active' ? 'Desativar usuário' : 'Ativar usuário'}
+                      >
+                        {user.status === 'active' ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setEditingUser(user)
+                          setIsEditModalOpen(true)
+                        }}
+                        title="Editar usuário"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          if (confirm(`Tem certeza que deseja deletar o usuário ${user.name}?`)) {
+                            deleteUser(user.id)
+                          }
+                        }}
+                        title="Deletar usuário"
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {users.length === 0 && !usersLoading && (
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">Nenhum usuário encontrado</p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6">
+              <p className="text-sm text-gray-700">
+                Página {page} de {totalPages} ({total} usuários)
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => loadUsers({ page: page - 1 })}
+                  disabled={page <= 1}
+                >
+                  Anterior
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => loadUsers({ page: page + 1 })}
+                  disabled={page >= totalPages}
+                >
+                  Próxima
+                </Button>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Modal de Edição */}
+      <UserEditModal
+        user={editingUser}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setEditingUser(null)
+        }}
+        onSave={updateUser}
+      />
     </div>
   )
 
