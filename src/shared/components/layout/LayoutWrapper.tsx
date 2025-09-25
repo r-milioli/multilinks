@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
+import { Footer } from './Footer'
 import { cn } from '@/shared/utils/cn'
 import { NavigationProvider } from '@/shared/contexts/NavigationContext'
 
@@ -43,6 +44,9 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
             {children}
           </div>
         </main>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </NavigationProvider>
   )

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/shared/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Badge } from '@/shared/components/ui/Badge'
+import { Footer } from '@/shared/components/layout/Footer'
 import { 
   ArrowRight, 
   Link as LinkIcon, 
@@ -35,11 +36,7 @@ import {
   UserCheck,
   Mail,
   Phone,
-  MapPin,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Github
+  MapPin
 } from 'lucide-react'
 
 export default function HomePage() {
@@ -452,65 +449,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-32 bg-black border-t border-gray-700 text-white">
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-pink-500 rounded-xl flex items-center justify-center">
-                  <LinkIcon className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <span className="text-2xl font-bold text-white">MultiLink</span>
-                  <p className="text-xs text-gray-400">Link in Bio</p>
-                </div>
-              </div>
-              <p className="text-gray-400">
-                A plataforma mais completa para gerenciar seus links e crescer online.
-              </p>
-              <div className="flex space-x-4">
-                <Twitter className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-                <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-                <Linkedin className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-                <Github className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4 text-white">Produto</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="#features" className="hover:text-white">Funcionalidades</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Preços</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4 text-white">Suporte</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/contact" className="hover:text-white">Contato</Link></li>
-                <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4 text-white">Legal</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/terms" className="hover:text-white">Termos de Uso</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Política de Privacidade</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">
-              © {new Date().getFullYear()} MultiLink. Todos os direitos reservados.
-            </p>
-            <p className="text-gray-400 mt-4 md:mt-0">
-              Feito com <Heart className="inline h-4 w-4 text-red-500" /> Por Robson Milioli
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
