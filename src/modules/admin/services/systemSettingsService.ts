@@ -246,18 +246,30 @@ export class SystemSettingsService {
         ]
       }
 
+      // Extrair dados com verificação mais robusta
+      const socialLinks = socialLinksResult.success && socialLinksResult.data?.value 
+        ? socialLinksResult.data.value 
+        : defaultSettings.socialLinks
+      
+      const contactInfo = contactInfoResult.success && contactInfoResult.data?.value 
+        ? contactInfoResult.data.value 
+        : defaultSettings.contactInfo
+      
+      const plans = plansResult.success && plansResult.data?.value 
+        ? plansResult.data.value 
+        : defaultSettings.plans
+
+      console.log('🔍 SystemSettingsService - Dados extraídos:')
+      console.log('  - Social Links extraídos:', JSON.stringify(socialLinks, null, 2))
+      console.log('  - Contact Info extraídos:', JSON.stringify(contactInfo, null, 2))
+      console.log('  - Plans extraídos:', JSON.stringify(plans, null, 2))
+
       const result = {
         success: true,
         data: {
-          socialLinks: socialLinksResult.success && socialLinksResult.data && socialLinksResult.data.value
-            ? socialLinksResult.data.value 
-            : defaultSettings.socialLinks,
-          contactInfo: contactInfoResult.success && contactInfoResult.data && contactInfoResult.data.value
-            ? contactInfoResult.data.value 
-            : defaultSettings.contactInfo,
-          plans: plansResult.success && plansResult.data && plansResult.data.value
-            ? plansResult.data.value 
-            : defaultSettings.plans
+          socialLinks,
+          contactInfo,
+          plans
         }
       }
 
