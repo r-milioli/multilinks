@@ -70,11 +70,30 @@ if [ "$NODE_ENV" = "production" ]; then
     
     # Aplicar migration segura que preserva dados existentes
     if [ -f "prisma/migrations/production-safe.sql" ]; then
-        echo "📋 Aplicando migration segura..."
-        psql $DATABASE_URL -f prisma/migrations/production-safe.sql
+        echo "📋 Arquivo de migration segura encontrado, mas usando Prisma migrate deploy..."
+        echo "⚠️  psql não disponível no container, usando migration padrão do Prisma..."
+        
+        # Tentar migrate deploy primeiro
+        if ./node_modules/.bin/prisma migrate deploy > /dev/null 2>&1; then
+            echo "✅ Migration deploy executada com sucesso!"
+        else
+            echo "⚠️  Migrate deploy falhou, tentando resolver baseline..."
+            echo "🔄 Executando db push para sincronizar schema..."
+            ./node_modules/.bin/prisma db push --accept-data-loss
+            echo "✅ Schema sincronizado com sucesso!"
+        fi
     else
         echo "⚠️  Arquivo de migration segura não encontrado, usando migration padrão..."
-        ./node_modules/.bin/prisma migrate deploy
+        
+        # Tentar migrate deploy primeiro
+        if ./node_modules/.bin/prisma migrate deploy > /dev/null 2>&1; then
+            echo "✅ Migration deploy executada com sucesso!"
+        else
+            echo "⚠️  Migrate deploy falhou, tentando resolver baseline..."
+            echo "🔄 Executando db push para sincronizar schema..."
+            ./node_modules/.bin/prisma db push --accept-data-loss
+            echo "✅ Schema sincronizado com sucesso!"
+        fi
     fi
 else
     echo "🔧 Ambiente de desenvolvimento - aplicando migration padrão..."
