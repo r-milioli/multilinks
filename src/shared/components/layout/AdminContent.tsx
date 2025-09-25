@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { 
   Users, 
   Settings, 
@@ -25,11 +25,34 @@ import { Input } from '@/shared/components/ui/Input'
 import { Label } from '@/shared/components/ui/Label'
 import { Textarea } from '@/shared/components/ui/Textarea'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
+import { useSystemSettings } from '@/modules/admin/hooks/useSystemSettings'
+import { SystemSettingsData } from '@/modules/admin/services/systemSettingsService'
 
 export function AdminContent() {
   const { currentSection } = useNavigation()
+  const { settings, isLoading, isSaving, saveSocialLinks, saveContactInfo, savePlans } = useSystemSettings()
 
-  // Mock data para demonstração
+  // Estados para formulários
+  const [socialLinksForm, setSocialLinksForm] = useState({
+    instagram: '',
+    facebook: '',
+    twitter: '',
+    linkedin: ''
+  })
+
+  const [contactInfoForm, setContactInfoForm] = useState({
+    email: '',
+    phone: '',
+    address: ''
+  })
+
+  const [plansForm, setPlansForm] = useState<Array<{
+    name: string
+    price: number
+    features: string[]
+  }>>([])
+
+  // Mock data para demonstração (mantido para dashboard)
   const systemStats = {
     totalUsers: 1247,
     activeUsers: 1089,
@@ -45,24 +68,14 @@ export function AdminContent() {
     { id: 3, name: 'Pedro Costa', email: 'pedro@email.com', role: 'USER', status: 'inactive', joinedAt: '2024-01-13' },
   ]
 
-  const systemSettings = {
-    socialLinks: {
-      instagram: 'https://instagram.com/multilink',
-      facebook: 'https://facebook.com/multilink',
-      twitter: 'https://twitter.com/multilink',
-      linkedin: 'https://linkedin.com/company/multilink'
-    },
-    plans: [
-      { name: 'Gratuito', price: 0, features: ['5 links', '1 formulário'] },
-      { name: 'Pro', price: 29.90, features: ['Links ilimitados', 'Formulários ilimitados'] },
-      { name: 'Business', price: 99.90, features: ['Tudo do Pro', 'Analytics avançado'] }
-    ],
-    contactInfo: {
-      email: 'contato@multilink.com',
-      phone: '(11) 99999-9999',
-      address: 'Rua das Flores, 123 - São Paulo, SP'
+  // Carregar dados nos formulários quando as configurações forem carregadas
+  React.useEffect(() => {
+    if (settings) {
+      setSocialLinksForm(settings.socialLinks)
+      setContactInfoForm(settings.contactInfo)
+      setPlansForm(settings.plans)
     }
-  }
+  }, [settings])
 
   const renderAdminDashboard = () => (
     <div className="space-y-6">
@@ -153,6 +166,18 @@ export function AdminContent() {
     </div>
   )
 
+  const handleSaveSocialLinks = async () => {
+    await saveSocialLinks(socialLinksForm)
+  }
+
+  const handleSaveContactInfo = async () => {
+    await saveContactInfo(contactInfoForm)
+  }
+
+  const handleSavePlans = async () => {
+    await savePlans(plansForm)
+  }
+
   const renderSystemSettings = () => (
     <div className="space-y-6">
       <div>
@@ -160,138 +185,226 @@ export function AdminContent() {
         <p className="text-gray-600 dark:text-gray-400">Gerencie as configurações globais do sistema</p>
       </div>
 
-      {/* Links de Redes Sociais */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Globe className="h-5 w-5" />
-            <span>Links de Redes Sociais</span>
-          </CardTitle>
-          <CardDescription>Configure os links das redes sociais que aparecem no footer</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="instagram">Instagram</Label>
-              <Input 
-                id="instagram" 
-                defaultValue={systemSettings.socialLinks.instagram}
-                placeholder="https://instagram.com/suaconta"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="facebook">Facebook</Label>
-              <Input 
-                id="facebook" 
-                defaultValue={systemSettings.socialLinks.facebook}
-                placeholder="https://facebook.com/suaconta"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="twitter">Twitter</Label>
-              <Input 
-                id="twitter" 
-                defaultValue={systemSettings.socialLinks.twitter}
-                placeholder="https://twitter.com/suaconta"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="linkedin">LinkedIn</Label>
-              <Input 
-                id="linkedin" 
-                defaultValue={systemSettings.socialLinks.linkedin}
-                placeholder="https://linkedin.com/company/suaconta"
-              />
-            </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">Carregando configurações...</p>
           </div>
-          <Button>
-            <Settings className="h-4 w-4 mr-2" />
-            Salvar Configurações
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Informações de Contato */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Mail className="h-5 w-5" />
-            <span>Informações de Contato</span>
-          </CardTitle>
-          <CardDescription>Configure as informações de contato que aparecem nas páginas públicas</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="admin-email">E-mail de Contato</Label>
-              <Input 
-                id="admin-email" 
-                type="email"
-                defaultValue={systemSettings.contactInfo.email}
-                placeholder="contato@seudominio.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="admin-phone">Telefone</Label>
-              <Input 
-                id="admin-phone" 
-                defaultValue={systemSettings.contactInfo.phone}
-                placeholder="(11) 99999-9999"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="admin-address">Endereço Completo</Label>
-            <Textarea 
-              id="admin-address" 
-              defaultValue={systemSettings.contactInfo.address}
-              placeholder="Rua, Número - Cidade, Estado"
-              rows={3}
-            />
-          </div>
-          <Button>
-            <Settings className="h-4 w-4 mr-2" />
-            Salvar Informações
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Planos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <DollarSign className="h-5 w-5" />
-            <span>Planos e Preços</span>
-          </CardTitle>
-          <CardDescription>Configure os planos disponíveis e seus preços</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {systemSettings.plans.map((plan, index) => (
-              <div key={index} className="p-4 border rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium">{plan.name}</h3>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl font-bold">R$ {plan.price}</span>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </div>
+        </div>
+      ) : (
+        <>
+          {/* Links de Redes Sociais */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Globe className="h-5 w-5" />
+                <span>Links de Redes Sociais</span>
+              </CardTitle>
+              <CardDescription>Configure os links das redes sociais que aparecem no footer</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instagram">Instagram</Label>
+                  <Input 
+                    id="instagram" 
+                    value={socialLinksForm.instagram}
+                    onChange={(e) => setSocialLinksForm(prev => ({ ...prev, instagram: e.target.value }))}
+                    placeholder="https://instagram.com/suaconta"
+                  />
                 </div>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex}>• {feature}</li>
-                  ))}
-                </ul>
+                <div className="space-y-2">
+                  <Label htmlFor="facebook">Facebook</Label>
+                  <Input 
+                    id="facebook" 
+                    value={socialLinksForm.facebook}
+                    onChange={(e) => setSocialLinksForm(prev => ({ ...prev, facebook: e.target.value }))}
+                    placeholder="https://facebook.com/suaconta"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="twitter">Twitter</Label>
+                  <Input 
+                    id="twitter" 
+                    value={socialLinksForm.twitter}
+                    onChange={(e) => setSocialLinksForm(prev => ({ ...prev, twitter: e.target.value }))}
+                    placeholder="https://twitter.com/suaconta"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="linkedin">LinkedIn</Label>
+                  <Input 
+                    id="linkedin" 
+                    value={socialLinksForm.linkedin}
+                    onChange={(e) => setSocialLinksForm(prev => ({ ...prev, linkedin: e.target.value }))}
+                    placeholder="https://linkedin.com/company/suaconta"
+                  />
+                </div>
               </div>
-            ))}
-            <Button variant="outline" className="w-full">
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Novo Plano
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+              <Button onClick={handleSaveSocialLinks} disabled={isSaving}>
+                <Settings className="h-4 w-4 mr-2" />
+                {isSaving ? 'Salvando...' : 'Salvar Configurações'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Informações de Contato */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Mail className="h-5 w-5" />
+                <span>Informações de Contato</span>
+              </CardTitle>
+              <CardDescription>Configure as informações de contato que aparecem nas páginas públicas</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="admin-email">E-mail de Contato</Label>
+                  <Input 
+                    id="admin-email" 
+                    type="email"
+                    value={contactInfoForm.email}
+                    onChange={(e) => setContactInfoForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="contato@seudominio.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="admin-phone">Telefone</Label>
+                  <Input 
+                    id="admin-phone" 
+                    value={contactInfoForm.phone}
+                    onChange={(e) => setContactInfoForm(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="(11) 99999-9999"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admin-address">Endereço Completo</Label>
+                <Textarea 
+                  id="admin-address" 
+                  value={contactInfoForm.address}
+                  onChange={(e) => setContactInfoForm(prev => ({ ...prev, address: e.target.value }))}
+                  placeholder="Rua, Número - Cidade, Estado"
+                  rows={3}
+                />
+              </div>
+              <Button onClick={handleSaveContactInfo} disabled={isSaving}>
+                <Settings className="h-4 w-4 mr-2" />
+                {isSaving ? 'Salvando...' : 'Salvar Informações'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Planos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <DollarSign className="h-5 w-5" />
+                <span>Planos e Preços</span>
+              </CardTitle>
+              <CardDescription>Configure os planos disponíveis e seus preços</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {plansForm.map((plan, index) => (
+                  <div key={index} className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <Input
+                        value={plan.name}
+                        onChange={(e) => {
+                          const newPlans = [...plansForm]
+                          newPlans[index].name = e.target.value
+                          setPlansForm(newPlans)
+                        }}
+                        placeholder="Nome do plano"
+                        className="font-medium"
+                      />
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="number"
+                          value={plan.price}
+                          onChange={(e) => {
+                            const newPlans = [...plansForm]
+                            newPlans[index].price = parseFloat(e.target.value) || 0
+                            setPlansForm(newPlans)
+                          }}
+                          placeholder="0.00"
+                          className="w-24 text-right font-bold"
+                        />
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            const newPlans = plansForm.filter((_, i) => i !== index)
+                            setPlansForm(newPlans)
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {plan.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-center space-x-2">
+                          <Input
+                            value={feature}
+                            onChange={(e) => {
+                              const newPlans = [...plansForm]
+                              newPlans[index].features[featureIndex] = e.target.value
+                              setPlansForm(newPlans)
+                            }}
+                            placeholder="Recurso do plano"
+                            className="text-sm"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const newPlans = [...plansForm]
+                              newPlans[index].features = newPlans[index].features.filter((_, i) => i !== featureIndex)
+                              setPlansForm(newPlans)
+                            }}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const newPlans = [...plansForm]
+                          newPlans[index].features.push('')
+                          setPlansForm(newPlans)
+                        }}
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Adicionar Recurso
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    setPlansForm([...plansForm, { name: '', price: 0, features: [''] }])
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Novo Plano
+                </Button>
+                <Button onClick={handleSavePlans} disabled={isSaving} className="w-full">
+                  <Settings className="h-4 w-4 mr-2" />
+                  {isSaving ? 'Salvando Planos...' : 'Salvar Planos'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   )
 
