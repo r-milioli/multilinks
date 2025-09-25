@@ -1,56 +1,52 @@
 import { NextResponse } from 'next/server'
-import { SystemSettingsService } from '@/modules/admin/services/systemSettingsService'
+import { PrismaClient } from '@prisma/client'
 
 export async function GET() {
   try {
-    console.log('🔍 Footer API - Iniciando busca de configurações...')
-    
-    const result = await SystemSettingsService.getFormattedSettings()
-    
-    console.log('🔍 Footer API - Resultado da busca:', JSON.stringify(result, null, 2))
-    
-    if (!result.success) {
-      console.log('❌ Footer API - Erro na busca:', result.error)
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 400 }
-      )
+    console.log('🔍 Footer API - Iniciando busca direta no banco...')
+
+    const prisma = new PrismaClient()
+
+    // Buscar dados diretamente do banco
+    const [socialLinksSetting, contactInfoSetting] = await Promise.all([
+      prisma.systemSettings.findFirst({
+        where: { key: 'social_links' }
+      }),
+      prisma.systemSettings.findFirst({
+        where: { key: 'contact_info' }
+      })
+    ])
+
+    console.log('🔍 Footer API - Dados do banco:')
+    console.log('  - Social Links Setting:', JSON.stringify(socialLinksSetting, null, 2))
+    console.log('  - Contact Info Setting:', JSON.stringify(contactInfoSetting, null, 2))
+
+    // Extrair dados com fallback
+    const socialLinks = socialLinksSetting?.value as any || {
+      instagram: '',
+      facebook: '',
+      twitter: '',
+      linkedin: ''
     }
 
-    console.log('✅ Footer API - Dados encontrados:', JSON.stringify(result.data, null, 2))
-
-    // Verificar se os dados estão vazios e inicializar se necessário
-    const hasData = result.data?.socialLinks && 
-      (result.data.socialLinks.instagram || result.data.socialLinks.facebook || result.data.socialLinks.twitter || result.data.socialLinks.linkedin)
-
-    if (!hasData) {
-      console.log('🔧 Footer API - Dados vazios, inicializando configurações padrão...')
-      await SystemSettingsService.initializeDefaultSettings()
-      
-      // Buscar novamente após inicialização
-      const newResult = await SystemSettingsService.getFormattedSettings()
-      if (newResult.success && newResult.data) {
-        result.data = newResult.data
-        console.log('✅ Footer API - Dados inicializados:', JSON.stringify(result.data, null, 2))
-      }
+    const contactInfo = contactInfoSetting?.value as any || {
+      email: '',
+      phone: '',
+      address: ''
     }
 
-    // Retornar apenas os dados necessários para o footer
+    console.log('✅ Footer API - Dados extraídos:')
+    console.log('  - Social Links:', JSON.stringify(socialLinks, null, 2))
+    console.log('  - Contact Info:', JSON.stringify(contactInfo, null, 2))
+
     const footerData = {
-      socialLinks: result.data?.socialLinks || {
-        instagram: '',
-        facebook: '',
-        twitter: '',
-        linkedin: ''
-      },
-      contactInfo: result.data?.contactInfo || {
-        email: '',
-        phone: '',
-        address: ''
-      }
+      socialLinks,
+      contactInfo
     }
 
     console.log('📤 Footer API - Dados finais enviados:', JSON.stringify(footerData, null, 2))
+
+    await prisma.$disconnect()
 
     return NextResponse.json({
       success: true,
