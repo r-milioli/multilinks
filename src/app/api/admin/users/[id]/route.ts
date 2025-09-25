@@ -38,8 +38,8 @@ export async function PUT(
     //   }
     // }
 
-    // Campos permitidos para atualização
-    const allowedFields = ['name', 'email', 'role', 'status', 'bio', 'website', 'socialLinks']
+         // Campos permitidos para atualização
+         const allowedFields = ['name', 'email', 'role', 'status', 'bio', 'username']
     const updateData: any = {}
 
     for (const field of allowedFields) {
@@ -66,9 +66,7 @@ export async function PUT(
         emailVerified: true,
         image: true,
         username: true,
-        bio: true,
-        website: true,
-        socialLinks: true
+        bio: true
       }
     })
 

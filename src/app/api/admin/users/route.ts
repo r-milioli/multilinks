@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 
 /**
  * GET /api/admin/users
@@ -9,55 +7,10 @@ import { authOptions } from '@/lib/auth'
  */
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Verificar autenticação e permissões quando implementarmos
-    // const session = await getServerSession(authOptions)
-    // if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
-    //   return NextResponse.json({ success: false, error: 'Não autorizado' }, { status: 401 })
-    // }
+    console.log('🔍 API Users - Iniciando busca de usuários...')
 
-    const { searchParams } = new URL(request.url)
-    
-    // Parâmetros de filtro e paginação
-    const search = searchParams.get('search') || ''
-    const role = searchParams.get('role') || ''
-    const status = searchParams.get('status') || ''
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const sortBy = searchParams.get('sortBy') || 'createdAt'
-    const sortOrder = searchParams.get('sortOrder') || 'desc'
-
-    // Construir filtros
-    const where: any = {}
-
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { username: { contains: search, mode: 'insensitive' } }
-      ]
-    }
-
-    if (role) {
-      where.role = role
-    }
-
-    if (status) {
-      where.status = status
-    }
-
-    // Ordenação
-    const orderBy: any = {}
-    orderBy[sortBy] = sortOrder
-
-    // Calcular offset
-    const skip = (page - 1) * limit
-
-    // Buscar usuários (versão simplificada)
+    // Versão ultra simplificada para debug
     const users = await prisma.user.findMany({
-      where,
-      orderBy,
-      skip,
-      take: limit,
       select: {
         id: true,
         name: true,
@@ -69,45 +22,42 @@ export async function GET(request: NextRequest) {
         emailVerified: true,
         image: true,
         username: true,
-        bio: true,
-        website: true,
-        socialLinks: true
+        bio: true
       }
     })
 
-    const total = await prisma.user.count({ where })
+    console.log('✅ API Users - Usuários encontrados:', users.length)
 
-    // Adicionar estatísticas básicas (sem queries complexas por enquanto)
+    // Adicionar estatísticas básicas
     const usersWithStats = users.map(user => ({
       ...user,
       stats: {
-        totalLinks: 0, // TODO: Implementar contagem real
-        totalClicks: 0, // TODO: Implementar contagem real
-        totalForms: 0, // TODO: Implementar contagem real
+        totalLinks: 0,
+        totalClicks: 0,
+        totalForms: 0,
         lastLogin: user.updatedAt?.toISOString()
       }
     }))
-
-    const totalPages = Math.ceil(total / limit)
-
-    // await prisma.$disconnect() // Removido para evitar desconexão da instância global
 
     return NextResponse.json({
       success: true,
       data: {
         users: usersWithStats,
-        total,
-        page,
-        limit,
-        totalPages
+        total: users.length,
+        page: 1,
+        limit: 20,
+        totalPages: 1
       }
     })
 
   } catch (error) {
-    console.error('Erro ao buscar usuários:', error)
-    // await prisma.$disconnect() // Removido para evitar desconexão da instância global
+    console.error('❌ Erro ao buscar usuários:', error)
     return NextResponse.json(
-      { success: false, error: 'Erro interno do servidor' },
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor',
+        details: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     )
   }

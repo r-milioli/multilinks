@@ -6,20 +6,13 @@ export interface User {
   name: string
   email: string
   role: 'USER' | 'ADMIN' | 'SUPER_ADMIN'
-  status: 'active' | 'inactive' | 'suspended'
+  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'PENDING'
   createdAt: string
   updatedAt: string
   emailVerified?: boolean
   image?: string
   username?: string
   bio?: string
-  website?: string
-  socialLinks?: {
-    instagram?: string
-    twitter?: string
-    linkedin?: string
-    youtube?: string
-  }
   stats?: {
     totalLinks: number
     totalClicks: number
@@ -127,7 +120,7 @@ export function useUsers(filters?: UserFilters) {
       const user = users.find(u => u.id === userId)
       if (!user) return { success: false, error: 'Usuário não encontrado' }
 
-      const newStatus = user.status === 'active' ? 'inactive' : 'active'
+      const newStatus = user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
       return await updateUser(userId, { status: newStatus })
     } catch (error) {
       console.error('Erro ao alterar status do usuário:', error)

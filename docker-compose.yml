@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   multi-link:
-    image: automacaodebaixocusto/multi-link:v1.4.7-production
+    image: automacaodebaixocusto/multi-link:v1.4.8-production
     deploy:
       replicas: 1
       restart_policy:

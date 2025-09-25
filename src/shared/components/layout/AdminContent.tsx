@@ -95,9 +95,9 @@ export function AdminContent() {
   }
 
   const recentUsers = [
-    { id: 1, name: 'João Silva', email: 'joao@email.com', role: 'USER', status: 'active', joinedAt: '2024-01-15' },
-    { id: 2, name: 'Maria Santos', email: 'maria@email.com', role: 'ADMIN', status: 'active', joinedAt: '2024-01-14' },
-    { id: 3, name: 'Pedro Costa', email: 'pedro@email.com', role: 'USER', status: 'inactive', joinedAt: '2024-01-13' },
+    { id: 1, name: 'João Silva', email: 'joao@email.com', role: 'USER', status: 'ACTIVE', joinedAt: '2024-01-15' },
+    { id: 2, name: 'Maria Santos', email: 'maria@email.com', role: 'ADMIN', status: 'ACTIVE', joinedAt: '2024-01-14' },
+    { id: 3, name: 'Pedro Costa', email: 'pedro@email.com', role: 'USER', status: 'INACTIVE', joinedAt: '2024-01-13' },
   ]
 
   // Carregar dados nos formulários quando as configurações forem carregadas
@@ -183,7 +183,7 @@ export function AdminContent() {
                   <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
                     {user.role}
                   </Badge>
-                  <Badge variant={user.status === 'active' ? 'default' : 'outline'}>
+                  <Badge variant={user.status === 'ACTIVE' ? 'default' : 'outline'}>
                     {user.status}
                   </Badge>
                   <Button variant="ghost" size="sm">
@@ -468,7 +468,7 @@ export function AdminContent() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Usuários Ativos</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {users.filter(u => u.status === 'active').length}
+                  {users.filter(u => u.status === 'ACTIVE').length}
                 </p>
               </div>
             </div>
@@ -634,8 +634,8 @@ export function AdminContent() {
                     <Badge variant={user.role === 'SUPER_ADMIN' ? 'destructive' : user.role === 'ADMIN' ? 'default' : 'secondary'}>
                       {user.role === 'SUPER_ADMIN' ? 'Super Admin' : user.role === 'ADMIN' ? 'Admin' : 'Usuário'}
                     </Badge>
-                    <Badge variant={user.status === 'active' ? 'default' : 'outline'}>
-                      {user.status === 'active' ? 'Ativo' : user.status === 'inactive' ? 'Inativo' : 'Suspenso'}
+                    <Badge variant={user.status === 'ACTIVE' ? 'default' : 'outline'}>
+                      {user.status === 'ACTIVE' ? 'Ativo' : user.status === 'INACTIVE' ? 'Inativo' : user.status === 'SUSPENDED' ? 'Suspenso' : 'Pendente'}
                     </Badge>
                     
                     <div className="flex gap-1">
@@ -643,9 +643,9 @@ export function AdminContent() {
                         variant="ghost" 
                         size="sm"
                         onClick={() => toggleUserStatus(user.id)}
-                        title={user.status === 'active' ? 'Desativar usuário' : 'Ativar usuário'}
+                        title={user.status === 'ACTIVE' ? 'Desativar usuário' : 'Ativar usuário'}
                       >
-                        {user.status === 'active' ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                        {user.status === 'ACTIVE' ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
                       </Button>
                       
                       <Button 
