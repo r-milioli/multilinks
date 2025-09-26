@@ -58,6 +58,9 @@ export class ProfileService {
       }
 
       // Atualizar perfil
+      console.log('💾 ProfileService: Atualizando perfil do usuário:', userId)
+      console.log('💾 ProfileService: Dados recebidos:', data)
+      
       const user = await prisma.user.update({
         where: { id: userId },
         data: {
@@ -72,6 +75,7 @@ export class ProfileService {
         }
       })
 
+      console.log('✅ ProfileService: Perfil atualizado com sucesso:', user.avatar)
       return { success: true, data: user }
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error)

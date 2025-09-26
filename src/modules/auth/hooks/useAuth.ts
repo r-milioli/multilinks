@@ -54,11 +54,14 @@ export function useAuth() {
 }
 
 export function useRequireAuth() {
-  const { requireAuth, isLoading, isAuthenticated } = useAuth()
+  const { isLoading, isAuthenticated } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
-    requireAuth()
-  }, [requireAuth])
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [isLoading, isAuthenticated, router])
 
   return {
     isLoading,

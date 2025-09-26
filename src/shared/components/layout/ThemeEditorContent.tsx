@@ -130,8 +130,16 @@ export function ThemeEditorContent() {
   const handleAvatarUpload = async (file: File, cropData?: any) => {
     setAvatarUploading(true)
     try {
+      console.log('🔄 ThemeEditorContent: Iniciando upload de avatar')
       // Upload de nova imagem
       const result = await uploadAvatar(file, cropData)
+      console.log('📥 ThemeEditorContent: Resultado do upload:', result)
+
+      if (!result) {
+        console.error('❌ ThemeEditorContent: uploadAvatar retornou undefined')
+        return { success: false, error: 'Erro no upload' }
+      }
+
       if (result.success && result.data) {
         // Atualizar o avatar no banco de dados
         const response = await fetch('/api/user/profile', {
@@ -153,13 +161,20 @@ export function ThemeEditorContent() {
             }
           })
           toast.success('Foto de perfil atualizada!')
+          return result
         } else {
-          toast.error('Erro ao salvar foto de perfil')
+          const errorMessage = 'Erro ao salvar foto de perfil'
+          toast.error(errorMessage)
+          return { success: false, error: errorMessage }
         }
       }
+
+      return result
     } catch (error) {
-      console.error('Erro ao atualizar avatar:', error)
-      toast.error('Erro ao atualizar foto de perfil')
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao atualizar foto de perfil'
+      console.error('❌ ThemeEditorContent: Erro ao atualizar avatar:', error)
+      toast.error(errorMessage)
+      return { success: false, error: errorMessage }
     } finally {
       setAvatarUploading(false)
     }
@@ -265,13 +280,13 @@ export function ThemeEditorContent() {
                       <Input
                         id="primaryColor"
                         type="color"
-                        value={localTheme.primaryColor}
+                        value={localTheme.primaryColor || '#3B82F6'}
                         onChange={(e) => handleUpdateProperty('primaryColor', e.target.value)}
                         className="h-10 w-20"
                       />
                       <Input
                         type="text"
-                        value={localTheme.primaryColor}
+                        value={localTheme.primaryColor || '#3B82F6'}
                         onChange={(e) => handleUpdateProperty('primaryColor', e.target.value)}
                         className="flex-1"
                         placeholder="#3B82F6"
@@ -290,13 +305,13 @@ export function ThemeEditorContent() {
                       <Input
                         id="secondaryColor"
                         type="color"
-                        value={localTheme.secondaryColor}
+                        value={localTheme.secondaryColor || '#64748B'}
                         onChange={(e) => handleUpdateProperty('secondaryColor', e.target.value)}
                         className="h-10 w-20"
                       />
                       <Input
                         type="text"
-                        value={localTheme.secondaryColor}
+                        value={localTheme.secondaryColor || '#64748B'}
                         onChange={(e) => handleUpdateProperty('secondaryColor', e.target.value)}
                         className="flex-1"
                         placeholder="#64748B"
@@ -315,13 +330,13 @@ export function ThemeEditorContent() {
                       <Input
                         id="backgroundColor"
                         type="color"
-                        value={localTheme.backgroundColor}
+                        value={localTheme.backgroundColor || '#FFFFFF'}
                         onChange={(e) => handleUpdateProperty('backgroundColor', e.target.value)}
                         className="h-10 w-20"
                       />
                       <Input
                         type="text"
-                        value={localTheme.backgroundColor}
+                        value={localTheme.backgroundColor || '#FFFFFF'}
                         onChange={(e) => handleUpdateProperty('backgroundColor', e.target.value)}
                         className="flex-1"
                         placeholder="#FFFFFF"
@@ -430,7 +445,7 @@ export function ThemeEditorContent() {
               <Label htmlFor="fontFamily">Família da Fonte</Label>
                 <select
                   id="fontFamily"
-                  value={localTheme.fontFamily}
+                  value={localTheme.fontFamily || 'Inter'}
                   onChange={(e) => handleUpdateProperty('fontFamily', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
                 >
@@ -463,7 +478,7 @@ export function ThemeEditorContent() {
                 type="number"
                 min="0"
                 max="50"
-                value={localTheme.borderRadius}
+                value={localTheme.borderRadius || 8}
                 onChange={(e) => handleUpdateProperty('borderRadius', parseInt(e.target.value))}
               />
             </div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
-import { UserStatusGuard } from '@/shared/components/UserStatusGuard'
+// import { UserStatusGuard } from '@/shared/components/UserStatusGuard'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -55,9 +55,7 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <UserStatusGuard>
-            {children}
-          </UserStatusGuard>
+          {children}
         </Providers>
       </body>
     </html>

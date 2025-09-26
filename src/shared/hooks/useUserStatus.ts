@@ -31,7 +31,7 @@ export function useUserStatus(): UserStatusData {
         setIsLoading(true)
         setError(null)
 
-        const response = await apiClient.get('/api/user/status')
+        const response = await apiClient.get('/user/status')
         
         if (response.success && response.data) {
           setUserStatus(response.data.status)

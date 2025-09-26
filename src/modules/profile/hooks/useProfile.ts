@@ -36,19 +36,25 @@ export function useProfile() {
     if (!session?.user?.id) return { success: false, error: 'Não autenticado' }
 
     try {
+      console.log('🔄 useProfile: Iniciando atualização do perfil')
+      console.log('🔄 useProfile: Dados para atualizar:', data)
       setIsUpdating(true)
+      
       const response = await apiClient.put<User>('/user/profile', data)
+      console.log('🔄 useProfile: Resposta da API:', response)
       
       if (response.success && response.data) {
+        console.log('✅ useProfile: Perfil atualizado com sucesso')
         setProfile(prev => prev ? { ...prev, ...response.data! } : null)
         toast.success('Perfil atualizado com sucesso!')
         return { success: true, data: response.data }
       } else {
+        console.error('❌ useProfile: Erro na resposta da API:', response.error)
         toast.error(response.error || 'Erro ao atualizar perfil')
         return { success: false, error: response.error }
       }
     } catch (error) {
-      console.error('Erro ao atualizar perfil:', error)
+      console.error('❌ useProfile: Erro ao atualizar perfil:', error)
       toast.error('Erro ao atualizar perfil')
       return { success: false, error: 'Erro interno' }
     } finally {

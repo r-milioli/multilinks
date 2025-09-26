@@ -30,7 +30,7 @@ interface ProfileEditorProps {
 }
 
 export function ProfileEditor({ onSave }: ProfileEditorProps) {
-  const { profile, isLoading, isUpdating, updateProfile } = useProfile()
+  const { profile, isLoading, isUpdating, updateProfile, refetch } = useProfile()
   const { uploadAvatar, isUploading: isUploadingAvatar } = useImageUpload()
   const [isEditing, setIsEditing] = useState(false)
 
@@ -81,12 +81,6 @@ export function ProfileEditor({ onSave }: ProfileEditorProps) {
     setIsEditing(false)
   }
 
-  const handleAvatarUpload = async (file: File, cropData?: any) => {
-    const result = await uploadAvatar(file, cropData)
-    if (result.success && result.data) {
-      await updateProfile({ avatar: result.data.url })
-    }
-  }
 
   if (isLoading) {
     return (
@@ -119,9 +113,10 @@ export function ProfileEditor({ onSave }: ProfileEditorProps) {
             <div className="relative">
               {profile.avatar ? (
                 <img
-                  src={profile.avatar}
+                  src={`${profile.avatar}?t=${Date.now()}`}
                   alt={profile.name || 'Avatar'}
                   className="h-24 w-24 rounded-full object-cover"
+                  key={profile.avatar} // Força re-render quando a URL muda
                 />
               ) : (
                 <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center">
@@ -133,7 +128,28 @@ export function ProfileEditor({ onSave }: ProfileEditorProps) {
             </div>
             <div>
               <AvatarUpload
-                onUpload={handleAvatarUpload}
+                onUpload={async (file, cropData) => {
+                  try {
+                    console.log('🔄 ProfileEditor: Iniciando upload de avatar')
+                    const result = await uploadAvatar(file, cropData)
+                    console.log('📥 ProfileEditor: Resultado do upload:', result)
+                    
+                    if (!result) {
+                      console.error('❌ ProfileEditor: uploadAvatar retornou undefined')
+                      return { success: false, error: 'Erro no upload' }
+                    }
+                    
+                    return {
+                      success: result.success,
+                      error: result.error,
+                      data: result.data,
+                      url: result.url
+                    }
+                  } catch (error) {
+                    console.error('❌ ProfileEditor: Erro no upload:', error)
+                    return { success: false, error: 'Erro interno' }
+                  }
+                }}
                 isUploading={isUploadingAvatar}
                 currentAvatar={profile.avatar}
               />

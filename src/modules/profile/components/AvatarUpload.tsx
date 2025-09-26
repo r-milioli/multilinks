@@ -40,9 +40,33 @@ export function AvatarUpload({ onUpload, isUploading = false, currentAvatar }: A
   }
 
   const handleUpload = async () => {
-    if (selectedFile) {
-      await onUpload(selectedFile, cropData)
-      handleClose()
+    console.log('🔄 AvatarUpload: Iniciando upload...')
+    console.log('📁 AvatarUpload: Arquivo selecionado:', selectedFile)
+    console.log('✂️ AvatarUpload: Dados de crop:', cropData)
+    
+    if (!selectedFile) {
+      console.log('❌ AvatarUpload: Nenhum arquivo selecionado')
+      return
+    }
+
+    try {
+      console.log('📤 AvatarUpload: Chamando onUpload...')
+      const result = await onUpload(selectedFile, cropData)
+      console.log('📥 AvatarUpload: Resultado do onUpload:', result)
+
+      if (!result) {
+        console.error('❌ AvatarUpload: onUpload retornou undefined')
+        return
+      }
+
+      if (result.success) {
+        console.log('✅ AvatarUpload: Upload concluído com sucesso')
+        handleClose()
+      } else {
+        console.error('❌ AvatarUpload: Upload falhou:', result.error)
+      }
+    } catch (error) {
+      console.error('❌ AvatarUpload: Erro no onUpload:', error)
     }
   }
 
@@ -64,9 +88,10 @@ export function AvatarUpload({ onUpload, isUploading = false, currentAvatar }: A
           <div className="flex flex-col items-center space-y-2">
             <div className="relative">
               <img
-                src={currentAvatar}
+                src={`${currentAvatar}?t=${Date.now()}`}
                 alt="Avatar atual"
                 className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 shadow-md"
+                key={currentAvatar} // Força re-render quando a URL muda
               />
               <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs">✓</span>
