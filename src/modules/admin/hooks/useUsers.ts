@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { apiClient } from '@/shared/services/apiClient'
 
 export interface User {
@@ -47,13 +47,13 @@ export function useUsers(filters?: UserFilters) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const loadUsers = async (newFilters?: UserFilters) => {
+  const loadUsers = useCallback(async (newFilters?: UserFilters) => {
     try {
       setIsLoading(true)
       setError(null)
 
       const queryParams = new URLSearchParams()
-      const currentFilters = { ...filters, ...newFilters }
+      const currentFilters = newFilters || filters
 
       if (currentFilters.search) queryParams.append('search', currentFilters.search)
       if (currentFilters.role) queryParams.append('role', currentFilters.role)
@@ -79,7 +79,7 @@ export function useUsers(filters?: UserFilters) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []) // Removido filters das dependências
 
   const updateUser = async (userId: string, userData: Partial<User>) => {
     try {
@@ -134,7 +134,7 @@ export function useUsers(filters?: UserFilters) {
 
   useEffect(() => {
     loadUsers()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     users,

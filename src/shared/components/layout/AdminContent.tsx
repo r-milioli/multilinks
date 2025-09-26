@@ -36,6 +36,9 @@ import { useUsers, User } from '@/modules/admin/hooks/useUsers'
 import { useAdminStats } from '@/modules/admin/hooks/useAdminStats'
 import { UserEditModal } from '@/modules/admin/components/UserEditModal'
 import { AdminGuard } from '@/shared/components/AdminGuard'
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog'
+import { toast } from 'react-hot-toast'
+import { useDebounce } from '@/shared/hooks/useDebounce'
 
 export function AdminContent() {
   const { currentSection } = useNavigation()
@@ -48,6 +51,14 @@ export function AdminContent() {
   const [selectedStatus, setSelectedStatus] = useState('')
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  
+  // Estados para confirmação de exclusão
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Debounce para busca
+  const debouncedSearchTerm = useDebounce(searchTerm, 500)
   
   const { 
     users, 
@@ -62,7 +73,7 @@ export function AdminContent() {
     toggleUserStatus,
     changeUserRole
   } = useUsers({
-    search: searchTerm,
+    search: debouncedSearchTerm,
     role: selectedRole,
     status: selectedStatus
   })
@@ -96,6 +107,64 @@ export function AdminContent() {
       setPlansForm(settings.plans)
     }
   }, [settings])
+
+  // Função para aplicar filtros manualmente
+  const applyFilters = React.useCallback(() => {
+    const hasFilters = debouncedSearchTerm !== '' || selectedRole !== '' || selectedStatus !== ''
+    
+    if (hasFilters) {
+      loadUsers({
+        search: debouncedSearchTerm,
+        role: selectedRole,
+        status: selectedStatus,
+        page: 1
+      })
+    } else {
+      loadUsers()
+    }
+  }, [debouncedSearchTerm, selectedRole, selectedStatus, loadUsers])
+
+  // Função para abrir diálogo de confirmação de exclusão
+  const handleDeleteUser = (user: User) => {
+    setUserToDelete(user)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Função para confirmar exclusão
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return
+
+    setIsDeleting(true)
+    try {
+      const result = await deleteUser(userToDelete.id)
+      
+      if (result.success) {
+        toast.success(`Usuário ${userToDelete.name} excluído com sucesso!`)
+      } else {
+        toast.error(result.error || 'Erro ao excluir usuário')
+      }
+    } catch (error) {
+      console.error('Erro ao excluir usuário:', error)
+      toast.error('Erro interno do servidor')
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteDialogOpen(false)
+      setUserToDelete(null)
+    }
+  }
+
+  // Função para cancelar exclusão
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false)
+    setUserToDelete(null)
+  }
+
+  // Função para limpar todos os filtros
+  const handleClearFilters = () => {
+    setSearchTerm('')
+    setSelectedRole('')
+    setSelectedStatus('')
+  }
 
   const renderAdminDashboard = () => {
     if (statsLoading) {
@@ -698,6 +767,11 @@ export function AdminContent() {
           <CardTitle className="flex items-center gap-2">
             <Filter className="h-5 w-5" />
             Filtros e Busca
+            {(searchTerm || selectedRole || selectedStatus) && (
+              <span className="text-sm text-blue-600 font-normal">
+                (Filtros ativos)
+              </span>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -756,6 +830,24 @@ export function AdminContent() {
                   size="sm"
                 >
                   Inativos
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="default"
+                  onClick={applyFilters}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Aplicar Filtros
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleClearFilters}
+                  size="sm"
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Limpar Filtros
                 </Button>
               </div>
             </div>
@@ -837,7 +929,19 @@ export function AdminContent() {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => toggleUserStatus(user.id)}
+                          onClick={async () => {
+                            try {
+                              const result = await toggleUserStatus(user.id)
+                              if (result.success) {
+                                toast.success(`Usuário ${user.status === 'ACTIVE' ? 'desativado' : 'ativado'} com sucesso!`)
+                              } else {
+                                toast.error(result.error || 'Erro ao alterar status do usuário')
+                              }
+                            } catch (error) {
+                              console.error('Erro ao alterar status:', error)
+                              toast.error('Erro interno do servidor')
+                            }
+                          }}
                           title={user.status === 'ACTIVE' ? 'Desativar usuário' : 'Ativar usuário'}
                           className="h-8 w-8 p-0"
                         >
@@ -860,11 +964,7 @@ export function AdminContent() {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => {
-                            if (confirm(`Tem certeza que deseja deletar o usuário ${user.name}?`)) {
-                              deleteUser(user.id)
-                            }
-                          }}
+                          onClick={() => handleDeleteUser(user)}
                           title="Deletar usuário"
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
                         >
@@ -923,6 +1023,19 @@ export function AdminContent() {
           setEditingUser(null)
         }}
         onSave={updateUser}
+      />
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        description={`Tem certeza que deseja excluir o usuário "${userToDelete?.name}"? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="destructive"
+        isLoading={isDeleting}
       />
     </div>
   )
