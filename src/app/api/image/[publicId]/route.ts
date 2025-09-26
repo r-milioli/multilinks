@@ -20,7 +20,7 @@ export async function GET(
 
     // Buscar imagem do MinIO
     const imageBuffer = await MinIOService.client.getObject(
-      process.env.MINIO_BUCKET_NAME!,
+      process.env.MINIO_BUCKET!,
       publicId
     )
 

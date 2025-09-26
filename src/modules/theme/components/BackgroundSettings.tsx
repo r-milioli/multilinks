@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Label } from '@/shared/components/ui/Label'
+import { useImageUpload } from '@/modules/profile/hooks/useImageUpload'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Input } from '@/shared/components/ui/Input'
 import { Button } from '@/shared/components/ui/Button'
@@ -15,33 +16,27 @@ interface BackgroundSettingsProps {
 export function BackgroundSettings({ themeSettings, onUpdate }: BackgroundSettingsProps) {
   const [isUploading, setIsUploading] = useState(false)
 
+  const { uploadBackground } = useImageUpload()
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     setIsUploading(true)
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('/api/upload/background', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      console.log('📋 Resultado do upload de background:', result)
+      console.log('🔄 BackgroundSettings: Iniciando upload de background')
+      const result = await uploadBackground(file)
+      console.log('📥 BackgroundSettings: Resultado do upload:', result)
 
       if (result.success) {
-        const imageUrl = result.imageUrl || result.url
-        console.log('🖼️ URL do background capturada:', imageUrl)
+        const imageUrl = result.url
+        console.log('🖼️ BackgroundSettings: URL do background capturada:', imageUrl)
         onUpdate('backgroundImage', imageUrl)
       } else {
-        throw new Error(result.error || 'Erro no upload')
+        console.error('❌ BackgroundSettings: Erro no upload:', result.error)
       }
     } catch (error) {
-      console.error('Erro no upload:', error)
+      console.error('❌ BackgroundSettings: Erro no upload:', error)
     } finally {
       setIsUploading(false)
     }

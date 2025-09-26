@@ -18,7 +18,7 @@ const MINIO_CONFIG = {
   useSSL: process.env.MINIO_USE_SSL === 'true',
   accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-  bucketName: process.env.MINIO_BUCKET_NAME || 'multilinks-images'
+  bucketName: process.env.MINIO_BUCKET || 'multilinks'
 }
 
 console.log('🔍 Diagnóstico MinIO')
@@ -32,7 +32,7 @@ console.log(`   MINIO_PORT: ${process.env.MINIO_PORT || 'NÃO DEFINIDA'}`)
 console.log(`   MINIO_USE_SSL: ${process.env.MINIO_USE_SSL || 'NÃO DEFINIDA'}`)
 console.log(`   MINIO_ACCESS_KEY: ${process.env.MINIO_ACCESS_KEY ? 'DEFINIDA' : 'NÃO DEFINIDA'}`)
 console.log(`   MINIO_SECRET_KEY: ${process.env.MINIO_SECRET_KEY ? 'DEFINIDA' : 'NÃO DEFINIDA'}`)
-console.log(`   MINIO_BUCKET_NAME: ${process.env.MINIO_BUCKET_NAME || 'NÃO DEFINIDA'}`)
+console.log(`   MINIO_BUCKET: ${process.env.MINIO_BUCKET || 'NÃO DEFINIDA'}`)
 console.log('')
 
 // 2. Verificar configuração final

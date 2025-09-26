@@ -6,6 +6,7 @@ import { Label } from '@/shared/components/ui/Label'
 import { Input } from '@/shared/components/ui/Input'
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { useImageUpload } from '@/modules/profile/hooks/useImageUpload'
 
 interface LinkImageUploadProps {
   currentImage?: string
@@ -52,39 +53,26 @@ export function LinkImageUpload({
     await uploadImage(file)
   }
 
+  const { uploadLinkImage } = useImageUpload()
+
   const uploadImage = async (file: File) => {
     setIsUploading(true)
     
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('/api/upload/link-image', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      console.log('📋 Resultado do upload:', result)
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Erro no upload')
-      }
+      console.log('🔄 LinkImageUpload: Iniciando upload de imagem')
+      const result = await uploadLinkImage(file)
+      console.log('📥 LinkImageUpload: Resultado do upload:', result)
 
       if (result.success) {
-        const imageUrl = result.imageUrl || result.url
-        console.log('🖼️ URL da imagem capturada:', imageUrl)
-        setPreviewUrl(imageUrl)
-        onImageChange(imageUrl)
-        toast.success('Imagem enviada com sucesso!')
+        console.log('🖼️ LinkImageUpload: URL da imagem capturada:', result.url)
+        setPreviewUrl(result.url)
+        onImageChange(result.url)
       } else {
-        throw new Error('Upload falhou')
+        console.error('❌ LinkImageUpload: Erro no upload:', result.error)
+        setPreviewUrl(null)
       }
-
     } catch (error) {
-      console.error('Erro no upload:', error)
-      toast.error(error instanceof Error ? error.message : 'Erro no upload da imagem')
+      console.error('❌ LinkImageUpload: Erro no upload:', error)
       setPreviewUrl(null)
     } finally {
       setIsUploading(false)

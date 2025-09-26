@@ -38,7 +38,7 @@ MINIO_PORT="9000"                        # Porta do MinIO
 MINIO_USE_SSL="false"                    # true se usar HTTPS
 MINIO_ACCESS_KEY="sua-access-key"        # Chave de acesso
 MINIO_SECRET_KEY="sua-secret-key"        # Chave secreta
-MINIO_BUCKET_NAME="multilinks-images"    # Nome do bucket
+MINIO_BUCKET="multilinks"    # Nome do bucket
 NEXT_PUBLIC_MINIO_ENDPOINT="http://seu-minio.com:9000"  # URL pública
 ```
 
@@ -158,7 +158,7 @@ node scripts/test-minio-upload.js
 
 # Verificar configuração
 echo $MINIO_ENDPOINT
-echo $MINIO_BUCKET_NAME
+echo $MINIO_BUCKET
 
 # Listar buckets
 mc ls seu-minio/

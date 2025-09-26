@@ -115,15 +115,26 @@ export function useImageUpload() {
     }
   }
 
-  const uploadBackground = async (file: File) => {
+  const uploadLinkImage = async (file: File, cropData?: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }) => {
+    console.log('🔄 useImageUpload: Iniciando upload de imagem do link...')
+    console.log('📁 useImageUpload: Arquivo recebido:', file)
+    console.log('✂️ useImageUpload: Dados de crop:', cropData)
+    
     try {
       // Validar arquivo
       const validation = validateImageFile(file)
       if (!validation.isValid) {
+        console.error('❌ useImageUpload: Arquivo inválido:', validation.error)
         toast.error(validation.error || 'Arquivo inválido')
         return { success: false, error: validation.error }
       }
 
+      console.log('✅ useImageUpload: Arquivo válido, iniciando upload...')
       setIsUploading(true)
       setUploadProgress(0)
 
@@ -140,24 +151,154 @@ export function useImageUpload() {
 
       const formData = new FormData()
       formData.append('file', file)
+      if (cropData) {
+        formData.append('cropData', JSON.stringify(cropData))
+      }
 
-      const response = await apiClient.upload('/upload/background-minio', formData)
-      const result = response.success ? response.data : null
+      const response = await apiClient.upload('/upload/link-image-minio', formData)
+      console.log('📥 useImageUpload: Resposta do upload:', response)
       
       clearInterval(progressInterval)
       setUploadProgress(100)
 
-      if (result) {
-        toast.success('Imagem de fundo enviada com sucesso!')
-        return { success: true, data: result }
+      if (response && response.success) {
+        const result = response
+        console.log('✅ useImageUpload: Upload de imagem do link bem-sucedido')
+        console.log('🖼️ useImageUpload: URL da imagem:', result.imageUrl || result.url)
+        
+        return {
+          success: true,
+          data: result,
+          url: result.imageUrl || result.url,
+          error: null
+        }
       } else {
-        toast.error('Erro ao enviar imagem de fundo')
-        return { success: false, error: 'Erro no upload' }
+        const errorMessage = 'Erro ao enviar imagem do link'
+        console.error('❌ useImageUpload: Upload falhou:', errorMessage)
+        toast.error(errorMessage)
+        return {
+          success: false,
+          data: null,
+          url: null,
+          error: errorMessage
+        }
       }
     } catch (error) {
-      console.error('Erro no upload:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Erro interno'
+      console.error('❌ useImageUpload: Erro no upload:', error)
       toast.error('Erro ao enviar imagem')
-      return { success: false, error: 'Erro interno' }
+      return {
+        success: false,
+        data: null,
+        url: null,
+        error: errorMessage
+      }
+    } finally {
+      setIsUploading(false)
+      setUploadProgress(0)
+    }
+  }
+
+  const uploadBackground = async (file: File, cropData?: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }) => {
+    console.log('🔄 useImageUpload: Iniciando upload de background...')
+    console.log('📁 useImageUpload: Arquivo recebido:', file)
+    console.log('✂️ useImageUpload: Dados de crop:', cropData)
+    
+    try {
+      // Validar arquivo
+      const validation = validateImageFile(file)
+      if (!validation.isValid) {
+        console.error('❌ useImageUpload: Arquivo inválido:', validation.error)
+        toast.error(validation.error || 'Arquivo inválido')
+        return { success: false, error: validation.error }
+      }
+
+      console.log('✅ useImageUpload: Arquivo válido, iniciando upload...')
+      setIsUploading(true)
+      setUploadProgress(0)
+
+      // Simular progresso
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return 90
+          }
+          return prev + 10
+        })
+      }, 100)
+
+      const formData = new FormData()
+      formData.append('file', file)
+      if (cropData) {
+        formData.append('cropData', JSON.stringify(cropData))
+      }
+
+      const response = await apiClient.upload('/upload/background-minio', formData)
+      console.log('📥 useImageUpload: Resposta do upload:', response)
+      
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+
+      if (response && response.success) {
+        const result = response
+        console.log('🔄 useImageUpload: Upload bem-sucedido, atualizando perfil...')
+        console.log('🖼️ useImageUpload: URL do background:', result.imageUrl || result.url)
+        
+        const backgroundUrl = result.imageUrl || result.url
+        
+        console.log('💾 useImageUpload: Atualizando perfil com background:', backgroundUrl)
+        const updateResult = await updateProfile({ backgroundImage: backgroundUrl })
+        
+        if (updateResult.success) {
+          console.log('✅ useImageUpload: Background atualizado no banco de dados')
+          // Recarregar o perfil para mostrar a nova imagem
+          await refetch()
+          console.log('✅ useImageUpload: Perfil recarregado com nova imagem')
+          toast.success('Imagem de fundo enviada com sucesso!')
+          return {
+            success: true,
+            data: result,
+            url: result.imageUrl || result.url,
+            error: null
+          }
+        } else {
+          const errorMessage = updateResult.error || 'Erro ao atualizar imagem de fundo'
+          console.error('❌ useImageUpload: Erro ao atualizar background no banco:', errorMessage)
+          toast.error(errorMessage)
+          return {
+            success: false,
+            data: null,
+            url: null,
+            error: errorMessage
+          }
+        }
+      } else {
+        const errorMessage = 'Erro ao enviar imagem de fundo'
+        console.error('❌ useImageUpload: Upload falhou:', errorMessage)
+        toast.error(errorMessage)
+        return {
+          success: false,
+          data: null,
+          url: null,
+          error: errorMessage
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro interno'
+      console.error('❌ useImageUpload: Erro no upload:', error)
+      toast.error('Erro ao enviar imagem')
+      return {
+        success: false,
+        data: null,
+        url: null,
+        error: errorMessage
+      }
     } finally {
       setIsUploading(false)
       setUploadProgress(0)
@@ -188,6 +329,7 @@ export function useImageUpload() {
     uploadProgress,
     uploadAvatar,
     uploadBackground,
+    uploadLinkImage,
     deleteImage
   }
 }

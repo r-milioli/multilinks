@@ -21,7 +21,7 @@ const MINIO_CONFIG = {
   useSSL: process.env.MINIO_USE_SSL === 'true',
   accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-  bucketName: process.env.MINIO_BUCKET_NAME || 'multilinks-images'
+  bucketName: process.env.MINIO_BUCKET || 'multilinks'
 }
 
 const minioClient = new Client(MINIO_CONFIG)

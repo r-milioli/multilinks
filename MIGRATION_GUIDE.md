@@ -40,7 +40,7 @@ MINIO_PORT="9000"
 MINIO_USE_SSL="true"
 MINIO_ACCESS_KEY="sua-access-key"
 MINIO_SECRET_KEY="sua-secret-key"
-MINIO_BUCKET_NAME="multilinks-images"
+MINIO_BUCKET="multilinks"
 NEXT_PUBLIC_MINIO_ENDPOINT="https://seu-minio.com:9000"
 ```
 
