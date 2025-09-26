@@ -54,13 +54,13 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     
     // Atualizar título baseado na seção
     const titles = {
-      'dashboard': 'Visão Geral',
-      'dashboard-links': 'Meus Links',
-      'dashboard-analytics': 'Analytics do Dashboard',
+      'dashboard': 'Dashboard',
+      'dashboard-links': 'Links',
+      'dashboard-analytics': 'Analytics',
       'dashboard-performance': 'Performance',
       'dashboard-activity': 'Atividade',
       'forms-list': 'Formulários',
-      'forms-create': 'Criar Formulário',
+      'forms-create': 'Criar',
       'analytics': 'Analytics',
       'settings': 'Configurações',
       'settings-profile': 'Perfil',
@@ -69,9 +69,9 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
       'settings-security': 'Segurança',
       'settings-integrations': 'Integrações',
       'settings-danger': 'Zona de Perigo',
-      'admin-dashboard': 'Dashboard Admin',
-      'admin-users': 'Gerenciar Usuários',
-      'admin-settings': 'Configurações do Sistema'
+      'admin-dashboard': 'Admin',
+      'admin-users': 'Usuários',
+      'admin-settings': 'Configurações'
     }
     
     const newTitle = titles[section]

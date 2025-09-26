@@ -109,15 +109,25 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        // Verificar se o usuário ainda existe no banco
+        // Verificar se o usuário ainda existe no banco e seu status
         try {
           const userExists = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { id: true, email: true }
+            select: { id: true, email: true, status: true }
           })
           
           if (!userExists) {
             console.error('Usuário não encontrado no banco, limpando sessão:', token.id)
+            // Retornar sessão vazia para forçar logout
+            return {
+              user: { id: '', email: '', name: '', image: '' },
+              expires: new Date().toISOString()
+            }
+          }
+
+          // Verificar status do usuário
+          if (userExists.status !== 'ACTIVE') {
+            console.error(`Usuário com status ${userExists.status}, limpando sessão:`, token.id)
             // Retornar sessão vazia para forçar logout
             return {
               user: { id: '', email: '', name: '', image: '' },
@@ -143,6 +153,29 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async signIn({ user, account, profile, email, credentials }) {
+      // Verificar status do usuário antes de permitir login
+      if (user?.id) {
+        try {
+          const userData = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { status: true }
+          })
+
+          if (!userData) {
+            console.error('Usuário não encontrado durante login:', user.id)
+            return false
+          }
+
+          if (userData.status !== 'ACTIVE') {
+            console.error(`Login negado para usuário com status ${userData.status}:`, user.id)
+            return false
+          }
+        } catch (error) {
+          console.error('Erro ao verificar status do usuário durante login:', error)
+          return false
+        }
+      }
+      
       return true
     },
     async redirect({ url, baseUrl }) {
