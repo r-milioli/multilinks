@@ -42,8 +42,11 @@ export function usePricing() {
     try {
       setIsLoading(true)
       
-      // Fazer requisição direta com fetch para debug
-      const response = await fetch('/api/public/pricing')
+      // Usar URL absoluta em produção para evitar problemas de roteamento
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      const apiUrl = `${baseUrl}/api/public/pricing`
+      
+      const response = await fetch(apiUrl)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -194,7 +197,7 @@ export function usePricing() {
         })
       }
     } catch (error) {
-      console.error('❌ Pricing Hook - Erro ao carregar dados de preços:', error)
+      console.error('Erro ao carregar dados de preços:', error)
       // Fallback para dados padrão em caso de erro
       const fallbackData = {
         plans: [

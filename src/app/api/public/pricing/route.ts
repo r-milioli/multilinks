@@ -7,6 +7,16 @@ import { SystemSettingsService } from '@/modules/admin/services/systemSettingsSe
  */
 export async function GET(request: NextRequest) {
   try {
+    // Verificar se o banco está acessível antes de fazer qualquer operação
+    try {
+      const { prisma } = await import('@/lib/db')
+      await prisma.$connect()
+      // Testar se conseguimos acessar os dados
+      await prisma.systemSettings.findFirst({ where: { key: 'plans' } })
+    } catch (dbError) {
+      throw new Error('Banco de dados não acessível')
+    }
+    
     // Buscar configurações do sistema
     const settingsResult = await SystemSettingsService.getFormattedSettings()
 
@@ -19,18 +29,37 @@ export async function GET(request: NextRequest) {
     const plansData = settings.plans || []
 
     // Converter dados do banco para formato da interface
-    const plans = plansData.map((plan: any, index: number) => ({
-      id: plan.id || `plan-${index}`,
-      name: plan.name || 'Plano',
-      price: typeof plan.price === 'number' ? `R$ ${plan.price}` : (plan.price || 'R$ 0'),
-      period: '/mês',
-      description: plan.description || '',
-      features: plan.features || [],
-      limitations: plan.limitations || [],
-      popular: plan.popular || (index === 1), // Pro como popular por padrão
-      cta: plan.cta || 'Começar',
-      href: plan.href || (index === 0 ? '/register' : index === 1 ? '/register?plan=pro' : '/register?plan=business')
-    }))
+    const plans = plansData.map((plan: any, index: number) => {
+      // Definir limitações baseadas no plano
+      let limitations = []
+      if (index === 0) { // Gratuito
+        limitations = [
+          'Sem domínio personalizado',
+          'Sem webhooks',
+          'Sem integrações avançadas',
+          'Analytics limitados'
+        ]
+      } else if (index === 1) { // Pro
+        limitations = [
+          'Webhooks limitados',
+          'Sem integrações premium'
+        ]
+      }
+      // Business não tem limitações
+
+      return {
+        id: plan.id || `plan-${index}`,
+        name: plan.name || 'Plano',
+        price: typeof plan.price === 'number' ? `R$ ${plan.price}` : (plan.price || 'R$ 0'),
+        period: '/mês',
+        description: plan.description || (index === 0 ? 'Perfeito para começar' : index === 1 ? 'Para profissionais' : 'Para empresas'),
+        features: plan.features || [],
+        limitations: limitations,
+        popular: plan.popular || (index === 1), // Pro como popular por padrão
+        cta: plan.cta || (index === 0 ? 'Começar grátis' : index === 1 ? 'Começar Pro' : 'Começar Business'),
+        href: plan.href || (index === 0 ? '/register' : index === 1 ? '/register?plan=pro' : '/register?plan=business')
+      }
+    })
 
     // Dados de funcionalidades (pode vir do banco também)
     const features = [

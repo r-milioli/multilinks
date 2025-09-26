@@ -214,18 +214,14 @@ export class SystemSettingsService {
    */
   static async getFormattedSettings() {
     try {
-      console.log('🔍 SystemSettingsService - Iniciando busca de configurações...')
+      // Aguardar um pouco para garantir que o banco esteja totalmente disponível
+      await new Promise(resolve => setTimeout(resolve, 100))
       
       const [socialLinksResult, contactInfoResult, plansResult] = await Promise.all([
         this.getSetting('social_links'),
         this.getSetting('contact_info'),
         this.getSetting('plans')
       ])
-
-      console.log('🔍 SystemSettingsService - Resultados das buscas:')
-      console.log('  - Social Links:', JSON.stringify(socialLinksResult, null, 2))
-      console.log('  - Contact Info:', JSON.stringify(contactInfoResult, null, 2))
-      console.log('  - Plans:', JSON.stringify(plansResult, null, 2))
 
       const defaultSettings: SystemSettingsData = {
         socialLinks: {
@@ -255,16 +251,13 @@ export class SystemSettingsService {
         ? contactInfoResult.data.value 
         : defaultSettings.contactInfo
       
-      const plans = plansResult.success && plansResult.data?.value 
-        ? plansResult.data.value 
-        : defaultSettings.plans
+      // Verificação mais robusta para plans
+      let plans = defaultSettings.plans
+      if (plansResult.success && plansResult.data && plansResult.data.value) {
+        plans = plansResult.data.value
+      }
 
-      console.log('🔍 SystemSettingsService - Dados extraídos:')
-      console.log('  - Social Links extraídos:', JSON.stringify(socialLinks, null, 2))
-      console.log('  - Contact Info extraídos:', JSON.stringify(contactInfo, null, 2))
-      console.log('  - Plans extraídos:', JSON.stringify(plans, null, 2))
-
-      const result = {
+      return {
         success: true,
         data: {
           socialLinks,
@@ -272,10 +265,6 @@ export class SystemSettingsService {
           plans
         }
       }
-
-      console.log('✅ SystemSettingsService - Dados finais:', JSON.stringify(result, null, 2))
-
-      return result
     } catch (error) {
       console.error('❌ SystemSettingsService - Erro ao carregar configurações formatadas:', error)
       return {
