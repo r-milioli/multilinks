@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -27,6 +27,8 @@ export default function ResetPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [token, setToken] = useState<string | null>(null)
+  const [tokenValid, setTokenValid] = useState<boolean | null>(null)
 
   const {
     register,
@@ -36,14 +38,60 @@ export default function ResetPasswordPage() {
     resolver: zodResolver(resetPasswordSchema)
   })
 
+  // Verificar token na URL quando componente carrega
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const tokenFromUrl = urlParams.get('token')
+    
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl)
+      validateToken(tokenFromUrl)
+    } else {
+      setTokenValid(false)
+    }
+  }, [])
+
+  const validateToken = async (tokenToValidate: string) => {
+    try {
+      const response = await fetch(`/api/auth/reset-password?token=${tokenToValidate}`)
+      const result = await response.json()
+      
+      setTokenValid(result.success)
+    } catch (error) {
+      console.error('Erro ao validar token:', error)
+      setTokenValid(false)
+    }
+  }
+
   const onSubmit = async (data: ResetPasswordFormData) => {
+    if (!token) {
+      alert('Token não encontrado')
+      return
+    }
+
     setIsLoading(true)
     try {
-      // Simular reset da senha
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setIsSuccess(true)
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          token: token,
+          password: data.password 
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setIsSuccess(true)
+      } else {
+        alert(result.error || 'Erro ao redefinir senha')
+      }
     } catch (error) {
       console.error('Erro ao resetar senha:', error)
+      alert('Erro de conexão. Tente novamente.')
     } finally {
       setIsLoading(false)
     }
@@ -100,7 +148,33 @@ export default function ResetPasswordPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!isSuccess ? (
+              {tokenValid === null ? (
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-gray-500 rounded-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                  </div>
+                  <p className="text-gray-300">Validando token...</p>
+                </div>
+              ) : !tokenValid ? (
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-red-500 rounded-full flex items-center justify-center">
+                    <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Token Inválido</h3>
+                    <p className="text-gray-300 text-sm">
+                      Este link de recuperação é inválido ou expirou. Solicite um novo link.
+                    </p>
+                  </div>
+                  <Button asChild className="w-full bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-500 hover:to-pink-600">
+                    <Link href="/forgot-password">
+                      Solicitar Novo Link
+                    </Link>
+                  </Button>
+                </div>
+              ) : !isSuccess ? (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="password" className="text-white">Nova Senha</Label>

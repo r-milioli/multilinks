@@ -48,11 +48,11 @@ model User {
   themeSettings        Json?        @default("{}")
   privacySettings      Json?        @default("{}")
   notificationSettings Json?        @default("{}")
-  integrationSettings  Json?        @default("{}")
-  legalLinksSettings   Json?        @default("{}")
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
+  integrationSettings  Json?        @default("{}")
   lastLoginAt          DateTime?
+  legalLinksSettings   Json?        @default("{}")
   role                 UserRole     @default(USER)
   status               UserStatus   @default(ACTIVE)
   accounts             Account[]
@@ -73,6 +73,20 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expires   DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([token])
+  @@index([expires])
+}
+
 model Link {
   id          String      @id @default(cuid())
   title       String
@@ -83,11 +97,11 @@ model Link {
   position    Int
   active      Boolean     @default(true)
   clickCount  Int         @default(0)
-  useForm     Boolean     @default(false)
-  formId      String?
   userId      String
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  formId      String?
+  useForm     Boolean     @default(false)
   analytics   Analytics[]
   formLinks   FormLink[]
   leads       Lead[]

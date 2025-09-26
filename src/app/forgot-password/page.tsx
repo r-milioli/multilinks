@@ -33,11 +33,25 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true)
     try {
-      // Simular envio do email
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setIsSubmitted(true)
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: data.email }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setIsSubmitted(true)
+      } else {
+        // Mostrar erro ao usuário
+        alert(result.error || 'Erro ao enviar email de recuperação')
+      }
     } catch (error) {
       console.error('Erro ao enviar email:', error)
+      alert('Erro de conexão. Tente novamente.')
     } finally {
       setIsLoading(false)
     }

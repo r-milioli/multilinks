@@ -72,6 +72,20 @@ export class AuthService {
         }
       })
 
+      // Enviar email de boas-vindas (não bloquear o registro se falhar)
+      try {
+        const { EmailService } = await import('@/lib/emailService')
+        await EmailService.sendWelcomeEmail(
+          user.email,
+          user.name || 'Usuário',
+          user.username || undefined
+        )
+        console.log('Email de boas-vindas enviado para:', user.email)
+      } catch (emailError) {
+        console.error('Erro ao enviar email de boas-vindas:', emailError)
+        // Não falhar o registro por causa do email
+      }
+
       return { success: true, data: user }
     } catch (error) {
       console.error('Erro no registro:', error)
@@ -141,9 +155,16 @@ export class AuthService {
         return { success: false, error: 'Email não encontrado' }
       }
 
-      // Aqui você implementaria o envio de email
-      // Por enquanto, apenas retornamos sucesso
-      return { success: true, message: 'Email de recuperação enviado' }
+      // Enviar email de recuperação
+      const { EmailService } = await import('@/lib/emailService')
+      const emailResult = await EmailService.sendPasswordResetEmail(user.email, 'token-placeholder', user.name || undefined)
+      
+      if (emailResult.success) {
+        return { success: true, message: 'Email de recuperação enviado' }
+      } else {
+        console.error('Erro ao enviar email:', emailResult.error)
+        return { success: false, error: 'Erro ao enviar email de recuperação' }
+      }
     } catch (error) {
       console.error('Erro ao resetar senha:', error)
       return { success: false, error: 'Erro interno do servidor' }

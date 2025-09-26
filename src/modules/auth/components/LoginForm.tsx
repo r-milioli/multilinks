@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { Label } from '@/shared/components/ui/Label'
@@ -72,7 +73,18 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-white">Senha</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-white">Senha</Label>
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-orange-400 hover:text-orange-300 text-sm" 
+                asChild
+              >
+                <Link href="/forgot-password">
+                  Esqueci minha senha
+                </Link>
+              </Button>
+            </div>
             <div className="relative">
               <Input
                 id="password"
