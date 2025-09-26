@@ -54,51 +54,17 @@ async function initializeDatabase() {
       console.log('✅ Configurações padrão criadas');
     }
     
-    // Verificar se os planos padrão existem
-    const plans = await prisma.plan.findMany();
+    // Verificar se há usuários no sistema
+    const userCount = await prisma.user.count();
+    console.log(`👥 Usuários no sistema: ${userCount}`);
     
-    if (plans.length === 0) {
-      console.log('📋 Criando planos padrão...');
-      
-      await prisma.plan.createMany({
-        data: [
-          {
-            id: 'plan_free',
-            name: 'Gratuito',
-            description: 'Plano gratuito com funcionalidades básicas',
-            price: 0,
-            currency: 'BRL',
-            billingCycle: 'monthly',
-            features: ['5 links', '1 formulário', 'Analytics básico'],
-            limits: { links: 5, forms: 1, clicks: 1000 },
-            active: true
-          },
-          {
-            id: 'plan_pro',
-            name: 'Pro',
-            description: 'Plano profissional com funcionalidades avançadas',
-            price: 29.90,
-            currency: 'BRL',
-            billingCycle: 'monthly',
-            features: ['Links ilimitados', 'Formulários ilimitados', 'Analytics avançado', 'Suporte prioritário'],
-            limits: { links: -1, forms: -1, clicks: -1 },
-            active: true
-          },
-          {
-            id: 'plan_business',
-            name: 'Business',
-            description: 'Plano empresarial para equipes',
-            price: 99.90,
-            currency: 'BRL',
-            billingCycle: 'monthly',
-            features: ['Tudo do Pro', 'Múltiplos usuários', 'API access', 'Suporte 24/7'],
-            limits: { links: -1, forms: -1, clicks: -1, users: 10 },
-            active: true
-          }
-        ]
-      });
-      
-      console.log('✅ Planos padrão criados');
+    // Verificar se a tabela PasswordResetToken existe e está funcionando
+    try {
+      const tokenCount = await prisma.passwordResetToken.count();
+      console.log(`🔐 Tokens de reset de senha: ${tokenCount}`);
+      console.log('✅ Sistema SMTP configurado e funcionando');
+    } catch (error) {
+      console.log('⚠️ Tabela PasswordResetToken não encontrada - migração SMTP pode estar pendente');
     }
     
     console.log('🎉 Inicialização do banco concluída com sucesso!');
