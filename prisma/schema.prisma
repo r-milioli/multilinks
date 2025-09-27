@@ -57,7 +57,7 @@ model User {
   status               UserStatus   @default(ACTIVE)
   accounts             Account[]
   analytics            Analytics[]
-  AuditLog             AuditLog[]
+  auditLogs            AuditLog[]
   forms                Form[]
   links                Link[]
   sessions             Session[]
@@ -243,17 +243,18 @@ model Subscription {
 }
 
 model AuditLog {
-  id         String   @id
-  userId     String?
-  action     String
-  resource   String
-  resourceId String?
-  oldData    Json?
-  newData    Json?
-  ipAddress  String?
-  userAgent  String?
-  createdAt  DateTime @default(now())
-  User       User?    @relation(fields: [userId], references: [id])
+  id          String   @id @default(cuid())
+  userId      String?
+  action      String
+  resource    String
+  resourceId  String?
+  description String?
+  oldData     Json?
+  newData     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
 
   @@index([action, resource])
   @@index([createdAt])
@@ -261,7 +262,7 @@ model AuditLog {
 }
 
 model Payment {
-  id              String    @id
+  id              String    @id @default(cuid())
   userId          String
   subscriptionId  String?
   amount          Decimal   @db.Decimal(10, 2)
@@ -272,7 +273,7 @@ model Payment {
   gatewayResponse Json?
   processedAt     DateTime?
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime
+  updatedAt       DateTime  @updatedAt
 
   @@index([processedAt])
   @@index([status])

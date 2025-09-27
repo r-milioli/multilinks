@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db'
 import { CreateLinkData, UpdateLinkData, ReorderLinkData } from '@/types/link.types'
 import { linkSchema } from '@/shared/utils/validation'
-import { LIMITS } from '@/shared/utils/constants'
+import { PlanLimitsService } from '@/shared/services/planLimitsService'
 
 export class LinkService {
   static async createLink(userId: string, data: CreateLinkData) {
@@ -21,14 +21,15 @@ export class LinkService {
       console.log('✅ Validação passou')
 
       // Verificar limite de links
-      const linkCount = await prisma.link.count({
-        where: { userId }
-      })
-
-      if (linkCount >= LIMITS.MAX_LINKS_PER_USER) {
+      const linkLimit = await PlanLimitsService.checkLinkLimit(userId)
+      
+      if (!linkLimit.allowed) {
         return { 
           success: false, 
-          error: `Limite máximo de ${LIMITS.MAX_LINKS_PER_USER} links atingido` 
+          error: linkLimit.message || `Limite de ${linkLimit.limit} links atingido`,
+          upgradeRequired: linkLimit.upgradeRequired,
+          current: linkLimit.current,
+          limit: linkLimit.limit
         }
       }
 
@@ -55,6 +56,16 @@ export class LinkService {
           active: data.active ?? true,
           useForm: data.useForm ?? false,
           formId: data.formId && data.formId.trim() !== '' ? data.formId : null
+        }
+      })
+
+      // Atualizar estatísticas do usuário
+      await prisma.userStats.update({
+        where: { userId },
+        data: {
+          totalLinks: {
+            increment: 1
+          }
         }
       })
 
@@ -126,6 +137,16 @@ export class LinkService {
         where: { id: linkId }
       })
 
+      // Atualizar estatísticas do usuário
+      await prisma.userStats.update({
+        where: { userId },
+        data: {
+          totalLinks: {
+            decrement: 1
+          }
+        }
+      })
+
       return { success: true }
     } catch (error) {
       console.error('Erro ao deletar link:', error)
@@ -167,12 +188,23 @@ export class LinkService {
 
   static async getUserLinks(userId: string) {
     try {
-      const links = await prisma.link.findMany({
-        where: { userId },
-        orderBy: { position: 'asc' }
-      })
+      const [links, limits] = await Promise.all([
+        prisma.link.findMany({
+          where: { userId },
+          orderBy: { position: 'asc' }
+        }),
+        PlanLimitsService.checkLinkLimit(userId)
+      ])
 
-      return { success: true, data: links }
+      return { 
+        success: true, 
+        data: links,
+        limits: {
+          current: limits.current,
+          limit: limits.limit,
+          isUnlimited: limits.limit === -1
+        }
+      }
     } catch (error) {
       console.error('Erro ao buscar links:', error)
       return { success: false, error: 'Erro interno do servidor' }
@@ -256,4 +288,3 @@ export class LinkService {
     }
   }
 }
-

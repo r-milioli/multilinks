@@ -1,146 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { SystemSettingsService } from '@/modules/admin/services/systemSettingsService'
+import { PricingService } from '@/modules/admin/services/pricingService'
 
 /**
  * GET /api/public/pricing
- * Endpoint público para buscar dados de preços
+ * Retorna os dados de preços e recursos dos planos
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verificar se o banco está acessível antes de fazer qualquer operação
-    try {
-      const { prisma } = await import('@/lib/db')
-      await prisma.$connect()
-      // Testar se conseguimos acessar os dados
-      await prisma.systemSettings.findFirst({ where: { key: 'plans' } })
-    } catch (dbError) {
-      throw new Error('Banco de dados não acessível')
-    }
-    
-    // Buscar configurações do sistema
-    const settingsResult = await SystemSettingsService.getFormattedSettings()
-
-    if (!settingsResult.success) {
-      throw new Error('Erro ao carregar configurações do sistema')
-    }
-
-    const settings = settingsResult.data
-    // Extrair dados de preços das configurações
-    const plansData = settings.plans || []
-
-    // Converter dados do banco para formato da interface
-    const plans = plansData.map((plan: any, index: number) => {
-      // Definir limitações baseadas no plano
-      let limitations = []
-      if (index === 0) { // Gratuito
-        limitations = [
-          'Sem domínio personalizado',
-          'Sem webhooks',
-          'Sem integrações avançadas',
-          'Analytics limitados'
-        ]
-      } else if (index === 1) { // Pro
-        limitations = [
-          'Webhooks limitados',
-          'Sem integrações premium'
-        ]
-      }
-      // Business não tem limitações
-
-      return {
-        id: plan.id || `plan-${index}`,
-        name: plan.name || 'Plano',
-        price: typeof plan.price === 'number' ? `R$ ${plan.price}` : (plan.price || 'R$ 0'),
-        period: '/mês',
-        description: plan.description || (index === 0 ? 'Perfeito para começar' : index === 1 ? 'Para profissionais' : 'Para empresas'),
-        features: plan.features || [],
-        limitations: limitations,
-        popular: plan.popular || (index === 1), // Pro como popular por padrão
-        cta: plan.cta || (index === 0 ? 'Começar grátis' : index === 1 ? 'Começar Pro' : 'Começar Business'),
-        href: plan.href || (index === 0 ? '/register' : index === 1 ? '/register?plan=pro' : '/register?plan=business')
-      }
-    })
-
-    // Dados de funcionalidades (pode vir do banco também)
-    const features = [
-      {
-        category: 'Gestão de Links',
-        items: [
-          { name: 'Links ilimitados', free: true, pro: true, business: true },
-          { name: 'Drag & drop', free: true, pro: true, business: true },
-          { name: 'Categorização', free: false, pro: true, business: true },
-          { name: 'Links programados', free: false, pro: false, business: true },
-          { name: 'A/B testing', free: false, pro: false, business: true }
-        ]
-      },
-      {
-        category: 'Personalização',
-        items: [
-          { name: 'Temas básicos', free: true, pro: true, business: true },
-          { name: 'Temas premium', free: false, pro: true, business: true },
-          { name: 'Editor visual', free: false, pro: true, business: true },
-          { name: 'CSS customizado', free: false, pro: false, business: true },
-          { name: 'Branding personalizado', free: false, pro: false, business: true }
-        ]
-      },
-      {
-        category: 'Analytics',
-        items: [
-          { name: 'Cliques básicos', free: true, pro: true, business: true },
-          { name: 'Geolocalização', free: false, pro: true, business: true },
-          { name: 'Dispositivos', free: false, pro: true, business: true },
-          { name: 'Relatórios avançados', free: false, pro: true, business: true },
-          { name: 'API de analytics', free: false, pro: false, business: true }
-        ]
-      },
-      {
-        category: 'Formulários',
-        items: [
-          { name: '1 formulário', free: true, pro: false, business: false },
-          { name: 'Formulários ilimitados', free: false, pro: true, business: true },
-          { name: 'Campos personalizados', free: false, pro: true, business: true },
-          { name: 'Validação avançada', free: false, pro: false, business: true },
-          { name: 'Automações', free: false, pro: false, business: true }
-        ]
-      },
-      {
-        category: 'Integrações',
-        items: [
-          { name: 'Webhooks básicos', free: false, pro: true, business: true },
-          { name: 'Webhooks ilimitados', free: false, pro: false, business: true },
-          { name: 'API completa', free: false, pro: false, business: true },
-          { name: 'Integrações nativas', free: false, pro: false, business: true },
-          { name: 'Webhooks customizados', free: false, pro: false, business: true }
-        ]
-      },
-      {
-        category: 'Suporte',
-        items: [
-          { name: 'Email', free: true, pro: true, business: true },
-          { name: 'Chat', free: false, pro: true, business: true },
-          { name: 'Suporte prioritário', free: false, pro: true, business: true },
-          { name: 'Suporte 24/7', free: false, pro: false, business: true },
-          { name: 'Gerente de conta', free: false, pro: false, business: true }
-        ]
-      }
-    ]
-
-    const pricingData = {
-      plans,
-      features
-    }
+    const pricingData = await PricingService.getPricingData()
 
     return NextResponse.json({
       success: true,
       data: pricingData
     })
-
   } catch (error) {
-    console.error('❌ API Pricing - Erro ao buscar dados de preços:', error)
-    
-    return NextResponse.json({
-      success: false,
-      error: 'Erro interno do servidor'
-    }, { status: 500 })
+    console.error('Erro ao buscar dados de preços:', error)
+    return NextResponse.json(
+      { success: false, error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
   }
 }

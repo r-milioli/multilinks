@@ -37,6 +37,7 @@ import { useAdminStats } from '@/modules/admin/hooks/useAdminStats'
 import { UserEditModal } from '@/modules/admin/components/UserEditModal'
 import { AdminGuard } from '@/shared/components/AdminGuard'
 import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog'
+import { PlanLimitsSection } from '@/shared/components/admin/PlanLimitsSection'
 import { toast } from 'react-hot-toast'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 
@@ -586,112 +587,8 @@ export function AdminContent() {
             </CardContent>
           </Card>
 
-          {/* Planos */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <DollarSign className="h-5 w-5" />
-                <span>Planos e Preços</span>
-              </CardTitle>
-              <CardDescription>Configure os planos disponíveis e seus preços</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {plansForm.map((plan, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <Input
-                        value={plan.name}
-                        onChange={(e) => {
-                          const newPlans = [...plansForm]
-                          newPlans[index].name = e.target.value
-                          setPlansForm(newPlans)
-                        }}
-                        placeholder="Nome do plano"
-                        className="font-medium"
-                      />
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="number"
-                          value={plan.price}
-                          onChange={(e) => {
-                            const newPlans = [...plansForm]
-                            newPlans[index].price = parseFloat(e.target.value) || 0
-                            setPlansForm(newPlans)
-                          }}
-                          placeholder="0.00"
-                          className="w-24 text-right font-bold"
-                        />
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            const newPlans = plansForm.filter((_, i) => i !== index)
-                            setPlansForm(newPlans)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      {plan.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-center space-x-2">
-                          <Input
-                            value={feature}
-                            onChange={(e) => {
-                              const newPlans = [...plansForm]
-                              newPlans[index].features[featureIndex] = e.target.value
-                              setPlansForm(newPlans)
-                            }}
-                            placeholder="Recurso do plano"
-                            className="text-sm"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              const newPlans = [...plansForm]
-                              newPlans[index].features = newPlans[index].features.filter((_, i) => i !== featureIndex)
-                              setPlansForm(newPlans)
-                            }}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          const newPlans = [...plansForm]
-                          newPlans[index].features.push('')
-                          setPlansForm(newPlans)
-                        }}
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        Adicionar Recurso
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => {
-                    setPlansForm([...plansForm, { name: '', price: 0, features: [''] }])
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Novo Plano
-                </Button>
-                <Button onClick={handleSavePlans} disabled={isSaving} className="w-full">
-                  <Settings className="h-4 w-4 mr-2" />
-                  {isSaving ? 'Salvando Planos...' : 'Salvar Planos'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Planos e Limites */}
+          <PlanLimitsSection />
         </>
       )}
     </div>
