@@ -132,6 +132,10 @@ export function useUsers(filters?: UserFilters) {
     return await updateUser(userId, { role: newRole })
   }
 
+  const changeUserPlan = async (userId: string, newPlan: 'free' | 'pro' | 'business') => {
+    return await updateUser(userId, { subscriptionPlan: newPlan })
+  }
+
   useEffect(() => {
     loadUsers()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -147,6 +151,7 @@ export function useUsers(filters?: UserFilters) {
     updateUser,
     deleteUser,
     toggleUserStatus,
-    changeUserRole
+    changeUserRole,
+    changeUserPlan
   }
 }

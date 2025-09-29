@@ -69,7 +69,15 @@ export async function GET(request: NextRequest) {
           emailVerified: true,
           image: true,
           username: true,
-          bio: true
+          bio: true,
+          userStats: {
+            select: {
+              subscriptionPlan: true,
+              totalLinks: true,
+              totalForms: true,
+              totalClicks: true
+            }
+          }
         },
         orderBy: {
           [sortBy]: sortOrder
@@ -86,9 +94,9 @@ export async function GET(request: NextRequest) {
     const usersWithStats = users.map(user => ({
       ...user,
       stats: {
-        totalLinks: 0,
-        totalClicks: 0,
-        totalForms: 0,
+        totalLinks: user.userStats?.totalLinks || 0,
+        totalClicks: user.userStats?.totalClicks || 0,
+        totalForms: user.userStats?.totalForms || 0,
         lastLogin: user.updatedAt?.toISOString()
       }
     }))

@@ -822,6 +822,17 @@ export function AdminContent() {
                       <Badge variant={user.role === 'SUPER_ADMIN' ? 'destructive' : user.role === 'ADMIN' ? 'default' : 'secondary'} className="text-xs">
                         {user.role === 'SUPER_ADMIN' ? 'Super' : user.role === 'ADMIN' ? 'Admin' : 'User'}
                       </Badge>
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs ${
+                          (user as any).userStats?.subscriptionPlan === 'business' ? 'border-purple-500 text-purple-600' :
+                          (user as any).userStats?.subscriptionPlan === 'pro' ? 'border-blue-500 text-blue-600' :
+                          'border-gray-400 text-gray-600'
+                        }`}
+                      >
+                        {(user as any).userStats?.subscriptionPlan === 'business' ? 'BUSINESS' :
+                         (user as any).userStats?.subscriptionPlan === 'pro' ? 'PRO' : 'FREE'}
+                      </Badge>
                       <Badge variant={user.status === 'ACTIVE' ? 'default' : 'outline'} className="text-xs">
                         {user.status === 'ACTIVE' ? 'Ativo' : user.status === 'INACTIVE' ? 'Inativo' : user.status === 'SUSPENDED' ? 'Suspenso' : 'Pendente'}
                       </Badge>

@@ -74,6 +74,26 @@ export async function PUT(
       }
     })
 
+    // Se subscriptionPlan foi fornecido, atualizar UserStats
+    if (body.subscriptionPlan !== undefined) {
+      const validPlans = ['free', 'pro', 'business']
+      if (validPlans.includes(body.subscriptionPlan)) {
+        await prisma.userStats.upsert({
+          where: { userId },
+          update: {
+            subscriptionPlan: body.subscriptionPlan
+          },
+          create: {
+            userId,
+            subscriptionPlan: body.subscriptionPlan,
+            totalLinks: 0,
+            totalForms: 0,
+            totalClicks: 0
+          }
+        })
+      }
+    }
+
     // await prisma.$disconnect() // Removido para evitar desconexão da instância global
 
     return NextResponse.json({

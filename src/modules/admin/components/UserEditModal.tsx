@@ -28,7 +28,8 @@ export function UserEditModal({ user, isOpen, onClose, onSave }: UserEditModalPr
         username: user.username,
         role: user.role,
         status: user.status,
-        bio: user.bio || ''
+        bio: user.bio || '',
+        subscriptionPlan: (user as any).userStats?.subscriptionPlan || 'free'
       })
       setError(null)
     }
@@ -146,6 +147,37 @@ export function UserEditModal({ user, isOpen, onClose, onSave }: UserEditModalPr
                   <SelectItem value="PENDING">Pendente</SelectItem>
                 </Select>
               </div>
+            </div>
+
+            {/* Plano de Assinatura */}
+            <div>
+              <Label htmlFor="subscriptionPlan">Plano de Assinatura</Label>
+              <Select
+                value={formData.subscriptionPlan || 'free'}
+                onChange={(e) => setFormData(prev => ({ ...prev, subscriptionPlan: e.target.value as any }))}
+              >
+                <SelectItem value="free">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                    FREE - Gratuito
+                  </div>
+                </SelectItem>
+                <SelectItem value="pro">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    PRO - Profissional
+                  </div>
+                </SelectItem>
+                <SelectItem value="business">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                    BUSINESS - Empresarial
+                  </div>
+                </SelectItem>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                Define os limites e recursos disponíveis para o usuário
+              </p>
             </div>
           </div>
 
