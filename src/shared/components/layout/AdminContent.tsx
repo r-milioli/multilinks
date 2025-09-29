@@ -38,6 +38,7 @@ import { UserEditModal } from '@/modules/admin/components/UserEditModal'
 import { AdminGuard } from '@/shared/components/AdminGuard'
 import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog'
 import { PlanLimitsSection } from '@/shared/components/admin/PlanLimitsSection'
+import { PlanBasicSection } from '@/shared/components/admin/PlanBasicSection'
 import { toast } from 'react-hot-toast'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 
@@ -587,7 +588,10 @@ export function AdminContent() {
             </CardContent>
           </Card>
 
-          {/* Planos e Limites */}
+          {/* Informações Básicas dos Planos */}
+          <PlanBasicSection />
+
+          {/* Limites e Features dos Planos */}
           <PlanLimitsSection />
         </>
       )}

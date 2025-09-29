@@ -15,7 +15,8 @@ export function useForms(shouldLoadImmediately = true) {
         throw new Error('Erro ao buscar formulários');
       }
       const data = await response.json();
-      setForms(data);
+      // A API retorna { forms, limits }, então precisamos extrair apenas os forms
+      setForms(data.forms || []);
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error('Erro desconhecido');
       console.error('Erro ao buscar formulários:', errorObj);

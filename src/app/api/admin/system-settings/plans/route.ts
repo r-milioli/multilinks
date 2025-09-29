@@ -3,10 +3,14 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { SystemSettingsService } from '@/modules/admin/services/systemSettingsService'
 
-export async function PUT(request: NextRequest) {
+/**
+ * GET /api/admin/system-settings/plans
+ * Retorna as informações básicas dos planos
+ */
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: 'Não autenticado' },
@@ -14,31 +18,15 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
-    
-    // Validar dados recebidos
-    if (!body || !Array.isArray(body)) {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') {
       return NextResponse.json(
-        { success: false, error: 'Dados inválidos - esperado array de planos' },
-        { status: 400 }
+        { success: false, error: 'Não autorizado' },
+        { status: 403 }
       )
     }
 
-    // Validar estrutura dos planos
-    const plans = body.map((plan: any, index: number) => {
-      if (!plan || typeof plan !== 'object') {
-        throw new Error(`Plano ${index + 1} inválido`)
-      }
+    const result = await SystemSettingsService.getSetting('plans')
 
-      return {
-        name: plan.name || `Plano ${index + 1}`,
-        price: typeof plan.price === 'number' ? plan.price : 0,
-        features: Array.isArray(plan.features) ? plan.features : []
-      }
-    })
-
-    const result = await SystemSettingsService.savePlans(plans)
-    
     if (!result.success) {
       return NextResponse.json(
         { success: false, error: result.error },
@@ -48,13 +36,82 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: result.data,
-      message: 'Planos salvos com sucesso!'
+      data: result.data?.value || []
+    })
+  } catch (error) {
+    console.error('Erro ao buscar planos:', error)
+    return NextResponse.json(
+      { success: false, error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * PUT /api/admin/system-settings/plans
+ * Atualiza as informações básicas dos planos
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Não autenticado' },
+        { status: 401 }
+      )
+    }
+
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') {
+      return NextResponse.json(
+        { success: false, error: 'Não autorizado' },
+        { status: 403 }
+      )
+    }
+
+    const plans = await request.json()
+
+    // Validar estrutura dos dados
+    if (!Array.isArray(plans)) {
+      return NextResponse.json(
+        { success: false, error: 'Formato de dados inválido' },
+        { status: 400 }
+      )
+    }
+
+    // Validar cada plano
+    for (const plan of plans) {
+      if (!plan.name || typeof plan.price !== 'number' || !plan.description) {
+        return NextResponse.json(
+          { success: false, error: 'Estrutura de plano inválida' },
+          { status: 400 }
+        )
+      }
+    }
+
+    const result = await SystemSettingsService.upsertSetting({
+      key: 'plans',
+      value: plans,
+      description: 'Informações básicas dos planos',
+      category: 'pricing',
+      isPublic: true
+    })
+
+    if (!result.success) {
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: plans
     })
   } catch (error) {
     console.error('Erro ao salvar planos:', error)
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Erro interno do servidor' },
+      { success: false, error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }

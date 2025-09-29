@@ -12,6 +12,7 @@ import { Modal, ModalContent, ModalHeader, ModalTitle } from '@/shared/component
 import { Loading } from '@/shared/components/ui/Loading'
 import { Plus, FileText, BarChart3 } from 'lucide-react'
 import { useNavigation } from '@/shared/contexts/NavigationContext'
+import { usePlanLimits } from '@/shared/hooks/usePlanLimits'
 
 type ViewMode = 'list' | 'create' | 'edit' | 'leads'
 
@@ -31,7 +32,8 @@ export function FormsListContent() {
     getFormById,
   } = useForms()
 
-  const formIds = forms.map(form => form.id)
+  const { canCreateForm, formLimits, plan } = usePlanLimits()
+  const formIds = forms?.map(form => form.id) || []
   const { getFormStats: getFormStatsFromHook, refreshStats } = useFormStats(formIds)
 
   // Atualizar estatísticas quando a página ganha foco
@@ -57,6 +59,12 @@ export function FormsListContent() {
   }
 
   const handleCreateForm = async (formData: any) => {
+    // Verificar se pode criar formulários
+    if (!canCreateForm()) {
+      console.log('Usuário não pode criar formulários no plano atual')
+      return
+    }
+
     try {
       await createForm(formData)
       setShowFormBuilder(false)
@@ -100,6 +108,12 @@ export function FormsListContent() {
   }
 
   const handleCreateNew = () => {
+    // Verificar se pode criar formulários
+    if (!canCreateForm()) {
+      console.log('Usuário não pode criar formulários no plano atual')
+      return
+    }
+
     setSelectedForm(null)
     setShowFormBuilder(true)
     setViewMode('create')
@@ -169,15 +183,31 @@ export function FormsListContent() {
             <BarChart3 className="h-4 w-4 mr-2" />
             Ver Leads
           </Button>
-          <Button onClick={handleCreateNew} className="w-full sm:w-auto">
-            <Plus className="h-4 w-4 mr-2" />
-            Criar Formulário
-          </Button>
+          {canCreateForm() ? (
+            <Button onClick={handleCreateNew} className="w-full sm:w-auto">
+              <Plus className="h-4 w-4 mr-2" />
+              Criar Formulário
+            </Button>
+          ) : (
+            <div className="w-full">
+              <Card className="p-4 border-orange-200 bg-orange-50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span className="text-orange-600 text-lg">🔒</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-orange-800">Formulários Bloqueados</h3>
+                    <p className="text-orange-600 text-sm">Disponível apenas no PRO</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Forms Grid */}
-      {forms.length === 0 ? (
+      {!forms || forms.length === 0 ? (
         <Card className="p-8 text-center">
           <div className="text-gray-500 mb-4">
             <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,14 +220,44 @@ export function FormsListContent() {
           <p className="text-gray-500 mb-4">
             Comece criando seu primeiro formulário de captura
           </p>
-          <Button onClick={handleCreateNew}>
-            <Plus className="h-4 w-4 mr-2" />
-            Criar Primeiro Formulário
-          </Button>
+          {canCreateForm() ? (
+            <Button onClick={handleCreateNew}>
+              <Plus className="h-4 w-4 mr-2" />
+              Criar Primeiro Formulário
+            </Button>
+          ) : (
+            <div className="w-full">
+              <Card className="p-6 border-orange-200 bg-orange-50">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span className="text-orange-600 text-xl">🔒</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-orange-800">Formulários Bloqueados</h3>
+                    <p className="text-orange-600 text-sm">Formulários disponíveis apenas no PRO</p>
+                  </div>
+                </div>
+                <p className="text-orange-700 mb-4">
+                  Faça upgrade para capturar leads e criar formulários de contato.
+                </p>
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={() => window.location.href = '/pricing'}
+                    className="bg-orange-600 hover:bg-orange-700"
+                  >
+                    Fazer Upgrade
+                  </Button>
+                  <Button variant="outline" className="border-orange-300 text-orange-700">
+                    Ver Preços
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {forms.map((form) => {
+          {forms?.map((form) => {
             const stats = getFormStats(form)
             return (
               <Card key={form.id} className="p-6">

@@ -24,6 +24,7 @@ import { CollapsibleSection } from '@/modules/theme/components/CollapsibleSectio
 import { useImageUpload } from '@/modules/profile/hooks/useImageUpload'
 import { AvatarUpload } from '@/modules/profile/components/AvatarUpload'
 import { useSession } from 'next-auth/react'
+import { FeatureGuard } from '@/shared/components/FeatureGuard'
 
 export function ThemeEditorContent() {
   const { data: session, update: updateSession } = useSession()
@@ -191,13 +192,14 @@ export function ThemeEditorContent() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold">Personalização da Página Pública</h2>
-        <p className="text-gray-600 mt-2">
-          Customize a aparência da sua página pública com cores, fontes, estilos de botão e backgrounds
-        </p>
-      </div>
+    <FeatureGuard feature="themeEditing">
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-2xl font-bold">Personalização da Página Pública</h2>
+          <p className="text-gray-600 mt-2">
+            Customize a aparência da sua página pública com cores, fontes, estilos de botão e backgrounds
+          </p>
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Coluna de Configurações - Scrollável no Desktop */}
@@ -690,6 +692,7 @@ export function ThemeEditorContent() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </FeatureGuard>
   )
 }

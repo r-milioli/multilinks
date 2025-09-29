@@ -12,12 +12,26 @@ export class PlanLimitsService {
    * Busca o plano atual do usuário
    */
   static async getUserPlan(userId: string): Promise<string> {
-    const userStats = await prisma.userStats.findUnique({
-      where: { userId },
-      select: { subscriptionPlan: true }
-    })
-    
-    return userStats?.subscriptionPlan || 'free'
+    try {
+      // Verificar se o Prisma está disponível
+      if (!prisma) {
+        console.warn('Prisma não está disponível, usando plano padrão')
+        return 'free'
+      }
+
+      const userStats = await prisma.userStats.findUnique({
+        where: { userId },
+        select: { subscriptionPlan: true }
+      })
+      
+      const plan = userStats?.subscriptionPlan || 'free'
+      
+      return plan
+    } catch (error) {
+      console.error('Erro ao buscar plano do usuário:', error)
+      // Em caso de erro, assumir plano free para não quebrar a aplicação
+      return 'free'
+    }
   }
 
   /**
@@ -49,31 +63,43 @@ export class PlanLimitsService {
    * Verifica o limite de links do usuário
    */
   static async checkLinkLimit(userId: string): Promise<LimitCheckResult> {
-    const plan = await this.getUserPlan(userId)
-    const limits = await this.getPlanLimits(plan)
-    
-    // Se for ilimitado, retorna permitido
-    if (isUnlimited(limits.maxLinks)) {
-      return {
-        allowed: true,
-        current: 0,
-        limit: -1
+    try {
+      const plan = await this.getUserPlan(userId)
+      const limits = await this.getPlanLimits(plan)
+      
+      // Se for ilimitado, retorna permitido
+      if (isUnlimited(limits.maxLinks)) {
+        return {
+          allowed: true,
+          current: 0,
+          limit: -1
+        }
       }
-    }
 
-    // Contar links do usuário
-    const currentCount = await prisma.link.count({
-      where: { userId }
-    })
+      // Contar links do usuário
+      const currentCount = await prisma.link.count({
+        where: { userId }
+      })
 
-    const allowed = currentCount < limits.maxLinks
-    
-    return {
-      allowed,
-      current: currentCount,
-      limit: limits.maxLinks,
-      upgradeRequired: !allowed,
-      message: !allowed ? UPGRADE_MESSAGES.links[plan as keyof typeof UPGRADE_MESSAGES.links] : undefined
+      // Para planos com maxLinks: 0, o usuário não pode criar links
+      const allowed = limits.maxLinks > 0 && currentCount < limits.maxLinks
+      
+      return {
+        allowed,
+        current: currentCount,
+        limit: limits.maxLinks,
+        upgradeRequired: !allowed,
+        message: !allowed ? UPGRADE_MESSAGES.links[plan as keyof typeof UPGRADE_MESSAGES.links] : undefined
+      }
+    } catch (error) {
+      console.error('Erro ao verificar limite de links:', error)
+      return {
+        allowed: false,
+        current: 0,
+        limit: 0,
+        upgradeRequired: true,
+        message: 'Erro ao verificar limite de links'
+      }
     }
   }
 
@@ -81,29 +107,41 @@ export class PlanLimitsService {
    * Verifica o limite de formulários do usuário
    */
   static async checkFormLimit(userId: string): Promise<LimitCheckResult> {
-    const plan = await this.getUserPlan(userId)
-    const limits = await this.getPlanLimits(plan)
-    
-    if (isUnlimited(limits.maxForms)) {
-      return {
-        allowed: true,
-        current: 0,
-        limit: -1
+    try {
+      const plan = await this.getUserPlan(userId)
+      const limits = await this.getPlanLimits(plan)
+      
+      if (isUnlimited(limits.maxForms)) {
+        return {
+          allowed: true,
+          current: 0,
+          limit: -1
+        }
       }
-    }
 
-    const currentCount = await prisma.form.count({
-      where: { userId }
-    })
+      const currentCount = await prisma.form.count({
+        where: { userId }
+      })
 
-    const allowed = currentCount < limits.maxForms
-    
-    return {
-      allowed,
-      current: currentCount,
-      limit: limits.maxForms,
-      upgradeRequired: !allowed,
-      message: !allowed ? UPGRADE_MESSAGES.forms[plan as keyof typeof UPGRADE_MESSAGES.forms] : undefined
+      // Para o plano FREE com maxForms: 0, o usuário não pode criar formulários
+      const allowed = limits.maxForms > 0 && currentCount < limits.maxForms
+      
+      return {
+        allowed,
+        current: currentCount,
+        limit: limits.maxForms,
+        upgradeRequired: !allowed,
+        message: !allowed ? UPGRADE_MESSAGES.forms[plan as keyof typeof UPGRADE_MESSAGES.forms] : undefined
+      }
+    } catch (error) {
+      console.error('Erro ao verificar limite de formulários:', error)
+      return {
+        allowed: false,
+        current: 0,
+        limit: 0,
+        upgradeRequired: true,
+        message: 'Erro ao verificar limite de formulários'
+      }
     }
   }
 

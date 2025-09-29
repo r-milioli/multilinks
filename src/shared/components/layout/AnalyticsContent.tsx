@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/sha
 import { Button } from '@/shared/components/ui/Button'
 import { BarChart3, TrendingUp, Users, MousePointer, Globe, Smartphone, Monitor, Calendar, RefreshCw } from 'lucide-react'
 import { LoadingPage } from '@/shared/components/ui/Loading'
+import { FeatureGuard } from '@/shared/components/FeatureGuard'
 
 interface AnalyticsSummary {
   totalClicks: number
@@ -101,13 +102,14 @@ export function AnalyticsContent() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Analytics</h2>
-          <p className="text-gray-600">Acompanhe o desempenho dos seus links</p>
-        </div>
+    <FeatureGuard feature="analytics">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div>
+            <h2 className="text-2xl font-bold">Analytics</h2>
+            <p className="text-gray-600">Acompanhe o desempenho dos seus links</p>
+          </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <select
             value={dateRange}
@@ -342,6 +344,7 @@ export function AnalyticsContent() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </FeatureGuard>
   )
 }

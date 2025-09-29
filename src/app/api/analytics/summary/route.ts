@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { PlanLimitsService } from '@/shared/services/planLimitsService'
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,6 +19,20 @@ export async function GET(request: NextRequest) {
     }
     
     console.log('✅ Usuário autenticado:', session.user.email)
+
+    // Verificar se o usuário tem acesso ao analytics
+    const analyticsAccess = await PlanLimitsService.checkFeatureAccess(session.user.id, 'analytics')
+    if (!analyticsAccess.allowed) {
+      console.log('❌ Usuário não tem acesso ao analytics')
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: analyticsAccess.message || 'Analytics não disponível no seu plano',
+          upgradeRequired: analyticsAccess.upgradeRequired
+        },
+        { status: 403 }
+      )
+    }
 
     const { searchParams } = new URL(request.url)
     const dateRange = searchParams.get('dateRange')

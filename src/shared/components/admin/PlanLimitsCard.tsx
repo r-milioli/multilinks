@@ -80,23 +80,6 @@ export function PlanLimitsCard({ planId, planName, limits, onUpdate }: PlanLimit
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {/* Preço */}
-          {planId !== 'free' && (
-            <div className="space-y-2">
-              <Label htmlFor={`${planId}-price`}>Preço (R$)</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-2.5">R$</span>
-                <Input
-                  id={`${planId}-price`}
-                  type="text"
-                  value={limits.price?.toString() || '0'}
-                  onChange={(e) => handlePriceChange(e.target.value)}
-                  className="pl-10"
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-          )}
 
           {/* Limites numéricos */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

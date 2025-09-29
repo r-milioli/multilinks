@@ -284,7 +284,18 @@ export default function PricingPage() {
                 
                 <CardHeader className="text-center pb-4">
                   <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-br ${plan.color || 'from-orange-400 to-pink-500'} rounded-2xl flex items-center justify-center`}>
-                    {plan.icon ? <plan.icon className="h-8 w-8 text-white" /> : <DollarSign className="h-8 w-8 text-white" />}
+                    {(() => {
+                      switch(plan.id) {
+                        case 'free':
+                          return <Users className="h-8 w-8 text-white" />;
+                        case 'pro':
+                          return <Zap className="h-8 w-8 text-white" />;
+                        case 'business':
+                          return <Crown className="h-8 w-8 text-white" />;
+                        default:
+                          return <DollarSign className="h-8 w-8 text-white" />;
+                      }
+                    })()}
                   </div>
                   <CardTitle className="text-2xl text-white">{plan.name}</CardTitle>
                   <p className="text-gray-300 mb-4">{plan.description}</p>
@@ -359,7 +370,24 @@ export default function PricingPage() {
                     <React.Fragment key={categoryIndex}>
                       <tr className="bg-gray-800/50">
                         <td colSpan={4} className="p-4 font-semibold text-white flex items-center gap-2">
-                          {category.icon ? <category.icon className="h-5 w-5" /> : <Database className="h-5 w-5" />}
+                          {(() => {
+                            switch(category.category) {
+                              case 'Gestão de Links':
+                                return <LinkIcon className="h-5 w-5" />;
+                              case 'Personalização':
+                                return <Palette className="h-5 w-5" />;
+                              case 'Analytics':
+                                return <BarChart3 className="h-5 w-5" />;
+                              case 'Formulários':
+                                return <FileText className="h-5 w-5" />;
+                              case 'Integrações':
+                                return <Webhook className="h-5 w-5" />;
+                              case 'Suporte':
+                                return <Shield className="h-5 w-5" />;
+                              default:
+                                return <Database className="h-5 w-5" />;
+                            }
+                          })()}
                           {category.category}
                         </td>
                       </tr>

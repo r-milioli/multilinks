@@ -1,5 +1,7 @@
+import { prisma } from '@/lib/db'
 import { SystemSettingsService } from './systemSettingsService'
 import { formatLimit } from '@/shared/utils/planLimits'
+import { Users, Zap, Crown, Link as LinkIcon, Palette, BarChart3, FileText, Webhook, Shield } from 'lucide-react'
 
 interface PlanData {
   id: string
@@ -105,18 +107,68 @@ export class PricingService {
     features: [
       {
         category: 'Gestão de Links',
+        icon: LinkIcon,
         items: [
           { name: 'Links ilimitados', free: true, pro: true, business: true },
           { name: 'Drag & drop', free: true, pro: true, business: true },
-          { name: 'Categorização', free: false, pro: true, business: true }
+          { name: 'Categorização', free: false, pro: true, business: true },
+          { name: 'Links programados', free: false, pro: false, business: true },
+          { name: 'A/B testing', free: false, pro: false, business: true }
+        ]
+      },
+      {
+        category: 'Personalização',
+        icon: Palette,
+        items: [
+          { name: 'Temas básicos', free: true, pro: true, business: true },
+          { name: 'Temas premium', free: false, pro: true, business: true },
+          { name: 'Editor visual', free: false, pro: true, business: true },
+          { name: 'CSS customizado', free: false, pro: false, business: true },
+          { name: 'Branding personalizado', free: false, pro: false, business: true }
         ]
       },
       {
         category: 'Analytics',
+        icon: BarChart3,
         items: [
           { name: 'Cliques básicos', free: true, pro: true, business: true },
           { name: 'Geolocalização', free: false, pro: true, business: true },
-          { name: 'Relatórios avançados', free: false, pro: true, business: true }
+          { name: 'Dispositivos', free: false, pro: true, business: true },
+          { name: 'Relatórios avançados', free: false, pro: true, business: true },
+          { name: 'API de analytics', free: false, pro: false, business: true }
+        ]
+      },
+      {
+        category: 'Formulários',
+        icon: FileText,
+        items: [
+          { name: '1 formulário', free: true, pro: false, business: false },
+          { name: 'Formulários ilimitados', free: false, pro: true, business: true },
+          { name: 'Campos personalizados', free: false, pro: true, business: true },
+          { name: 'Validação avançada', free: false, pro: false, business: true },
+          { name: 'Automações', free: false, pro: false, business: true }
+        ]
+      },
+      {
+        category: 'Integrações',
+        icon: Webhook,
+        items: [
+          { name: 'Webhooks básicos', free: false, pro: true, business: true },
+          { name: 'Webhooks ilimitados', free: false, pro: false, business: true },
+          { name: 'API completa', free: false, pro: false, business: true },
+          { name: 'Integrações nativas', free: false, pro: false, business: true },
+          { name: 'Webhooks customizados', free: false, pro: false, business: true }
+        ]
+      },
+      {
+        category: 'Suporte',
+        icon: Shield,
+        items: [
+          { name: 'Email', free: true, pro: true, business: true },
+          { name: 'Chat', free: false, pro: true, business: true },
+          { name: 'Suporte prioritário', free: false, pro: true, business: true },
+          { name: 'Suporte 24/7', free: false, pro: false, business: true },
+          { name: 'Gerente de conta', free: false, pro: false, business: true }
         ]
       }
     ]
@@ -151,14 +203,26 @@ export class PricingService {
       href: `/register${planId !== 'free' ? `?plan=${planId}` : ''}`
     }
 
+    // Se tiver features e limitations no banco, usar elas
+    if (limits.features && limits.limitations) {
+      return {
+        ...baseData,
+        features: limits.features,
+        limitations: limits.limitations
+      }
+    }
+
+    // Caso contrário, usar os limites padrão
     const features = []
     const limitations = []
 
     // Links
     if (limits.maxLinks === -1) {
       features.push('Links ilimitados')
-    } else {
+    } else if (limits.maxLinks > 0) {
       features.push(`Até ${limits.maxLinks} links`)
+    } else {
+      features.push('Até 5 links')
     }
 
     // Formulários
@@ -217,33 +281,121 @@ export class PricingService {
   /**
    * Busca e formata os dados de preços
    */
+  /**
+   * Salva todas as configurações de preços
+   */
+  static async savePricingData(data: {
+    plans: Array<{
+      name: string
+      price: number
+      description: string
+    }>,
+    limits: {
+      [key: string]: {
+        features: string[]
+        limitations: string[]
+      }
+    },
+    features: PlanFeatureCategory[]
+  }) {
+    try {
+      console.log('🔄 PricingService - Salvando dados no banco...')
+
+      // Salvar informações básicas dos planos
+      await SystemSettingsService.upsertSetting({
+        key: 'plans',
+        value: data.plans,
+        description: 'Informações básicas dos planos',
+        category: 'pricing',
+        isPublic: true
+      })
+
+      // Salvar limites e features de cada plano
+      await SystemSettingsService.upsertSetting({
+        key: 'plan_limits',
+        value: data.limits,
+        description: 'Features e limitações de cada plano',
+        category: 'pricing',
+        isPublic: true
+      })
+
+      // Salvar tabela de comparação
+      await SystemSettingsService.upsertSetting({
+        key: 'plan_features',
+        value: data.features,
+        description: 'Tabela de comparação de funcionalidades',
+        category: 'pricing',
+        isPublic: true
+      })
+
+      return { success: true }
+    } catch (error) {
+      console.error('❌ PricingService - Erro ao salvar dados:', error)
+      return { success: false, error: 'Erro ao salvar dados' }
+    }
+  }
+
   static async getPricingData(): Promise<PricingData> {
     try {
-      const [limitsResult, featuresResult] = await Promise.all([
+      console.log('🔄 PricingService - Buscando dados do banco...')
+
+      // Buscar todas as configurações
+      const [plansResult, limitsResult, featuresResult] = await Promise.all([
+        SystemSettingsService.getSetting('plans'),
         SystemSettingsService.getSetting('plan_limits'),
         SystemSettingsService.getSetting('plan_features')
       ])
 
-      let plans = this.defaultPricing.plans
-      let features = this.defaultPricing.features
+      console.log('📦 PricingService - Resultados das consultas:', {
+        plans: { success: plansResult.success, hasData: !!plansResult?.data?.value, data: plansResult?.data?.value },
+        limits: { success: limitsResult.success, hasData: !!limitsResult?.data?.value, data: limitsResult?.data?.value },
+        features: { success: featuresResult.success, hasData: !!featuresResult?.data?.value, data: featuresResult?.data?.value }
+      })
 
-      // Formatar planos se existirem no banco
-      if (limitsResult.success && limitsResult.data?.value) {
-        const limits = limitsResult.data.value
-        console.log('Limites do banco:', limits) // Debug
-        plans = Object.keys(limits).map(planId => 
-          this.formatPlanLimits(planId, limits[planId])
-        )
+      // Verificar cada conjunto de dados
+      const dbPlans = plansResult.success && plansResult.data?.value ? plansResult.data.value : []
+      const dbLimits = limitsResult.success && limitsResult.data?.value ? limitsResult.data.value : {}
+      const dbFeatures = featuresResult.success && featuresResult.data?.value ? featuresResult.data.value : []
+
+      // Se não tiver NENHUM dado no banco, usar fallback completo
+      if (dbPlans.length === 0 && Object.keys(dbLimits).length === 0 && dbFeatures.length === 0) {
+        console.log('⚠️ PricingService - Nenhum dado encontrado no banco, usando fallback completo')
+        console.log('📊 PricingService - Contadores:', {
+          dbPlansLength: dbPlans.length,
+          dbLimitsKeys: Object.keys(dbLimits).length,
+          dbFeaturesLength: dbFeatures.length
+        })
+        return this.defaultPricing
       }
 
-      // Usar recursos do banco se existirem
-      if (featuresResult.success && featuresResult.data?.value) {
-        features = featuresResult.data.value
+      console.log('✅ PricingService - Dados encontrados no banco, processando...')
+
+      // Usar dados do banco ou fallback para cada parte
+      const features = dbFeatures.length > 0 ? dbFeatures : this.defaultPricing.features
+
+      // Construir os planos combinando dados básicos com limites
+      const plans = (dbPlans.length > 0 ? dbPlans : this.defaultPricing.plans).map(plan => {
+        const planId = plan.name.toLowerCase()
+        const planLimits = dbLimits[planId] || {}
+
+        // Formatar os limites do plano
+        const formattedPlan = this.formatPlanLimits(planId, {
+          ...planLimits,
+          price: plan.price
+        })
+
+        return {
+          ...formattedPlan,
+          name: plan.name,
+          description: plan.description || formattedPlan.description,
+          price: planId === 'free' ? 'Grátis' : `R$ ${plan.price.toFixed(2).replace('.', ',')}`
+        }
+      })
+
+      return { 
+        plans, 
+        features: dbFeatures 
       }
-
-      console.log('Planos formatados:', plans) // Debug
-
-      return { plans, features }
     } catch (error) {
       console.error('Erro ao buscar dados de preços:', error)
       return this.defaultPricing

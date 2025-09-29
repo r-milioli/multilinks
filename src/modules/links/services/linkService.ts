@@ -59,13 +59,19 @@ export class LinkService {
         }
       })
 
-      // Atualizar estatísticas do usuário
-      await prisma.userStats.update({
+      // Atualizar ou criar estatísticas do usuário
+      await prisma.userStats.upsert({
         where: { userId },
-        data: {
+        update: {
           totalLinks: {
             increment: 1
           }
+        },
+        create: {
+          userId,
+          totalLinks: 1,
+          totalClicks: 0,
+          subscriptionPlan: 'free'
         }
       })
 
@@ -138,12 +144,18 @@ export class LinkService {
       })
 
       // Atualizar estatísticas do usuário
-      await prisma.userStats.update({
+      await prisma.userStats.upsert({
         where: { userId },
-        data: {
+        update: {
           totalLinks: {
             decrement: 1
           }
+        },
+        create: {
+          userId,
+          totalLinks: 0,
+          totalClicks: 0,
+          subscriptionPlan: 'free'
         }
       })
 

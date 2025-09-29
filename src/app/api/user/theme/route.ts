@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { ThemeSettings } from '@/types/common.types'
+import { PlanLimitsService } from '@/shared/services/planLimitsService'
 
 export async function GET() {
   try {
@@ -139,6 +140,19 @@ export async function POST(request: NextRequest) {
     }
 
     const themeSettings: ThemeSettings = await request.json()
+
+    // Verificar se o usuário tem acesso ao editor de tema
+    const themeAccess = await PlanLimitsService.checkFeatureAccess(session.user.id, 'themeEditing')
+    if (!themeAccess.allowed) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: themeAccess.message || 'Editor de tema não disponível no seu plano',
+          upgradeRequired: themeAccess.upgradeRequired
+        },
+        { status: 403 }
+      )
+    }
 
     // Validar dados do tema
     if (!themeSettings.primaryColor || !themeSettings.fontFamily) {

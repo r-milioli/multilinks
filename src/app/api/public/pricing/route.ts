@@ -7,14 +7,23 @@ import { PricingService } from '@/modules/admin/services/pricingService'
  */
 export async function GET(request: NextRequest) {
   try {
+    console.log('🔍 Pricing API - Iniciando busca de dados...')
+    console.log('🌐 Pricing API - Request URL:', request.url)
+    console.log('🌐 Pricing API - Request headers:', Object.fromEntries(request.headers.entries()))
+    
     const pricingData = await PricingService.getPricingData()
+    console.log('✅ Pricing API - Dados obtidos:', JSON.stringify(pricingData, null, 2))
 
-    return NextResponse.json({
+    const response = {
       success: true,
       data: pricingData
-    })
+    }
+    
+    console.log('📤 Pricing API - Enviando resposta:', JSON.stringify(response, null, 2))
+    
+    return NextResponse.json(response)
   } catch (error) {
-    console.error('Erro ao buscar dados de preços:', error)
+    console.error('❌ Pricing API - Erro ao buscar dados de preços:', error)
     return NextResponse.json(
       { success: false, error: 'Erro interno do servidor' },
       { status: 500 }

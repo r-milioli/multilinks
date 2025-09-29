@@ -20,6 +20,7 @@ import { SocialLinksEditor } from '@/modules/profile/components/SocialLinksEdito
 import { LegalLinksSettingsComponent } from '@/modules/profile/components/LegalLinksSettings'
 import { LegalLinksSettings } from '@/types/profile.types'
 import { toast } from 'react-hot-toast'
+import { FeatureGuard } from '@/shared/components/FeatureGuard'
 // import { Textarea } from '@/shared/components/ui/Textarea' // Componente não existe
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/Select' // Componente não existe
 // Ícones removidos - agora usando sidebar principal
@@ -801,45 +802,47 @@ export function SettingsContent() {
           </Card>
 
           {/* Webhook */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Webhook</CardTitle>
-              <CardDescription>
-                Configure um webhook para receber notificações de novos leads
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="webhook-url">URL do Webhook</Label>
-                  <Input
-                    id="webhook-url"
-                    value={integrationSettings.webhookUrl || ''}
-                    onChange={(e) => updateIntegrationSetting('webhookUrl', e.target.value)}
-                    placeholder="https://seu-servidor.com/webhook"
-                  />
-                  <p className="text-sm text-gray-500">
-                    URL completa onde os dados dos leads serão enviados
-                  </p>
-                </div>
-                
-                {integrationSettings.webhookUrl && (
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleTestWebhook}
-                    >
-                      Testar Webhook
-                    </Button>
-                    <p className="text-xs text-gray-500 self-center">
-                      Teste se o webhook está funcionando
+          <FeatureGuard feature="webhooks">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Webhook</CardTitle>
+                <CardDescription>
+                  Configure um webhook para receber notificações de novos leads
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="webhook-url">URL do Webhook</Label>
+                    <Input
+                      id="webhook-url"
+                      value={integrationSettings.webhookUrl || ''}
+                      onChange={(e) => updateIntegrationSetting('webhookUrl', e.target.value)}
+                      placeholder="https://seu-servidor.com/webhook"
+                    />
+                    <p className="text-sm text-gray-500">
+                      URL completa onde os dados dos leads serão enviados
                     </p>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  
+                  {integrationSettings.webhookUrl && (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleTestWebhook}
+                      >
+                        Testar Webhook
+                      </Button>
+                      <p className="text-xs text-gray-500 self-center">
+                        Teste se o webhook está funcionando
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </FeatureGuard>
 
           {/* Informações sobre Webhooks */}
           <WebhookEventsInfo />

@@ -12,18 +12,31 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Buscar formulários e limites
-    const [forms, limits] = await Promise.all([
-      prisma.form.findMany({
-        where: {
-          userId: session.user.id,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      }),
-      PlanLimitsService.checkFormLimit(session.user.id)
-    ]);
+    // Buscar formulários
+    const forms = await prisma.form.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Buscar limites com tratamento de erro
+    let limits;
+    try {
+      limits = await PlanLimitsService.checkFormLimit(session.user.id);
+    } catch (error) {
+      console.error('Erro ao verificar limites de formulário:', error);
+      // Usar limites padrão em caso de erro
+      limits = {
+        current: forms.length,
+        limit: 0,
+        isUnlimited: false,
+        allowed: false,
+        upgradeRequired: true
+      };
+    }
 
     return NextResponse.json({
       forms,
@@ -112,12 +125,19 @@ export async function POST(request: NextRequest) {
           active,
         },
       }),
-      prisma.userStats.update({
+      prisma.userStats.upsert({
         where: { userId: session.user.id },
-        data: {
+        update: {
           totalForms: {
             increment: 1
           }
+        },
+        create: {
+          userId: session.user.id,
+          totalLinks: 0,
+          totalForms: 1,
+          totalClicks: 0,
+          subscriptionPlan: 'free'
         }
       })
     ]);

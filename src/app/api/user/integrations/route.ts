@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { IntegrationSettings } from '@/types/integrations.types'
+import { PlanLimitsService } from '@/shared/services/planLimitsService'
 
 export async function GET() {
   try {
@@ -54,6 +55,21 @@ export async function POST(request: NextRequest) {
     }
 
     const integrationSettings: IntegrationSettings = await request.json()
+
+    // Verificar se o usuário tem acesso a webhooks
+    if (integrationSettings.webhookUrl && integrationSettings.webhookUrl.trim() !== '') {
+      const webhookAccess = await PlanLimitsService.checkWebhookLimit(session.user.id)
+      if (!webhookAccess.allowed) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: webhookAccess.message || 'Webhooks não disponível no seu plano',
+            upgradeRequired: webhookAccess.upgradeRequired
+          },
+          { status: 403 }
+        )
+      }
+    }
 
     // Validar dados de integração (validações mais flexíveis)
     if (integrationSettings.googleAnalytics && integrationSettings.googleAnalytics.trim() !== '') {
