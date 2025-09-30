@@ -9,6 +9,8 @@ export interface PlanLimits {
   themeEditing: boolean
   analytics: boolean
   prioritySupport: boolean
+  price: number
+  name?: string
 }
 
 export interface LimitCheckResult {

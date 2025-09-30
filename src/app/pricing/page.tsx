@@ -37,8 +37,10 @@ export default function PricingPage() {
   // Dados estáticos para fallback
   const staticPlans = [
     {
+      id: 'free',
       name: 'Gratuito',
       price: 'R$ 0',
+      priceValue: 0,
       period: '/mês',
       description: 'Perfeito para começar',
       icon: Users,
@@ -62,8 +64,10 @@ export default function PricingPage() {
       popular: false
     },
     {
+      id: 'pro',
       name: 'Pro',
-      price: 'R$ 19',
+      price: 'R$ 25',
+      priceValue: 25,
       period: '/mês',
       description: 'Para profissionais',
       icon: Zap,
@@ -87,8 +91,10 @@ export default function PricingPage() {
       popular: true
     },
     {
+      id: 'business',
       name: 'Business',
-      price: 'R$ 49',
+      price: 'R$ 40',
+      priceValue: 40,
       period: '/mês',
       description: 'Para empresas',
       icon: Crown,
@@ -338,7 +344,7 @@ export default function PricingPage() {
                     }`}
                     variant={plan.popular ? 'default' : 'outline'}
                   >
-                    <Link href={plan.href}>
+                    <Link href={plan.id === 'free' ? '/register' : `/checkout?plan=${plan.id}&price=${(plan as any).priceValue || 0}`} onClick={() => console.log(`🔗 Link clicado - Plano: ${plan.id}, Preço: ${(plan as any).priceValue || 0}`)}>
                       {plan.cta}
                       {plan.popular && <Sparkles className="h-4 w-4 ml-2" />}
                     </Link>

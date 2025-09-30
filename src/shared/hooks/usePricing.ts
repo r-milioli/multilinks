@@ -6,6 +6,7 @@ export interface PlanData {
   id: string
   name: string
   price: string
+  priceValue?: number
   period: string
   description: string
   icon?: any // LucideIcon

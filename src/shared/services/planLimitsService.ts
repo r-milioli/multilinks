@@ -39,20 +39,53 @@ export class PlanLimitsService {
    */
   static async getPlanLimits(plan: string): Promise<PlanLimits> {
     try {
-      // Buscar limites do banco
-      const settings = await prisma.systemSettings.findUnique({
-        where: { key: 'plan_limits' }
-      })
+      // Buscar limites e preços do banco
+      const [limitsSettings, plansSettings] = await Promise.all([
+        prisma.systemSettings.findUnique({ where: { key: 'plan_limits' } }),
+        prisma.systemSettings.findUnique({ where: { key: 'plans' } })
+      ])
 
-      if (settings?.value) {
-        const limits = settings.value as Record<string, PlanLimits>
+      let planLimits: PlanLimits
+      let planPrice = 0
+      let planName = plan
+
+      // Buscar limites
+      if (limitsSettings?.value) {
+        const limits = limitsSettings.value as Record<string, PlanLimits>
         if (limits[plan]) {
-          return limits[plan]
+          planLimits = limits[plan]
+        } else {
+          // Fallback para limites padrão
+          planLimits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free
+        }
+      } else {
+        // Fallback para limites padrão
+        planLimits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free
+      }
+
+      // Buscar preço e nome
+      if (plansSettings?.value) {
+        const plans = plansSettings.value as Array<{ name: string; price: number; description: string }>
+        const planData = plans.find(p => p.name.toLowerCase() === plan.toLowerCase())
+        if (planData) {
+          planPrice = planData.price
+          planName = planData.name
         }
       }
 
-      // Fallback para limites padrão
-      return PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free
+      // Se não encontrou preço no banco, usar fallback
+      if (planPrice === 0) {
+        const fallbackPlan = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]
+        if (fallbackPlan) {
+          planPrice = fallbackPlan.price
+        }
+      }
+
+      return {
+        ...planLimits,
+        price: planPrice,
+        name: planName
+      }
     } catch (error) {
       console.error('Erro ao buscar limites do plano:', error)
       return PLAN_LIMITS.free

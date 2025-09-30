@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer'
 import { PasswordResetToken } from '@prisma/client'
+import { prisma } from './db'
 
 // Configuração do transporter SMTP
 const createTransporter = () => {
@@ -432,6 +433,132 @@ export class EmailService {
       </body>
       </html>
     `
+  }
+
+  /**
+   * Enviar confirmação de pagamento
+   */
+  static async sendPaymentConfirmation(
+    userId: string, 
+    paymentData: { planName: string; amount: number }
+  ): Promise<boolean> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true, email: true }
+      })
+
+      if (!user) {
+        console.error('Usuário não encontrado para confirmação de pagamento:', userId)
+        return false
+      }
+
+      const subject = '✅ Pagamento Aprovado - MultiLink'
+      const message = `
+        <h3>🎉 Parabéns! Seu pagamento foi aprovado!</h3>
+        <p><strong>Plano:</strong> ${paymentData.planName}</p>
+        <p><strong>Valor:</strong> R$ ${paymentData.amount.toFixed(2)}</p>
+        <p>Sua assinatura está ativa e você já pode usar todas as funcionalidades do seu plano.</p>
+        <p>Acesse seu dashboard para começar a usar o MultiLink!</p>
+      `
+
+      await this.sendEmail({
+        to: user.email,
+        subject: subject,
+        html: message,
+        text: `Pagamento aprovado! Plano: ${paymentData.planName}, Valor: R$ ${paymentData.amount.toFixed(2)}`
+      })
+      console.log(`✅ Email de confirmação de pagamento enviado para ${user.email}`)
+      return true
+
+    } catch (error) {
+      console.error('Erro ao enviar confirmação de pagamento:', error)
+      return false
+    }
+  }
+
+  /**
+   * Enviar notificação de pagamento vencido
+   */
+  static async sendPaymentOverdue(
+    userId: string, 
+    paymentData: { planName: string; amount: number }
+  ): Promise<boolean> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true, email: true }
+      })
+
+      if (!user) {
+        console.error('Usuário não encontrado para notificação de vencimento:', userId)
+        return false
+      }
+
+      const subject = '⚠️ Pagamento Vencido - MultiLink'
+      const message = `
+        <h3>⚠️ Atenção: Seu pagamento está vencido</h3>
+        <p><strong>Plano:</strong> ${paymentData.planName}</p>
+        <p><strong>Valor:</strong> R$ ${paymentData.amount.toFixed(2)}</p>
+        <p>Para manter sua assinatura ativa, realize o pagamento o quanto antes.</p>
+        <p>Acesse seu dashboard para ver as opções de pagamento.</p>
+      `
+
+      await this.sendEmail({
+        to: user.email,
+        subject: subject,
+        html: message,
+        text: `Pagamento vencido! Plano: ${paymentData.planName}, Valor: R$ ${paymentData.amount.toFixed(2)}`
+      })
+      console.log(`⚠️ Email de pagamento vencido enviado para ${user.email}`)
+      return true
+
+    } catch (error) {
+      console.error('Erro ao enviar notificação de vencimento:', error)
+      return false
+    }
+  }
+
+  /**
+   * Enviar notificação de cancelamento de assinatura
+   */
+  static async sendSubscriptionCancelled(
+    userId: string, 
+    planName: string
+  ): Promise<boolean> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true, email: true }
+      })
+
+      if (!user) {
+        console.error('Usuário não encontrado para notificação de cancelamento:', userId)
+        return false
+      }
+
+      const subject = '❌ Assinatura Cancelada - MultiLink'
+      const message = `
+        <h3>❌ Sua assinatura foi cancelada</h3>
+        <p><strong>Plano:</strong> ${planName}</p>
+        <p>Sua assinatura foi cancelada conforme solicitado.</p>
+        <p>Você ainda pode usar o plano gratuito do MultiLink.</p>
+        <p>Se mudou de ideia, pode reativar sua assinatura a qualquer momento.</p>
+      `
+
+      await this.sendEmail({
+        to: user.email,
+        subject: subject,
+        html: message,
+        text: `Assinatura cancelada! Plano: ${paymentData.planName}`
+      })
+      console.log(`❌ Email de cancelamento enviado para ${user.email}`)
+      return true
+
+    } catch (error) {
+      console.error('Erro ao enviar notificação de cancelamento:', error)
+      return false
+    }
   }
 
   // Verificar configuração do email

@@ -375,7 +375,13 @@ export class PricingService {
 
       // Construir os planos combinando dados básicos com limites
       const plans = (dbPlans.length > 0 ? dbPlans : this.defaultPricing.plans).map(plan => {
-        const planId = plan.name.toLowerCase()
+        // Mapear nomes para IDs consistentes
+        const nameToIdMap: Record<string, string> = {
+          'Gratuito': 'free',
+          'Pro': 'pro',
+          'Business': 'business'
+        }
+        const planId = nameToIdMap[plan.name] || plan.name.toLowerCase()
         const planLimits = dbLimits[planId] || {}
 
         // Formatar os limites do plano
