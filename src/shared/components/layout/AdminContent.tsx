@@ -41,11 +41,22 @@ import { PlanLimitsSection } from '@/shared/components/admin/PlanLimitsSection'
 import { PlanBasicSection } from '@/shared/components/admin/PlanBasicSection'
 import { toast } from 'react-hot-toast'
 import { useDebounce } from '@/shared/hooks/useDebounce'
+import { useFinancialData } from '@/modules/admin/hooks/useFinancialData'
+import { FinancialMetrics } from '@/modules/admin/components/FinancialMetrics'
+import { SalesTable } from '@/modules/admin/components/SalesTable'
+import { FinancialCharts } from '@/modules/admin/components/FinancialCharts'
 
 export function AdminContent() {
   const { currentSection } = useNavigation()
   const { settings, isLoading, isSaving, saveSocialLinks, saveContactInfo, savePlans } = useSystemSettings()
   const { stats, recentActivity, isLoading: statsLoading } = useAdminStats()
+  const { 
+    stats: financialStats, 
+    sales, 
+    chartData, 
+    planPerformance, 
+    isLoading: financialLoading 
+  } = useFinancialData()
   
   // Estados para gerenciamento de usuários
   const [searchTerm, setSearchTerm] = useState('')
@@ -952,11 +963,54 @@ export function AdminContent() {
     </div>
   )
 
+  // Renderizar seção financeira
+  const renderFinancialControl = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Controle Financeiro</h1>
+          <p className="text-gray-600 dark:text-gray-400">Gerencie vendas, receita e performance financeira</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className="text-right">
+            <div className="text-sm text-gray-600 dark:text-gray-400">Última atualização</div>
+            <div className="text-gray-900 dark:text-white font-medium">
+              {new Date().toLocaleDateString('pt-BR', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Métricas Financeiras */}
+      {financialStats && (
+        <FinancialMetrics stats={financialStats} isLoading={financialLoading} />
+      )}
+
+      {/* Gráficos */}
+      <FinancialCharts 
+        chartData={chartData} 
+        planPerformance={planPerformance} 
+        isLoading={financialLoading} 
+      />
+
+      {/* Tabela de Vendas */}
+      <SalesTable sales={sales} isLoading={financialLoading} />
+    </div>
+  )
+
   // Renderizar conteúdo baseado na seção atual
   return (
     <AdminGuard>
       {(() => {
         switch (currentSection) {
+          case 'admin-financial':
+            return renderFinancialControl()
           case 'admin-settings':
             return renderSystemSettings()
           case 'admin-users':

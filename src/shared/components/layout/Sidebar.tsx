@@ -23,7 +23,8 @@ import {
   Activity,
   Crown,
   Users,
-  Cog
+  Cog,
+  DollarSign
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
@@ -166,6 +167,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           label: 'Dashboard Admin',
           icon: BarChart3,
           section: 'admin-dashboard'
+        },
+        {
+          id: 'admin-financial',
+          label: 'Controle Financeiro',
+          icon: DollarSign,
+          section: 'admin-financial'
         },
         {
           id: 'admin-users',

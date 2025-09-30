@@ -55,6 +55,7 @@ export function DynamicContent() {
       return <SettingsContent />
     
     case 'admin-dashboard':
+    case 'admin-financial':
     case 'admin-users':
     case 'admin-settings':
       return <AdminContent />
