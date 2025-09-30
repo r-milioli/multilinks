@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Button } from '@/shared/components/ui/Button'
@@ -13,15 +13,36 @@ import { Footer } from '@/shared/components/layout/Footer'
 export default function LoginPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       setIsRedirecting(true)
-      // Redirecionamento imediato com replace
-      router.replace('/dashboard')
+      
+      // Verificar se há parâmetros de redirecionamento
+      const redirectUrl = searchParams.get('redirect')
+      const plan = searchParams.get('plan')
+      const price = searchParams.get('price')
+      
+      if (redirectUrl) {
+        // Construir URL de redirecionamento com parâmetros
+        let finalRedirectUrl = redirectUrl
+        if (plan && price) {
+          const url = new URL(finalRedirectUrl, window.location.origin)
+          url.searchParams.set('plan', plan)
+          url.searchParams.set('price', price)
+          finalRedirectUrl = url.pathname + url.search
+        }
+        
+        console.log('🔄 Redirecionando após login para:', finalRedirectUrl)
+        router.replace(finalRedirectUrl)
+      } else {
+        // Redirecionamento padrão para dashboard
+        router.replace('/dashboard')
+      }
     }
-  }, [status, session, router])
+  }, [status, session, router, searchParams])
 
   // Mostrar loading durante verificação ou redirecionamento
   if (status === 'loading' || isRedirecting) {

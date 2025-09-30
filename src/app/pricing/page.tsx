@@ -2,12 +2,15 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/shared/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Footer } from '@/shared/components/layout/Footer'
 import { useContact } from '@/shared/hooks/useContact'
 import { usePricing } from '@/shared/hooks/usePricing'
+import { AuthModal } from '@/shared/components/ui/AuthModal'
 import { 
   ArrowLeft, 
   DollarSign, 
@@ -31,8 +34,14 @@ import {
 } from 'lucide-react'
 
 export default function PricingPage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
   const { contactData, isLoading: contactLoading } = useContact()
   const { pricingData, isLoading: pricingLoading } = usePricing()
+  
+  // Estado do modal de autenticação
+  const [showAuthModal, setShowAuthModal] = React.useState(false)
+  const [selectedPlan, setSelectedPlan] = React.useState<{id: string, name: string, priceValue: number} | null>(null)
   
   // Dados estáticos para fallback
   const staticPlans = [
@@ -117,6 +126,55 @@ export default function PricingPage() {
       popular: false
     }
   ]
+
+  // Função para lidar com clique nos planos
+  const handlePlanClick = (plan: any) => {
+    // Se for plano gratuito, redirecionar direto para registro
+    if (plan.id === 'free') {
+      router.push('/register')
+      return
+    }
+
+    // Para planos pagos (Pro e Business), verificar autenticação
+    if (status === 'loading') {
+      // Aguardar carregamento da sessão
+      return
+    }
+
+    if (!session || status !== 'authenticated') {
+      // Usuário não logado - mostrar modal de autenticação
+      setSelectedPlan({
+        id: plan.id,
+        name: plan.name,
+        priceValue: plan.priceValue || 0
+      })
+      setShowAuthModal(true)
+      return
+    }
+
+    // Usuário logado - redirecionar direto para checkout
+    const checkoutUrl = `/checkout?plan=${plan.id}&price=${plan.priceValue || 0}`
+    router.push(checkoutUrl)
+  }
+
+  // Funções do modal
+  const handleLogin = () => {
+    if (selectedPlan) {
+      const loginUrl = `/login?redirect=/checkout&plan=${selectedPlan.id}&price=${selectedPlan.priceValue}`
+      router.push(loginUrl)
+    }
+    setShowAuthModal(false)
+  }
+
+  const handleRegister = () => {
+    router.push('/register')
+    setShowAuthModal(false)
+  }
+
+  const handleCloseModal = () => {
+    setShowAuthModal(false)
+    setSelectedPlan(null)
+  }
 
   // Usar dados dinâmicos ou fallback
   const plans = pricingData?.plans || staticPlans
@@ -336,18 +394,26 @@ export default function PricingPage() {
 
                   {/* CTA */}
                   <Button 
-                    asChild 
+                    onClick={() => handlePlanClick(plan)}
                     className={`w-full ${
                       plan.popular 
                         ? 'bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-500 hover:to-pink-600' 
                         : ''
                     }`}
                     variant={plan.popular ? 'default' : 'outline'}
+                    disabled={status === 'loading'}
                   >
-                    <Link href={plan.id === 'free' ? '/register' : `/checkout?plan=${plan.id}&price=${(plan as any).priceValue || 0}`} onClick={() => console.log(`🔗 Link clicado - Plano: ${plan.id}, Preço: ${(plan as any).priceValue || 0}`)}>
-                      {plan.cta}
-                      {plan.popular && <Sparkles className="h-4 w-4 ml-2" />}
-                    </Link>
+                    {status === 'loading' ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Carregando...
+                      </>
+                    ) : (
+                      <>
+                        {plan.cta}
+                        {plan.popular && <Sparkles className="h-4 w-4 ml-2" />}
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -508,6 +574,16 @@ export default function PricingPage() {
           </Card>
         </div>
       </main>
+
+      {/* Modal de Autenticação */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={handleCloseModal}
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+        planName={selectedPlan?.name || ''}
+        planPrice={selectedPlan?.priceValue || 0}
+      />
 
       {/* Footer */}
       <Footer />
