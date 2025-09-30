@@ -182,9 +182,26 @@ export default function CheckoutPage() {
       const updatedStatus = await getPaymentStatus(payment.id)
       if (updatedStatus) {
         setPayment(updatedStatus)
+        
+        // Se o pagamento foi aprovado, ir para tela de sucesso
+        if (updatedStatus.status === 'paid' || updatedStatus.status === 'received') {
+          setCurrentStep('success')
+        }
       }
     }
   }
+
+  // Polling automático para verificar status do pagamento
+  useEffect(() => {
+    if (currentStep === 'payment' && payment && payment.status === 'pending') {
+      const interval = setInterval(async () => {
+        console.log('🔄 Verificando status do pagamento automaticamente...')
+        await handleRefreshPayment()
+      }, 10000) // Verifica a cada 10 segundos
+
+      return () => clearInterval(interval)
+    }
+  }, [currentStep, payment])
 
   const handleBackToPricing = () => {
     router.push('/pricing')
