@@ -225,16 +225,22 @@ export class PaymentService {
           }
         })
 
+        // Determinar o plano baseado no status
+        let newPlan = subscription.planId
+        if (subscriptionStatus === 'canceled' || event === 'PAYMENT_CANCELLED' || event === 'PAYMENT_REFUNDED') {
+          newPlan = 'free' // Alterar para plano free em casos negativos
+        }
+
         // Atualizar UserStats
         await prisma.userStats.upsert({
           where: { userId: dbPayment.userId },
           update: {
-            subscriptionPlan: subscription.planId,
+            subscriptionPlan: newPlan,
             subscriptionStatus: subscriptionStatus
           },
           create: {
             userId: dbPayment.userId,
-            subscriptionPlan: subscription.planId,
+            subscriptionPlan: newPlan,
             subscriptionStatus: subscriptionStatus
           }
         })
@@ -374,10 +380,11 @@ export class PaymentService {
         }
       })
 
-      // Atualizar UserStats
+      // Atualizar UserStats - alterar para plano free quando cancelado
       await prisma.userStats.update({
         where: { userId },
         data: {
+          subscriptionPlan: 'free',
           subscriptionStatus: 'canceled'
         }
       })
