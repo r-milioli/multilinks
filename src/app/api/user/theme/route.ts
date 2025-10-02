@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { ThemeSettings } from '@/types/common.types'
 import { PlanLimitsService } from '@/shared/services/planLimitsService'
+import { revalidatePath } from 'next/cache'
 
 export async function GET() {
   try {
@@ -28,7 +29,7 @@ export async function GET() {
       )
     }
 
-    const themeSettings = user.themeSettings as ThemeSettings || {
+    const themeSettings = (user.themeSettings as any) || {
       primaryColor: '#3B82F6',
       secondaryColor: '#64748B',
       textColor: '#1E293B',
@@ -140,6 +141,8 @@ export async function POST(request: NextRequest) {
     }
 
     const themeSettings: ThemeSettings = await request.json()
+    console.log('💾 API Theme - Recebendo dados:', themeSettings)
+    console.log('💾 API Theme - linkButtonSettings:', themeSettings.linkButtonSettings)
 
     // Verificar se o usuário tem acesso ao editor de tema
     const themeAccess = await PlanLimitsService.checkFeatureAccess(session.user.id, 'themeEditing')
@@ -165,9 +168,24 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        themeSettings: themeSettings
+        themeSettings: themeSettings as any
       }
     })
+
+    // Revalidar página pública do usuário para refletir mudanças imediatamente
+    try {
+      const userWithUsername = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { username: true }
+      })
+      
+      if (userWithUsername?.username) {
+        revalidatePath(`/${userWithUsername.username}`)
+        console.log(`✅ Página pública revalidada: /${userWithUsername.username}`)
+      }
+    } catch (error) {
+      console.warn('Erro ao revalidar página pública:', error)
+    }
 
     return NextResponse.json({
       success: true,

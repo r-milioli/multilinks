@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation'
 import { ProfileService } from '@/modules/profile/services/profileService'
 import { PublicPageWrapper } from '@/modules/public/components/PublicPageWrapper'
 
+// Revalidar página a cada 60 segundos para refletir mudanças de tema
+export const revalidate = 60
+
 interface PageProps {
   params: {
     username: string

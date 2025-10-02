@@ -72,8 +72,17 @@ export function ThemeEditorContent() {
   }, [session?.user?.id])
 
   const handleUpdateProperty = (property: string, value: any) => {
-    const updatedTheme = { ...localTheme, [property]: value }
-    setLocalTheme(updatedTheme)
+    // Se o valor é um objeto, fazer merge. Se não, substituir diretamente
+    const updatedTheme = { 
+      ...localTheme, 
+      [property]: typeof value === 'object' && value !== null && !Array.isArray(value)
+        ? {
+            ...(localTheme as any)[property],
+            ...value
+          }
+        : value
+    }
+    setLocalTheme(updatedTheme as any)
     setHasChanges(true)
   }
 
@@ -84,7 +93,7 @@ export function ThemeEditorContent() {
   }
 
   const handleSave = async () => {
-    console.log('Salvando tema:', localTheme)
+    console.log('💾 Salvando tema:', localTheme)
     const result = await saveTheme(localTheme)
     if (result.success) {
       toast.success('Tema salvo com sucesso!')

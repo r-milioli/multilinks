@@ -20,7 +20,7 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
   
   // Só inicializar o hook se o link realmente usa formulário
   const shouldUseForm = Boolean(link.useForm && link.formId)
-  const { form, loadForm, loading } = usePublicForm(shouldUseForm ? link.formId : '')
+  const { form, loadForm, loading } = usePublicForm(shouldUseForm ? (link.formId || '') : '')
 
   const handleClick = () => {
     console.log('🔗 Link clicado:', {
@@ -104,6 +104,17 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
     animationSpeed: 300
   }
 
+  // Usar o hoverEffect do themeSettings se disponível, senão usar o do linkButtonSettings
+  // Converter objeto para string se necessário (para compatibilidade com dados antigos)
+  let themeHoverEffect = themeSettings?.hoverEffect
+  if (typeof themeHoverEffect === 'object' && themeHoverEffect !== null) {
+    // Se for um objeto, converter para string
+    themeHoverEffect = Object.values(themeHoverEffect).join('')
+  }
+  const finalHoverEffect = themeHoverEffect || linkButtonSettings.hoverEffect
+  
+
+
   // Funções auxiliares para configurações de imagem
   const getImageSizeClasses = (size: string) => {
     switch (size) {
@@ -186,26 +197,23 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
     const rounded = getBorderRadiusClass(borderRadius)
     
     // Efeitos de hover baseados nas configurações
-    const hoverEffect = linkButtonSettings.hoverEffect || 'scale'
+    const hoverEffect = finalHoverEffect || 'scale'
     
-    const hoverClasses = {
+    const hoverEffectsMap = {
       'scale': 'hover:scale-[1.02]',
       'lift': 'hover:shadow-lg hover:-translate-y-1',
       'slide': 'hover:translate-x-2',
       'rotate': 'hover:rotate-1',
       'glow': 'hover:shadow-blue-500/50 hover:shadow-lg',
       'none': ''
-    }[hoverEffect] || 'hover:scale-[1.02]'
+    } as const
+    
+    const hoverClasses = hoverEffectsMap[hoverEffect as keyof typeof hoverEffectsMap] || 'hover:scale-[1.02]'
     
     // Base sempre aplicada com tamanho dinâmico
-    const base = `w-full ${getButtonSizeClasses(linkButtonSettings.size)} transition-all duration-300 focus:outline-none group relative overflow-hidden`
+    const base = `w-full ${getButtonSizeClasses(linkButtonSettings.size)} transition-all focus:outline-none group relative overflow-hidden`
     
-    // Se há cores customizadas definidas, usar apenas classes básicas
-    if (themeSettings?.buttonColors) {
-      return cn(base, rounded, 'border-2 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
-    }
-    
-    // Fallback para estilos pré-definidos se não há cores customizadas
+    // Fallback para estilos pré-definidos se não há tema
     if (!themeSettings) {
       return cn(
         base, rounded, 'border-2 border-transparent',
@@ -219,39 +227,118 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
     const primaryColor = themeSettings.primaryColor || '#3B82F6'
     const secondaryColor = themeSettings.secondaryColor || '#64748B'
 
-    // Usar linkButtonSettings.style em vez de themeSettings.buttonStyle
-    switch (linkButtonSettings.style) {
+    // Usar themeSettings.buttonStyle se disponível, senão usar linkButtonSettings.style
+    let buttonStyle = themeSettings?.buttonStyle || linkButtonSettings.style
+    
+    // Converter objeto para string se necessário (para compatibilidade com dados antigos)
+    if (typeof buttonStyle === 'object' && buttonStyle !== null) {
+      buttonStyle = Object.values(buttonStyle).join('')
+    }
+    
+    // Se há cores personalizadas E não é um estilo específico, usar cores personalizadas
+    const hasCustomColors = themeSettings?.buttonColors && Object.keys(themeSettings.buttonColors).length > 0
+    const isSpecialStyle = ['glass', 'neon', 'gradient', '3d', 'modern'].includes(buttonStyle)
+    
+    // Debug temporário
+    console.log('🎨 DEBUG Button Style:', {
+      buttonStyle,
+      hasCustomColors,
+      isSpecialStyle,
+      willUseCustomColors: hasCustomColors && !isSpecialStyle
+    })
+    
+    if (hasCustomColors && !isSpecialStyle) {
+      // Aplicar cores personalizadas com estilo básico
+      console.log('🎨 Usando cores personalizadas para:', buttonStyle)
+      return cn(base, rounded, 'border-2 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
+    }
+    
+    // Aplicar estilos específicos
+    console.log('🎨 Aplicando estilo específico:', buttonStyle)
+    switch (buttonStyle) {
+      case 'rounded':
       case 'default':
+        console.log('🎨 → Rounded/Default style')
         return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
       
-      case 'minimal':
-        return cn(
-          base, 'rounded-none border-0 bg-transparent text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2',
-          'hover:shadow-sm',
-          hoverClasses
-        )
-      
-      case 'filled':
-        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2', hoverClasses)
+      case 'sharp':
+        console.log('🎨 → Sharp style')
+        return cn(base, 'rounded-none border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
       
       case 'outlined':
+        console.log('🎨 → Outlined style')
         return cn(base, rounded, 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-offset-2', hoverClasses)
       
+      case 'filled':
+        console.log('🎨 → Filled style')
+        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2', hoverClasses)
+      
       case 'gradient':
+        console.log('🎨 → Gradient style')
         return cn(
           base, rounded, 'border-0 text-white font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700',
           hoverClasses
         )
       
+      case 'neon':
+        console.log('🎨 → Neon style')
+        return cn(
+          base, rounded, 'border-2 border-cyan-400 bg-black text-cyan-400 font-medium shadow-lg hover:shadow-cyan-400/50 focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2',
+          'hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] hover:border-cyan-300',
+          hoverClasses
+        )
+      
       case 'glass':
+        console.log('🎨 → Glass style')
         return cn(
           base, rounded, 'border border-white/20 bg-white/10 backdrop-blur-md text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'hover:bg-white/20 dark:hover:bg-white/20',
           hoverClasses
         )
       
+      case '3d':
+        console.log('🎨 → 3D style')
+        return cn(
+          base, rounded, 'border-2 border-transparent bg-gradient-to-b from-white to-gray-200 dark:from-gray-700 dark:to-gray-900 text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
+          'hover:from-gray-50 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-800',
+          hoverClasses
+        )
+      
+      case 'minimal':
+        console.log('🎨 → Minimal style')
+        return cn(
+          base, 'rounded-none border-0 bg-transparent text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2',
+          'hover:shadow-sm',
+          hoverClasses
+        )
+      
+      case 'pill':
+        console.log('🎨 → Pill style')
+        return cn(
+          base, 'rounded-full border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2',
+          'hover:bg-gray-50 dark:hover:bg-gray-700',
+          hoverClasses
+        )
+      
+      case 'card':
+        console.log('🎨 → Card style')
+        return cn(
+          base, rounded, 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg focus:ring-2 focus:ring-offset-2',
+          'hover:border-gray-300 dark:hover:border-gray-600',
+          hoverClasses
+        )
+      
+      case 'modern':
+        console.log('🎨 → Modern style')
+        return cn(
+          base, rounded, 'border-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
+          'hover:bg-gray-800 dark:hover:bg-gray-100',
+          hoverClasses
+        )
+      
       default:
+        console.log('🎨 → Default fallback style')
         return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
     }
   }
@@ -274,10 +361,10 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         e.currentTarget.style.borderColor = buttonColors.hoverBorder
         
         // Aplicar cores de hover nos elementos filhos
-        const titleElement = e.currentTarget.querySelector('h3')
-        const descElement = e.currentTarget.querySelector('p')
-        const urlElement = e.currentTarget.querySelector('p:last-of-type')
-        const iconElement = e.currentTarget.querySelector('svg')
+        const titleElement = e.currentTarget.querySelector('h3') as HTMLElement
+        const descElement = e.currentTarget.querySelector('p') as HTMLElement
+        const urlElement = e.currentTarget.querySelector('p:last-of-type') as HTMLElement
+        const iconElement = e.currentTarget.querySelector('svg') as SVGSVGElement
         
         if (titleElement) titleElement.style.color = buttonColors.hoverText
         if (descElement) descElement.style.color = buttonColors.hoverText
@@ -290,10 +377,10 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         e.currentTarget.style.borderColor = buttonColors.border
         
         // Restaurar cores normais nos elementos filhos
-        const titleElement = e.currentTarget.querySelector('h3')
-        const descElement = e.currentTarget.querySelector('p')
-        const urlElement = e.currentTarget.querySelector('p:last-of-type')
-        const iconElement = e.currentTarget.querySelector('svg')
+        const titleElement = e.currentTarget.querySelector('h3') as HTMLElement
+        const descElement = e.currentTarget.querySelector('p') as HTMLElement
+        const urlElement = e.currentTarget.querySelector('p:last-of-type') as HTMLElement
+        const iconElement = e.currentTarget.querySelector('svg') as SVGSVGElement
         
         if (titleElement) titleElement.style.color = buttonColors.text
         if (descElement) descElement.style.color = buttonColors.text
@@ -307,7 +394,7 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
           {link.image ? (
             <img
               src={link.image}
-              alt={link.title}
+              alt={link.title || 'Link'}
               className={`${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius} object-cover`}
               onError={(e) => {
                 const target = e.target as HTMLImageElement

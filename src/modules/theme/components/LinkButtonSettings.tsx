@@ -367,7 +367,11 @@ export function LinkButtonSettings({ themeSettings, onUpdate }: LinkButtonSettin
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className={`w-full rounded-lg border transition-all duration-${linkButtonSettings.animationSpeed} ${getButtonSizeClasses(linkButtonSettings.size)} ${getButtonStyleClasses(linkButtonSettings.style)} ${getButtonAlignmentClasses(linkButtonSettings.alignment)} ${getHoverEffectClasses(linkButtonSettings.hoverEffect)}`}
+                className={`w-full rounded-lg border transition-all ${getButtonSizeClasses(linkButtonSettings.size)} ${getButtonStyleClasses(linkButtonSettings.style)} ${getButtonAlignmentClasses(linkButtonSettings.alignment)} ${getHoverEffectClasses(linkButtonSettings.hoverEffect)}`}
+                style={{
+                  transitionDuration: `${linkButtonSettings.animationSpeed}ms`,
+                  borderRadius: themeSettings?.borderRadius ? `${themeSettings.borderRadius}px` : undefined
+                }}
               >
                 <div className="flex items-center space-x-3">
                   {linkButtonSettings.showIcons && (

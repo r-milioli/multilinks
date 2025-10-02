@@ -472,7 +472,7 @@ export function PublicPage({ user }: PublicPageProps) {
 
           {/* Footer com Links Legais */}
           <LegalFooter 
-            settings={user.legalLinksSettings || {
+            settings={(user.legalLinksSettings as any) || {
               showLegalLinks: false,
               showPrivacyPolicy: false,
               showTermsOfService: false,
@@ -483,7 +483,7 @@ export function PublicPage({ user }: PublicPageProps) {
           />
           
           {/* Footer Padrão (apenas se links legais não estão ativos) */}
-          {(!user.legalLinksSettings?.showLegalLinks || user.legalLinksSettings?.linksPosition === 'hidden') && (
+          {(!(user.legalLinksSettings as any)?.showLegalLinks || (user.legalLinksSettings as any)?.linksPosition === 'hidden') && (
             <div className="mt-12 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Criado com{' '}

@@ -149,7 +149,7 @@ export function ButtonAnimationEffects({ themeSettings, onUpdate }: ButtonAnimat
                 ''
               } ${enableGlow ? 'hover:shadow-blue-400/50' : ''} ${enablePulse ? 'animate-pulse' : ''}`}
               style={{
-                borderRadius: '8px',
+                borderRadius: `${themeSettings?.borderRadius || 8}px`,
                 transitionDuration: `${animationSpeed}ms`
               }}
             >

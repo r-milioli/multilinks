@@ -69,9 +69,9 @@ export class ProfileService {
           ...(data.bio !== undefined && { bio: data.bio }),
           ...(data.title && { title: data.title }),
           ...(data.avatar && { avatar: data.avatar }),
-          ...(data.themeSettings && { themeSettings: data.themeSettings }),
-          ...(data.privacySettings && { privacySettings: data.privacySettings }),
-          ...(data.legalLinksSettings && { legalLinksSettings: data.legalLinksSettings })
+          ...(data.themeSettings && { themeSettings: data.themeSettings as any }),
+          ...(data.privacySettings && { privacySettings: data.privacySettings as any }),
+          ...(data.legalLinksSettings && { legalLinksSettings: data.legalLinksSettings as any })
         }
       })
 
@@ -148,6 +148,11 @@ export class ProfileService {
       if (!user) {
         return { success: false, error: 'Usuário não encontrado' }
       }
+
+      console.log('🔍 ProfileService - Dados do usuário carregados:', {
+        username: user.username,
+        themeSettings: user.themeSettings
+      })
 
       return { success: true, data: user }
     } catch (error) {
