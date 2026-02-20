@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PricingService } from '@/modules/admin/services/pricingService'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/public/pricing
  * Retorna os dados de preços e recursos dos planos

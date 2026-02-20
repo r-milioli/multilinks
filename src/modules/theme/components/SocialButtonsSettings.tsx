@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { cn } from '@/shared/utils/cn'
 import { Label } from '@/shared/components/ui/Label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
-import { Share2, Palette, Layout, Sparkles, Maximize2 } from 'lucide-react'
+import { Share2, Palette, Layout, Maximize2 } from 'lucide-react'
 
 interface SocialButtonsSettingsProps {
   themeSettings: any
@@ -66,20 +67,6 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
     onUpdate('socialButtonsSettings', {
       ...socialButtonsSettings,
       showLabels
-    })
-  }
-
-  const handleHoverEffectChange = (hoverEffect: string) => {
-    onUpdate('socialButtonsSettings', {
-      ...socialButtonsSettings,
-      hoverEffect
-    })
-  }
-
-  const handleAnimationSpeedChange = (animationSpeed: number) => {
-    onUpdate('socialButtonsSettings', {
-      ...socialButtonsSettings,
-      animationSpeed
     })
   }
 
@@ -374,57 +361,6 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
           </div>
         </div>
 
-        {/* Efeitos de Hover */}
-        <div>
-          <Label className="text-base font-medium flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4" />
-            Efeitos de Hover
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[
-              { value: 'none', label: 'Nenhum' },
-              { value: 'scale', label: 'Escala' },
-              { value: 'lift', label: 'Elevação' },
-              { value: 'glow', label: 'Brilho' },
-              { value: 'slide', label: 'Deslizar' },
-              { value: 'rotate', label: 'Rotação' }
-            ].map((effect) => (
-              <button
-                key={effect.value}
-                onClick={() => handleHoverEffectChange(effect.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-center ${
-                  socialButtonsSettings.hoverEffect === effect.value
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="font-medium text-sm">{effect.label}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Velocidade da Animação */}
-        <div>
-          <Label htmlFor="social-animation-speed" className="text-base font-medium mb-3">
-            Velocidade da Animação: {socialButtonsSettings.animationSpeed}ms
-          </Label>
-          <input
-            id="social-animation-speed"
-            type="range"
-            min="100"
-            max="1000"
-            step="100"
-            value={socialButtonsSettings.animationSpeed}
-            onChange={(e) => handleAnimationSpeedChange(Number(e.target.value))}
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>Rápido</span>
-            <span>Lento</span>
-          </div>
-        </div>
-
         {/* Cores Personalizadas */}
         <div>
           <Label className="text-base font-medium flex items-center gap-2 mb-3">
@@ -476,19 +412,30 @@ export function SocialButtonsSettings({ themeSettings, onUpdate }: SocialButtons
         <div>
           <Label className="text-base font-medium mb-3">Preview</Label>
           <div className={`flex ${getButtonSpacingClasses(socialButtonsSettings.spacing)} ${getButtonAlignmentClasses(socialButtonsSettings.alignment)} p-4 bg-gray-50 dark:bg-gray-800 rounded-lg`}>
-            {socialIcons.slice(0, 4).map((social, index) => (
-              <div
-                key={index}
-                className={`${getButtonSizeClasses(socialButtonsSettings.size)} ${getButtonShapeClasses(socialButtonsSettings.shape)} ${getButtonStyleClasses(socialButtonsSettings.style)} ${getHoverEffectClasses(socialButtonsSettings.hoverEffect)} transition-all duration-${socialButtonsSettings.animationSpeed} flex items-center justify-center cursor-pointer`}
-                style={{
-                  backgroundColor: socialButtonsSettings.backgroundColor,
-                  color: socialButtonsSettings.iconColor,
-                  borderColor: socialButtonsSettings.borderColor
-                }}
-              >
-                <span className="text-lg">{social.icon}</span>
-              </div>
-            ))}
+            {socialIcons.slice(0, 4).map((social, index) => {
+              const isMinimal = socialButtonsSettings.style === 'minimal'
+              const animSpeed = themeSettings?.animationSpeed ?? socialButtonsSettings.animationSpeed ?? 300
+              const hoverEff = themeSettings?.hoverEffect ?? socialButtonsSettings.hoverEffect ?? 'scale'
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    socialButtonsSettings.showLabels ? 'gap-2 px-3 py-2' : getButtonSizeClasses(socialButtonsSettings.size),
+                    getButtonShapeClasses(socialButtonsSettings.shape),
+                    getButtonStyleClasses(socialButtonsSettings.style),
+                    getHoverEffectClasses(hoverEff),
+                    'transition-all flex items-center justify-center cursor-pointer'
+                  )}
+                  style={{
+                    transitionDuration: `${animSpeed}ms`,
+                    ...(isMinimal ? { backgroundColor: 'transparent', color: socialButtonsSettings.iconColor, borderColor: socialButtonsSettings.borderColor } : { backgroundColor: socialButtonsSettings.backgroundColor, color: socialButtonsSettings.iconColor, borderColor: socialButtonsSettings.borderColor })
+                  }}
+                >
+                  <span className="text-lg flex-shrink-0">{social.icon}</span>
+                  {socialButtonsSettings.showLabels && <span className="text-xs font-medium truncate">{social.name}</span>}
+                </div>
+              )
+            })}
           </div>
         </div>
       </CardContent>

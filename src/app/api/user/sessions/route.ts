@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 function getUserAgentBrowser(userAgent: string): string {
   if (userAgent.includes('Chrome')) return 'Chrome'
   if (userAgent.includes('Firefox')) return 'Firefox'

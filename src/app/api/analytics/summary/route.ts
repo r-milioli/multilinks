@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { PlanLimitsService } from '@/shared/services/planLimitsService'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     console.log('🔍 API Analytics Summary chamada')

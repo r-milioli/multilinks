@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SystemSettingsService } from '@/modules/admin/services/systemSettingsService'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/debug/get-setting?key=social_links
  * Endpoint para testar a função getSetting

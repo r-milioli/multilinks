@@ -162,9 +162,12 @@ export function SocialLinks({ socialLinks, themeSettings }: SocialLinksProps) {
       {socialLinks.map((socialLink) => {
         const platformData = getPlatformData(socialLink.platform)
         const isCustomStyle = socialButtonsSettings.style === 'default' || 
-                             socialButtonsSettings.style === 'minimal' ||
                              socialButtonsSettings.style === 'filled' ||
                              socialButtonsSettings.style === 'outlined'
+        const isMinimal = socialButtonsSettings.style === 'minimal'
+        const hoverEffect = themeSettings?.hoverEffect ?? socialButtonsSettings.hoverEffect ?? 'scale'
+        const animationSpeed = themeSettings?.animationSpeed ?? socialButtonsSettings.animationSpeed ?? 300
+        const showLabels = socialButtonsSettings.showLabels === true
         
         return (
           <a
@@ -173,19 +176,25 @@ export function SocialLinks({ socialLinks, themeSettings }: SocialLinksProps) {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              getButtonSizeClasses(socialButtonsSettings.size),
               getButtonShapeClasses(socialButtonsSettings.shape),
               getButtonStyleClasses(socialButtonsSettings.style),
-              getHoverEffectClasses(socialButtonsSettings.hoverEffect),
+              getHoverEffectClasses(hoverEffect),
               'flex items-center justify-center transition-all',
-              'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800'
+              'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800',
+              showLabels ? 'gap-2 px-3 py-2 min-w-0' : getButtonSizeClasses(socialButtonsSettings.size)
             )}
             style={{
-              transitionDuration: `${socialButtonsSettings.animationSpeed}ms`,
-              backgroundColor: isCustomStyle ? socialButtonsSettings.backgroundColor : undefined,
-              color: isCustomStyle ? socialButtonsSettings.iconColor : undefined,
-              borderColor: isCustomStyle ? socialButtonsSettings.borderColor : undefined,
-              // Para estilos especiais, usar a cor da plataforma
+              transitionDuration: `${animationSpeed}ms`,
+              ...(isMinimal && {
+                backgroundColor: 'transparent',
+                borderColor: socialButtonsSettings.borderColor,
+                color: socialButtonsSettings.iconColor
+              }),
+              ...(isCustomStyle && !isMinimal && {
+                backgroundColor: socialButtonsSettings.backgroundColor,
+                color: socialButtonsSettings.iconColor,
+                borderColor: socialButtonsSettings.borderColor
+              }),
               ...(socialButtonsSettings.style === 'filled' && {
                 backgroundColor: platformData.color,
                 color: '#FFFFFF'
@@ -198,15 +207,15 @@ export function SocialLinks({ socialLinks, themeSettings }: SocialLinksProps) {
                 background: `linear-gradient(135deg, ${platformData.color}, ${platformData.color}dd)`
               })
             }}
-            title={socialButtonsSettings.showLabels ? socialLink.platform : undefined}
+            title={showLabels ? undefined : socialLink.platform}
           >
             <SocialIcon 
               platform={socialLink.platform} 
-              className={getIconSizeClasses(socialButtonsSettings.size)}
+              className={cn(getIconSizeClasses(socialButtonsSettings.size), showLabels && 'flex-shrink-0')}
             />
-            {socialButtonsSettings.showLabels && (
+            {showLabels && (
               <span 
-                className="ml-2 text-xs font-medium hidden sm:inline"
+                className="text-xs font-medium truncate"
                 style={{ 
                   color: socialButtonsSettings.style === 'filled' ? '#FFFFFF' : 
                          socialButtonsSettings.style === 'outlined' ? platformData.color :
