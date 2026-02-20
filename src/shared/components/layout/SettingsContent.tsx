@@ -353,7 +353,7 @@ export function SettingsContent() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Informações Pessoais</h3>
-        <p className="text-gray-600">Atualize suas informações pessoais</p>
+        <p className="text-gray-600 dark:text-gray-400">Atualize suas informações pessoais</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -404,7 +404,7 @@ export function SettingsContent() {
           onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
           placeholder="Conte um pouco sobre você..."
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         />
       </div>
       
@@ -431,7 +431,7 @@ export function SettingsContent() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Configurações de Notificação</h3>
-        <p className="text-gray-600">Configure como você quer ser notificado</p>
+        <p className="text-gray-600 dark:text-gray-400">Configure como você quer ser notificado</p>
       </div>
       
       {notificationsLoading ? (
@@ -443,7 +443,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="email-notifications">Notificações por Email</Label>
-              <p className="text-sm text-gray-500">Receba emails sobre atividades importantes</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Receba emails sobre atividades importantes</p>
             </div>
             <Switch
               id="email-notifications"
@@ -455,7 +455,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="push-notifications">Notificações Push</Label>
-              <p className="text-sm text-gray-500">Receba notificações no navegador</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Receba notificações no navegador</p>
             </div>
             <Switch
               id="push-notifications"
@@ -467,7 +467,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="weekly-reports">Relatórios Semanais</Label>
-              <p className="text-sm text-gray-500">Receba um resumo semanal do desempenho</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Receba um resumo semanal do desempenho</p>
             </div>
             <Switch
               id="weekly-reports"
@@ -479,7 +479,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="new-followers">Novos Seguidores</Label>
-              <p className="text-sm text-gray-500">Seja notificado quando alguém seguir seu perfil</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Seja notificado quando alguém seguir seu perfil</p>
             </div>
             <Switch
               id="new-followers"
@@ -491,7 +491,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="link-clicks">Cliques em Links</Label>
-              <p className="text-sm text-gray-500">Seja notificado sobre cliques nos seus links</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Seja notificado sobre cliques nos seus links</p>
             </div>
             <Switch
               id="link-clicks"
@@ -503,7 +503,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="profile-views">Visualizações do Perfil</Label>
-              <p className="text-sm text-gray-500">Seja notificado sobre visualizações do seu perfil</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Seja notificado sobre visualizações do seu perfil</p>
             </div>
             <Switch
               id="profile-views"
@@ -515,7 +515,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="system-updates">Atualizações do Sistema</Label>
-              <p className="text-sm text-gray-500">Receba notificações sobre atualizações e novidades</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Receba notificações sobre atualizações e novidades</p>
             </div>
             <Switch
               id="system-updates"
@@ -527,7 +527,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="marketing-emails">Emails de Marketing</Label>
-              <p className="text-sm text-gray-500">Receba emails promocionais e dicas</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Receba emails promocionais e dicas</p>
             </div>
             <Switch
               id="marketing-emails"
@@ -539,7 +539,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="sms-notifications">Notificações SMS</Label>
-              <p className="text-sm text-gray-500">Receba notificações por SMS</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Receba notificações por SMS</p>
             </div>
             <Switch
               id="sms-notifications"
@@ -551,13 +551,13 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="notification-frequency">Frequência de Notificações</Label>
-              <p className="text-sm text-gray-500">Com que frequência você quer receber notificações</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Com que frequência você quer receber notificações</p>
             </div>
             <select
               id="notification-frequency"
               value={notificationSettings.notificationFrequency}
               onChange={(e) => updateNotificationSetting('notificationFrequency', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="immediate">Imediato</option>
               <option value="daily">Diário</option>
@@ -585,7 +585,7 @@ export function SettingsContent() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Segurança da Conta</h3>
-        <p className="text-gray-600">Gerencie a segurança da sua conta</p>
+        <p className="text-gray-600 dark:text-gray-400">Gerencie a segurança da sua conta</p>
       </div>
       
       {/* Alteração de Senha */}
@@ -655,23 +655,23 @@ export function SettingsContent() {
           ) : (
             <div className="space-y-3">
               {activeSessions.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">Nenhuma sessão ativa encontrada</p>
+                <p className="text-gray-500 dark:text-gray-400 text-center py-4">Nenhuma sessão ativa encontrada</p>
               ) : (
                 activeSessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={session.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{session.device}</span>
                         {session.isCurrent && (
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                          <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded">
                             Atual
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {session.browser} • {session.location}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
                         Última atividade: {new Date(session.lastActivity).toLocaleString('pt-BR')}
                       </p>
                     </div>
@@ -680,7 +680,7 @@ export function SettingsContent() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleTerminateSession(session.id)}
-                        className="text-red-600 border-red-300 hover:bg-red-50"
+                        className="text-red-600 dark:text-red-400 border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         Encerrar
                       </Button>
@@ -698,7 +698,7 @@ export function SettingsContent() {
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             Autenticação de Dois Fatores
-            <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-medium">
+            <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 px-2 py-1 rounded-full font-medium">
               🚧 Em Desenvolvimento
             </span>
           </CardTitle>
@@ -710,7 +710,7 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="two-factor">2FA Ativado</Label>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {security.twoFactor 
                   ? 'Autenticação de dois fatores está ativada' 
                   : 'Autenticação de dois fatores está desativada'
@@ -729,8 +729,8 @@ export function SettingsContent() {
               }}
             />
           </div>
-          <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-            <p className="text-sm text-orange-800">
+          <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+            <p className="text-sm text-orange-800 dark:text-orange-200">
               <strong>🚧 Em Desenvolvimento:</strong> A funcionalidade de autenticação de dois fatores está sendo desenvolvida e será disponibilizada em breve.
             </p>
           </div>
@@ -743,13 +743,13 @@ export function SettingsContent() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Integrações</h3>
-        <p className="text-gray-600">Conecte com outras ferramentas e serviços</p>
+        <p className="text-gray-600 dark:text-gray-400">Conecte com outras ferramentas e serviços</p>
       </div>
       
       {integrationsLoading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-gray-500 mt-2">Carregando configurações...</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Carregando configurações...</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -770,7 +770,7 @@ export function SettingsContent() {
                   onChange={(e) => updateIntegrationSetting('googleAnalytics', e.target.value)}
                   placeholder="UA-XXXXXXXXX-X ou G-XXXXXXXXXX"
                 />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Formato: UA-XXXXXXXXX-X (Universal Analytics) ou G-XXXXXXXXXX (Google Analytics 4)
                 </p>
               </div>
@@ -794,7 +794,7 @@ export function SettingsContent() {
                   onChange={(e) => updateIntegrationSetting('facebookPixel', e.target.value)}
                   placeholder="123456789012345"
                 />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   ID numérico do seu Facebook Pixel (15-16 dígitos)
                 </p>
               </div>
@@ -820,7 +820,7 @@ export function SettingsContent() {
                       onChange={(e) => updateIntegrationSetting('webhookUrl', e.target.value)}
                       placeholder="https://seu-servidor.com/webhook"
                     />
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       URL completa onde os dados dos leads serão enviados
                     </p>
                   </div>
@@ -834,7 +834,7 @@ export function SettingsContent() {
                       >
                         Testar Webhook
                       </Button>
-                      <p className="text-xs text-gray-500 self-center">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 self-center">
                         Teste se o webhook está funcionando
                       </p>
                     </div>
@@ -870,7 +870,7 @@ export function SettingsContent() {
                     rows={8}
                     className="font-mono text-sm"
                   />
-                  <div className="text-sm text-gray-500 space-y-1">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
                     <p><strong>Exemplos de uso:</strong></p>
                     <ul className="list-disc list-inside ml-4 space-y-1">
                       <li>Botões do WhatsApp, Telegram, etc.</li>
@@ -878,7 +878,7 @@ export function SettingsContent() {
                       <li>Scripts de analytics adicionais</li>
                       <li>Elementos HTML customizados</li>
                     </ul>
-                    <p className="mt-2 text-xs text-amber-600">
+                    <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
                       ⚠️ Use com cuidado: scripts maliciosos podem afetar a segurança
                     </p>
                   </div>
@@ -910,11 +910,11 @@ export function SettingsContent() {
   const renderDangerSection = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-red-600">Zona de Perigo</h3>
-        <p className="text-gray-600">Ações irreversíveis para sua conta</p>
+        <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Zona de Perigo</h3>
+        <p className="text-gray-600 dark:text-gray-400">Ações irreversíveis para sua conta</p>
       </div>
       
-      <Card className="border-red-200 bg-red-50">
+      <Card className="border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/10">
         <CardHeader>
           <CardTitle className="text-red-600">Deletar Conta</CardTitle>
           <CardDescription>
@@ -924,7 +924,7 @@ export function SettingsContent() {
         <CardContent>
           <Button 
             variant="outline" 
-            className="border-red-300 text-red-600 hover:bg-red-100"
+            className="border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20"
             onClick={handleDeleteAccount}
           >
             Deletar Conta Permanentemente
@@ -939,7 +939,7 @@ export function SettingsContent() {
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold">Configurações</h2>
-        <p className="text-gray-600">Gerencie suas preferências e configurações</p>
+        <p className="text-gray-600 dark:text-gray-400">Gerencie suas preferências e configurações</p>
       </div>
 
       {/* Content */}

@@ -249,12 +249,14 @@ export function PublicPage({ user }: PublicPageProps) {
     </div>
   )
 
+  const fontFamily = themeSettings?.fontFamily || 'Inter'
+
   const renderProfileInfo = () => (
-    <div>
+    <div style={{ fontFamily }}>
       {/* Name and Title */}
       <h1 
         className="text-2xl font-bold mb-2"
-        style={{ color: themeSettings.nameColor || themeSettings.textColor || '#1E293B' }}
+        style={{ color: themeSettings.nameColor || themeSettings.textColor || '#1E293B', fontFamily }}
       >
         {user.name || user.username}
       </h1>
@@ -262,7 +264,7 @@ export function PublicPage({ user }: PublicPageProps) {
       {user.title && (
         <p 
           className="text-lg mb-4"
-          style={{ color: themeSettings.titleColor || themeSettings.secondaryColor || '#64748B' }}
+          style={{ color: themeSettings.titleColor || themeSettings.secondaryColor || '#64748B', fontFamily }}
         >
           {user.title}
         </p>
@@ -272,7 +274,7 @@ export function PublicPage({ user }: PublicPageProps) {
       {privacySettings.showEmail && user.email && (
         <p 
           className="text-sm mb-4"
-          style={{ color: themeSettings.titleColor || themeSettings.secondaryColor || '#64748B', opacity: 0.7 }}
+          style={{ color: themeSettings.titleColor || themeSettings.secondaryColor || '#64748B', opacity: 0.7, fontFamily }}
         >
           {user.email}
         </p>
@@ -282,7 +284,7 @@ export function PublicPage({ user }: PublicPageProps) {
       {user.bio && (
         <p 
           className="leading-relaxed"
-          style={{ color: themeSettings.bioColor || themeSettings.textColor || '#1E293B' }}
+          style={{ color: themeSettings.bioColor || themeSettings.textColor || '#1E293B', fontFamily }}
         >
           {user.bio}
         </p>
@@ -332,8 +334,8 @@ export function PublicPage({ user }: PublicPageProps) {
         className="min-h-screen"
         style={{
           ...getBackgroundStyle(),
-          fontFamily: themeSettings.fontFamily || 'Inter',
-          color: themeSettings.textColor || '#1E293B'
+          fontFamily: themeSettings?.fontFamily || 'Inter',
+          color: themeSettings?.textColor || '#1E293B'
         }}
       >
         <div className="container mx-auto px-4 py-8 max-w-md">

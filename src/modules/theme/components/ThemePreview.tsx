@@ -123,7 +123,7 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
         className="text-xl font-bold mb-1"
         style={{ 
           color: themeSettings.nameColor || themeSettings.textColor,
-          fontFamily: themeSettings.fontFamily 
+          fontFamily: themeSettings.fontFamily || 'Inter'
         }}
       >
         Seu Nome
@@ -132,7 +132,7 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
         className="text-sm opacity-80 mb-2"
         style={{ 
           color: themeSettings.titleColor || themeSettings.secondaryColor,
-          fontFamily: themeSettings.fontFamily 
+          fontFamily: themeSettings.fontFamily || 'Inter'
         }}
       >
         Seu título
@@ -141,7 +141,7 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
         className="text-sm"
         style={{ 
           color: themeSettings.bioColor || themeSettings.textColor,
-          fontFamily: themeSettings.fontFamily 
+          fontFamily: themeSettings.fontFamily || 'Inter'
         }}
       >
         Sua biografia ou descrição pessoal
@@ -187,15 +187,17 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
     }
   }
 
+  const fontFamily = themeSettings.fontFamily || 'Inter'
+
   return (
-    <div className={`${className}`}>
-      <h3 className="text-lg font-semibold mb-4" style={{ color: themeSettings.textColor }}>
+    <div className={`${className}`} style={{ fontFamily }}>
+      <h3 className="text-lg font-semibold mb-4" style={{ color: themeSettings.textColor, fontFamily }}>
         Preview do Tema
       </h3>
       
       <div 
         className="p-6 rounded-lg border-2 border-dashed border-gray-300"
-        style={getBackgroundStyle()}
+        style={{ ...getBackgroundStyle(), fontFamily }}
       >
         <div className={cn("space-y-4", getAvatarPositionClasses(themeSettings.avatarSettings?.position || 'top'))}>
           {themeSettings.avatarSettings?.position === 'top' ? (
@@ -215,6 +217,7 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
             <button
               className={getButtonClasses()}
               style={{ 
+                fontFamily,
                 color: themeSettings.buttonStyle === 'filled' ? 'white' : themeSettings.primaryColor,
                 backgroundColor: themeSettings.buttonStyle === 'filled' ? themeSettings.primaryColor : 'transparent',
                 borderColor: themeSettings.buttonStyle === 'outlined' ? themeSettings.primaryColor : 'transparent'
@@ -226,6 +229,7 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
             <button
               className={getButtonClasses()}
               style={{ 
+                fontFamily,
                 color: themeSettings.buttonStyle === 'filled' ? 'white' : themeSettings.primaryColor,
                 backgroundColor: themeSettings.buttonStyle === 'filled' ? themeSettings.primaryColor : 'transparent',
                 borderColor: themeSettings.buttonStyle === 'outlined' ? themeSettings.primaryColor : 'transparent'
@@ -241,7 +245,7 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
               <div
                 key={platform}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs"
-                style={{ backgroundColor: themeSettings.secondaryColor }}
+                style={{ backgroundColor: themeSettings.secondaryColor, fontFamily }}
               >
                 {platform[0]}
               </div>

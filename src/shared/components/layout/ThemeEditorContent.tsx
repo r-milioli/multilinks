@@ -25,6 +25,7 @@ import { useImageUpload } from '@/modules/profile/hooks/useImageUpload'
 import { AvatarUpload } from '@/modules/profile/components/AvatarUpload'
 import { useSession } from 'next-auth/react'
 import { FeatureGuard } from '@/shared/components/FeatureGuard'
+import { GoogleFontLoader } from '@/shared/components/GoogleFontLoader'
 
 export function ThemeEditorContent() {
   const { data: session, update: updateSession } = useSession()
@@ -202,10 +203,11 @@ export function ThemeEditorContent() {
 
   return (
     <FeatureGuard feature="themeEditing">
+      <GoogleFontLoader fontFamily={localTheme?.fontFamily} />
       <div className="space-y-8">
         <div>
           <h2 className="text-2xl font-bold">Personalização da Página Pública</h2>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             Customize a aparência da sua página pública com cores, fontes, estilos de botão e backgrounds
           </p>
         </div>
@@ -251,8 +253,8 @@ export function ThemeEditorContent() {
                   onClick={() => handlePresetSelect(key)}
                   className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
                     JSON.stringify(localTheme) === JSON.stringify(preset)
-                      ? 'border-primary bg-primary/10'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary bg-primary/10 dark:bg-primary/20'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1">
@@ -284,7 +286,7 @@ export function ThemeEditorContent() {
                     <Label htmlFor="primaryColor" className="text-sm font-medium">
                       Cor Primária
                     </Label>
-                    <p className="text-xs text-gray-500 mb-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                       Usada para gradientes e elementos de destaque
                     </p>
                     <div className="flex gap-2">
@@ -309,7 +311,7 @@ export function ThemeEditorContent() {
                     <Label htmlFor="secondaryColor" className="text-sm font-medium">
                       Cor Secundária
                     </Label>
-                    <p className="text-xs text-gray-500 mb-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                       Usada para gradientes e elementos secundários
                     </p>
                     <div className="flex gap-2">
@@ -334,7 +336,7 @@ export function ThemeEditorContent() {
                     <Label htmlFor="backgroundColor" className="text-sm font-medium">
                       Cor de Fundo Sólida
                     </Label>
-                    <p className="text-xs text-gray-500 mb-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                       Cor de fundo quando usar fundo sólido
                     </p>
                     <div className="flex gap-2">
@@ -371,7 +373,7 @@ export function ThemeEditorContent() {
                   <Label htmlFor="nameColor" className="text-sm font-medium">
                     Cor do Nome
                   </Label>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     Cor do nome principal do usuário
                   </p>
                   <div className="flex gap-2">
@@ -396,7 +398,7 @@ export function ThemeEditorContent() {
                   <Label htmlFor="titleColor" className="text-sm font-medium">
                     Cor do Título
                   </Label>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     Cor do título/subtítulo do usuário
                   </p>
                   <div className="flex gap-2">
@@ -421,7 +423,7 @@ export function ThemeEditorContent() {
                   <Label htmlFor="bioColor" className="text-sm font-medium">
                     Cor da Biografia
                   </Label>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     Cor do texto da biografia/descrição
                   </p>
                   <div className="flex gap-2">
@@ -458,7 +460,7 @@ export function ThemeEditorContent() {
                   id="fontFamily"
                   value={localTheme.fontFamily || 'Inter'}
                   onChange={(e) => handleUpdateProperty('fontFamily', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 >
                 {AVAILABLE_FONTS.map((font) => (
                   <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
@@ -586,8 +588,8 @@ export function ThemeEditorContent() {
                     key={type.value}
                     className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
                       localTheme.backgroundType === type.value
-                        ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-primary bg-primary/10 dark:bg-primary/20'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                     }`}
                   >
                     <input
@@ -596,11 +598,11 @@ export function ThemeEditorContent() {
                       value={type.value}
                       checked={localTheme.backgroundType === type.value}
                       onChange={() => handleUpdateProperty('backgroundType', type.value)}
-                      className="w-4 h-4 text-primary focus:ring-primary border-gray-300"
+                      className="w-4 h-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600"
                     />
                     <div className="flex-1">
                       <div className="font-medium">{type.label}</div>
-                      <div className="text-sm text-gray-500">{type.description}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{type.description}</div>
                     </div>
                   </label>
                 ))}
@@ -612,19 +614,6 @@ export function ThemeEditorContent() {
                   onUpdate={handleUpdateProperty}
                 />
               )}
-          </CollapsibleSection>
-
-          {/* Configurações dos Botões de Links */}
-          <CollapsibleSection
-            title="Configurações dos Botões de Links"
-            description="Personalize a aparência dos botões de links"
-            icon={<Link className="w-5 h-5" />}
-            defaultOpen={false}
-          >
-            <LinkButtonSettings 
-              themeSettings={localTheme} 
-              onUpdate={handleThemeUpdate} 
-            />
           </CollapsibleSection>
 
           {/* Configurações do Modal de Formulário */}

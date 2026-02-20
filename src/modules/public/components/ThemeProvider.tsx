@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect } from 'react'
 import { ThemeSettings } from '@/types/common.types'
+import { GoogleFontLoader } from '@/shared/components/GoogleFontLoader'
 
 interface ThemeContextType {
   themeSettings: ThemeSettings
@@ -66,6 +67,7 @@ export function ThemeProvider({ children, themeSettings }: ThemeProviderProps) {
 
   return (
     <ThemeContext.Provider value={{ themeSettings }}>
+      <GoogleFontLoader fontFamily={themeSettings?.fontFamily} />
       {children}
     </ThemeContext.Provider>
   )

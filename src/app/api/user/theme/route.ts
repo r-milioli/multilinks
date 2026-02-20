@@ -29,7 +29,7 @@ export async function GET() {
       )
     }
 
-    const themeSettings = (user.themeSettings as any) || {
+    const DEFAULT_THEME = {
       primaryColor: '#3B82F6',
       secondaryColor: '#64748B',
       textColor: '#1E293B',
@@ -88,32 +88,46 @@ export async function GET() {
         shadow: 'none',
         position: 'top'
       },
-    backgroundSettings: {
-      position: 'center',
-      size: 'cover',
-      repeat: 'no-repeat',
-      attachment: 'scroll'
-    },
-    formModalSettings: {
-      backgroundColor: '#FFFFFF',
-      textColor: '#1E293B',
-      borderColor: '#E5E7EB',
-      borderRadius: 8,
-      shadow: 'lg',
-      backdropBlur: true,
-      inputBackgroundColor: '#FFFFFF',
-      inputBorderColor: '#E5E7EB',
-      inputTextColor: '#1E293B',
-      inputFocusBorderColor: '#3B82F6',
-      buttonBackgroundColor: '#3B82F6',
-      buttonTextColor: '#FFFFFF',
-      buttonHoverBackgroundColor: '#2563EB',
-      buttonHoverTextColor: '#FFFFFF',
-      titleColor: '#1E293B',
-      descriptionColor: '#64748B',
-      errorColor: '#EF4444',
-      successColor: '#10B981'
-    }
+      backgroundSettings: {
+        position: 'center',
+        size: 'cover',
+        repeat: 'no-repeat',
+        attachment: 'scroll'
+      },
+      formModalSettings: {
+        backgroundColor: '#FFFFFF',
+        textColor: '#1E293B',
+        borderColor: '#E5E7EB',
+        borderRadius: 8,
+        shadow: 'lg',
+        backdropBlur: true,
+        inputBackgroundColor: '#FFFFFF',
+        inputBorderColor: '#E5E7EB',
+        inputTextColor: '#1E293B',
+        inputFocusBorderColor: '#3B82F6',
+        buttonBackgroundColor: '#3B82F6',
+        buttonTextColor: '#FFFFFF',
+        buttonHoverBackgroundColor: '#2563EB',
+        buttonHoverTextColor: '#FFFFFF',
+        titleColor: '#1E293B',
+        descriptionColor: '#64748B',
+        errorColor: '#EF4444',
+        successColor: '#10B981'
+      }
+    } as const
+
+    // Mesclar tema salvo com defaults para garantir campos como fontFamily
+    const saved = (user.themeSettings as any) || {}
+    const themeSettings = {
+      ...DEFAULT_THEME,
+      ...saved,
+      buttonColors: { ...DEFAULT_THEME.buttonColors, ...(saved.buttonColors || {}) },
+      linkButtonSettings: { ...DEFAULT_THEME.linkButtonSettings, ...(saved.linkButtonSettings || {}) },
+      socialButtonsSettings: { ...DEFAULT_THEME.socialButtonsSettings, ...(saved.socialButtonsSettings || {}) },
+      imageSettings: { ...DEFAULT_THEME.imageSettings, ...(saved.imageSettings || {}) },
+      avatarSettings: { ...DEFAULT_THEME.avatarSettings, ...(saved.avatarSettings || {}) },
+      backgroundSettings: { ...DEFAULT_THEME.backgroundSettings, ...(saved.backgroundSettings || {}) },
+      formModalSettings: { ...DEFAULT_THEME.formModalSettings, ...(saved.formModalSettings || {}) }
     }
 
     return NextResponse.json({
