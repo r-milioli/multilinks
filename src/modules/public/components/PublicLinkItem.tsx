@@ -235,46 +235,31 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
       buttonStyle = Object.values(buttonStyle).join('')
     }
     
-    // Se há cores personalizadas E não é um estilo específico, usar cores personalizadas
-    const hasCustomColors = themeSettings?.buttonColors && Object.keys(themeSettings.buttonColors).length > 0
+    // Estilos que têm aparência própria (não usar buttonColors no inline style)
     const isSpecialStyle = ['glass', 'neon', 'gradient', '3d', 'modern'].includes(buttonStyle)
-    
-    // Debug temporário
-    console.log('🎨 DEBUG Button Style:', {
-      buttonStyle,
-      hasCustomColors,
-      isSpecialStyle,
-      willUseCustomColors: hasCustomColors && !isSpecialStyle
-    })
-    
+    const hasCustomColors = themeSettings?.buttonColors && Object.keys(themeSettings.buttonColors).length > 0
+
     if (hasCustomColors && !isSpecialStyle) {
-      // Aplicar cores personalizadas com estilo básico
-      console.log('🎨 Usando cores personalizadas para:', buttonStyle)
-      return cn(base, rounded, 'border-2 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
+      const radiusClass = buttonStyle === 'sharp' ? 'rounded-none' : buttonStyle === 'pill' ? 'rounded-full' : rounded
+      return cn(base, radiusClass, 'border-2 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
     }
     
     // Aplicar estilos específicos
-    console.log('🎨 Aplicando estilo específico:', buttonStyle)
     switch (buttonStyle) {
       case 'rounded':
       case 'default':
-        console.log('🎨 → Rounded/Default style')
         return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
       
       case 'sharp':
-        console.log('🎨 → Sharp style')
         return cn(base, 'rounded-none border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
       
       case 'outlined':
-        console.log('🎨 → Outlined style')
         return cn(base, rounded, 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-offset-2', hoverClasses)
       
       case 'filled':
-        console.log('🎨 → Filled style')
         return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2', hoverClasses)
       
       case 'gradient':
-        console.log('🎨 → Gradient style')
         return cn(
           base, rounded, 'border-0 text-white font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700',
@@ -282,7 +267,6 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       case 'neon':
-        console.log('🎨 → Neon style')
         return cn(
           base, rounded, 'border-2 border-cyan-400 bg-black text-cyan-400 font-medium shadow-lg hover:shadow-cyan-400/50 focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2',
           'hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] hover:border-cyan-300',
@@ -290,7 +274,6 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       case 'glass':
-        console.log('🎨 → Glass style')
         return cn(
           base, rounded, 'border border-white/20 bg-white/10 backdrop-blur-md text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'hover:bg-white/20 dark:hover:bg-white/20',
@@ -298,7 +281,6 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       case '3d':
-        console.log('🎨 → 3D style')
         return cn(
           base, rounded, 'border-2 border-transparent bg-gradient-to-b from-white to-gray-200 dark:from-gray-700 dark:to-gray-900 text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'hover:from-gray-50 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-800',
@@ -306,7 +288,6 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       case 'minimal':
-        console.log('🎨 → Minimal style')
         return cn(
           base, 'rounded-none border-0 bg-transparent text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2',
           'hover:shadow-sm',
@@ -314,7 +295,6 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       case 'pill':
-        console.log('🎨 → Pill style')
         return cn(
           base, 'rounded-full border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2',
           'hover:bg-gray-50 dark:hover:bg-gray-700',
@@ -322,7 +302,6 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       case 'card':
-        console.log('🎨 → Card style')
         return cn(
           base, rounded, 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg focus:ring-2 focus:ring-offset-2',
           'hover:border-gray-300 dark:hover:border-gray-600',
@@ -330,7 +309,6 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       case 'modern':
-        console.log('🎨 → Modern style')
         return cn(
           base, rounded, 'border-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'hover:bg-gray-800 dark:hover:bg-gray-100',
@@ -338,8 +316,41 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         )
       
       default:
-        console.log('🎨 → Default fallback style')
         return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
+    }
+  }
+
+  const resolvedButtonStyle = (() => {
+    let s = themeSettings?.buttonStyle ?? linkButtonSettings.style
+    if (typeof s === 'object' && s !== null) s = Object.values(s).join('')
+    return String(s || 'default')
+  })()
+  const isSpecialButtonStyle = ['glass', 'neon', 'gradient', '3d', 'modern'].includes(resolvedButtonStyle)
+
+  const buttonInlineStyle: React.CSSProperties = {
+    transitionDuration: `${linkButtonSettings.animationSpeed || 300}ms`
+  }
+  // Raio de borda: pill = fixo (pílula), sharp = 0 (sobrepõe opção de raio), demais = tema
+  if (resolvedButtonStyle === 'pill') {
+    buttonInlineStyle.borderRadius = '9999px'
+  } else if (resolvedButtonStyle === 'sharp') {
+    buttonInlineStyle.borderRadius = '0'
+  } else if (themeSettings?.borderRadius != null) {
+    buttonInlineStyle.borderRadius = `${themeSettings.borderRadius}px`
+  }
+  if (!isSpecialButtonStyle) {
+    buttonInlineStyle.color = buttonColors.text
+    if (resolvedButtonStyle === 'outlined') {
+      buttonInlineStyle.backgroundColor = 'transparent'
+      buttonInlineStyle.borderColor = buttonColors.border
+    } else if (resolvedButtonStyle === 'minimal') {
+      buttonInlineStyle.backgroundColor = 'transparent'
+      buttonInlineStyle.borderWidth = 0
+      buttonInlineStyle.borderStyle = 'solid'
+      buttonInlineStyle.borderColor = 'transparent'
+    } else {
+      buttonInlineStyle.backgroundColor = buttonColors.background
+      buttonInlineStyle.borderColor = buttonColors.border
     }
   }
 
@@ -348,44 +359,45 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
     <button
       onClick={handleClick}
       className={getButtonStyle()}
-      style={{
-        backgroundColor: buttonColors.background,
-        color: buttonColors.text,
-        borderColor: buttonColors.border,
-        borderRadius: themeSettings?.borderRadius ? `${themeSettings.borderRadius}px` : undefined,
-        transitionDuration: `${linkButtonSettings.animationSpeed || 300}ms`
-      }}
+      style={buttonInlineStyle}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = buttonColors.hoverBackground
-        e.currentTarget.style.color = buttonColors.hoverText
-        e.currentTarget.style.borderColor = buttonColors.hoverBorder
-        
-        // Aplicar cores de hover nos elementos filhos
+        if (!isSpecialButtonStyle) {
+          if (resolvedButtonStyle !== 'outlined') e.currentTarget.style.backgroundColor = buttonColors.hoverBackground
+          else e.currentTarget.style.backgroundColor = 'transparent'
+          e.currentTarget.style.color = buttonColors.hoverText
+          if (resolvedButtonStyle !== 'minimal') e.currentTarget.style.borderColor = buttonColors.hoverBorder
+        }
         const titleElement = e.currentTarget.querySelector('h3') as HTMLElement
         const descElement = e.currentTarget.querySelector('p') as HTMLElement
         const urlElement = e.currentTarget.querySelector('p:last-of-type') as HTMLElement
         const iconElement = e.currentTarget.querySelector('svg') as SVGSVGElement
-        
-        if (titleElement) titleElement.style.color = buttonColors.hoverText
-        if (descElement) descElement.style.color = buttonColors.hoverText
-        if (urlElement) urlElement.style.color = buttonColors.hoverText
-        if (iconElement) iconElement.style.color = buttonColors.hoverText
+        const hoverText = isSpecialButtonStyle ? undefined : buttonColors.hoverText
+        const normalText = isSpecialButtonStyle ? undefined : buttonColors.text
+        if (hoverText && (titleElement || descElement || urlElement || iconElement)) {
+          if (titleElement) titleElement.style.color = hoverText
+          if (descElement) descElement.style.color = hoverText
+          if (urlElement) urlElement.style.color = hoverText
+          if (iconElement) iconElement.style.color = hoverText
+        }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = buttonColors.background
-        e.currentTarget.style.color = buttonColors.text
-        e.currentTarget.style.borderColor = buttonColors.border
-        
-        // Restaurar cores normais nos elementos filhos
+        if (!isSpecialButtonStyle) {
+          if (resolvedButtonStyle !== 'outlined') e.currentTarget.style.backgroundColor = buttonColors.background
+          else e.currentTarget.style.backgroundColor = 'transparent'
+          e.currentTarget.style.color = buttonColors.text
+          if (resolvedButtonStyle !== 'minimal') e.currentTarget.style.borderColor = buttonColors.border
+        }
         const titleElement = e.currentTarget.querySelector('h3') as HTMLElement
         const descElement = e.currentTarget.querySelector('p') as HTMLElement
         const urlElement = e.currentTarget.querySelector('p:last-of-type') as HTMLElement
         const iconElement = e.currentTarget.querySelector('svg') as SVGSVGElement
-        
-        if (titleElement) titleElement.style.color = buttonColors.text
-        if (descElement) descElement.style.color = buttonColors.text
-        if (urlElement) urlElement.style.color = buttonColors.text
-        if (iconElement) iconElement.style.color = buttonColors.text
+        const textColor = isSpecialButtonStyle ? undefined : buttonColors.text
+        if (textColor != null && (titleElement || descElement || urlElement || iconElement)) {
+          if (titleElement) titleElement.style.color = textColor
+          if (descElement) descElement.style.color = textColor
+          if (urlElement) urlElement.style.color = textColor
+          if (iconElement) iconElement.style.color = textColor
+        }
       }}
     >
       <div className={`flex items-center ${getImagePositionClasses(imageSettings.position)} ${getImageSpacingClasses(imageSettings.position, imageSettings.spacing)}`}>
@@ -419,21 +431,21 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         <div className="flex-1 text-left min-w-0">
           <h3 
             className="font-semibold truncate"
-            style={{ color: buttonColors.text }}
+            style={isSpecialButtonStyle ? undefined : { color: buttonColors.text }}
           >
             {link.title}
           </h3>
           {link.description && (
             <p 
               className="text-sm truncate mb-1"
-              style={{ color: buttonColors.text, opacity: 0.8 }}
+              style={isSpecialButtonStyle ? { opacity: 0.8 } : { color: buttonColors.text, opacity: 0.8 }}
             >
               {link.description}
             </p>
           )}
           <p 
             className="text-sm truncate"
-            style={{ color: buttonColors.text, opacity: 0.6 }}
+            style={isSpecialButtonStyle ? { opacity: 0.6 } : { color: buttonColors.text, opacity: 0.6 }}
           >
             {formatUrlForDisplay(link.url)}
           </p>
@@ -443,7 +455,7 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
         <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
           <ExternalLink 
             className="h-5 w-5" 
-            style={{ color: buttonColors.text, opacity: 0.7 }}
+            style={isSpecialButtonStyle ? { opacity: 0.7 } : { color: buttonColors.text, opacity: 0.7 }}
           />
         </div>
       </div>

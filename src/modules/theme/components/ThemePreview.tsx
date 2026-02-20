@@ -151,8 +151,8 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
 
   const getButtonClasses = () => {
     const linkButtonSettings = themeSettings.linkButtonSettings || {}
-    
-    // Função para obter classes de tamanho
+    const effectiveStyle = themeSettings.buttonStyle || linkButtonSettings.style || 'default'
+
     const getButtonSizeClasses = (size: string) => {
       switch (size) {
         case 'small':
@@ -166,26 +166,71 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
       }
     }
 
-    const baseClasses = `${getButtonSizeClasses(linkButtonSettings.size || 'medium')} font-medium transition-colors`
-    
-    // Usar linkButtonSettings.style em vez de themeSettings.buttonStyle
-    switch (linkButtonSettings.style || 'default') {
+    const baseClasses = `${getButtonSizeClasses(linkButtonSettings.size || 'medium')} font-medium transition-colors w-full`
+    const rounded = 'rounded-lg'
+
+    switch (effectiveStyle) {
+      case 'rounded':
       case 'default':
-        return `${baseClasses} rounded-lg`
-      case 'minimal':
-        return `${baseClasses} rounded-none`
+        return cn(baseClasses, rounded, 'border-2 border-transparent shadow-sm hover:shadow-md')
+      case 'sharp':
+        return cn(baseClasses, 'rounded-none border-2 border-transparent shadow-sm hover:shadow-md')
       case 'outlined':
-        return `${baseClasses} rounded-lg border-2 border-current`
+        return cn(baseClasses, rounded, 'border-2 bg-transparent')
       case 'filled':
-        return `${baseClasses} rounded-lg bg-current text-white`
+        return cn(baseClasses, rounded, 'border-2 border-transparent shadow-lg hover:shadow-xl')
       case 'gradient':
-        return `${baseClasses} bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg`
+        return cn(
+          baseClasses, rounded, 'border-0 text-white font-medium shadow-lg hover:shadow-xl',
+          'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
+        )
+      case 'neon':
+        return cn(
+          baseClasses, rounded, 'border-2 border-cyan-400 bg-black text-cyan-400 font-medium shadow-lg',
+          'hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] hover:border-cyan-300'
+        )
       case 'glass':
-        return `${baseClasses} bg-white/10 backdrop-blur-md border border-white/20 rounded-lg`
+        return cn(
+          baseClasses, rounded, 'border border-white/20 bg-white/10 backdrop-blur-md shadow-lg hover:shadow-xl',
+          'hover:bg-white/20'
+        )
+      case '3d':
+        return cn(
+          baseClasses, rounded, 'border-2 border-transparent shadow-lg hover:shadow-xl',
+          'bg-gradient-to-b from-white to-gray-200 dark:from-gray-700 dark:to-gray-900 dark:text-white',
+          'hover:from-gray-50 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-800'
+        )
+      case 'minimal':
+        return cn(
+          baseClasses, 'rounded-none border-0 bg-transparent',
+          'hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-sm'
+        )
+      case 'pill':
+        return cn(
+          baseClasses, 'rounded-full border-2 border-transparent shadow-sm hover:shadow-md',
+          'hover:bg-gray-50 dark:hover:bg-gray-700'
+        )
+      case 'card':
+        return cn(
+          baseClasses, rounded, 'border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg',
+          'hover:border-gray-300 dark:hover:border-gray-600'
+        )
+      case 'modern':
+        return cn(
+          baseClasses, rounded, 'border-0 font-medium shadow-lg hover:shadow-xl',
+          'bg-gray-900 dark:bg-white text-white dark:text-gray-900',
+          'hover:bg-gray-800 dark:hover:bg-gray-100'
+        )
       default:
-        return `${baseClasses} rounded-lg`
+        return cn(baseClasses, rounded, 'border-2 border-transparent shadow-sm hover:shadow-md')
     }
   }
+
+  const isSpecialButtonStyle = (style: string) =>
+    ['gradient', 'neon', 'glass', '3d', 'modern'].includes(style)
+
+  const getEffectiveButtonStyle = () =>
+    themeSettings.buttonStyle || themeSettings.linkButtonSettings?.style || 'default'
 
   const fontFamily = themeSettings.fontFamily || 'Inter'
 
@@ -214,29 +259,41 @@ export function ThemePreview({ themeSettings, className = '', avatarUrl }: Theme
           
           {/* Botões de exemplo */}
           <div className="flex flex-col gap-2 max-w-xs mx-auto">
-            <button
-              className={getButtonClasses()}
-              style={{ 
+            {(() => {
+              const effectiveStyle = getEffectiveButtonStyle()
+              const special = isSpecialButtonStyle(effectiveStyle)
+              const baseStyle: React.CSSProperties = {
                 fontFamily,
-                color: themeSettings.buttonStyle === 'filled' ? 'white' : themeSettings.primaryColor,
-                backgroundColor: themeSettings.buttonStyle === 'filled' ? themeSettings.primaryColor : 'transparent',
-                borderColor: themeSettings.buttonStyle === 'outlined' ? themeSettings.primaryColor : 'transparent'
-              }}
-            >
-              Link Exemplo 1
-            </button>
-            
-            <button
-              className={getButtonClasses()}
-              style={{ 
-                fontFamily,
-                color: themeSettings.buttonStyle === 'filled' ? 'white' : themeSettings.primaryColor,
-                backgroundColor: themeSettings.buttonStyle === 'filled' ? themeSettings.primaryColor : 'transparent',
-                borderColor: themeSettings.buttonStyle === 'outlined' ? themeSettings.primaryColor : 'transparent'
-              }}
-            >
-              Link Exemplo 2
-            </button>
+                transitionDuration: '300ms'
+              }
+              if (effectiveStyle === 'pill') baseStyle.borderRadius = '9999px'
+              else if (effectiveStyle === 'sharp') baseStyle.borderRadius = 0
+              else if (themeSettings.borderRadius != null) baseStyle.borderRadius = `${themeSettings.borderRadius}px`
+              if (!special) {
+                baseStyle.color = effectiveStyle === 'filled' ? 'white' : themeSettings.primaryColor
+                if (effectiveStyle === 'outlined') {
+                  baseStyle.backgroundColor = 'transparent'
+                  baseStyle.borderColor = themeSettings.primaryColor
+                } else if (effectiveStyle === 'minimal') {
+                  baseStyle.backgroundColor = 'transparent'
+                  baseStyle.borderWidth = 0
+                  baseStyle.borderColor = 'transparent'
+                } else {
+                  baseStyle.backgroundColor = effectiveStyle === 'filled' ? themeSettings.primaryColor : 'transparent'
+                  baseStyle.borderColor = effectiveStyle === 'outlined' ? themeSettings.primaryColor : 'transparent'
+                }
+              }
+              return (
+                <>
+                  <button className={getButtonClasses()} style={baseStyle}>
+                    Link Exemplo 1
+                  </button>
+                  <button className={getButtonClasses()} style={baseStyle}>
+                    Link Exemplo 2
+                  </button>
+                </>
+              )
+            })()}
           </div>
           
           {/* Social links */}
