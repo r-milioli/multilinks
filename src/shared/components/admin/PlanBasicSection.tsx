@@ -13,22 +13,11 @@ type PlanBasicData = {
 
 type PlanBasicDataArray = Array<PlanBasicData>;
 
+/** Valores padrão (fallback local) – devem coincidir com o seed e a API */
 const defaultPlans: PlanBasicDataArray = [
-  {
-    name: 'Gratuito',
-    price: 0,
-    description: 'Perfeito para começar'
-  },
-  {
-    name: 'Pro',
-    price: 19,
-    description: 'Para profissionais'
-  },
-  {
-    name: 'Business',
-    price: 49,
-    description: 'Para empresas'
-  }
+  { name: 'Gratuito', price: 0, description: 'Gratuito' },
+  { name: 'Pro', price: 20, description: 'Pro' },
+  { name: 'Business', price: 40, description: 'Business' },
 ]
 
 export function PlanBasicSection() {

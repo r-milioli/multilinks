@@ -78,7 +78,7 @@ async function main() {
 
   for (const socialLink of socialLinks) {
     await prisma.socialLink.upsert({
-      where: { 
+      where: {
         userId_platform: {
           userId: user.id,
           platform: socialLink.platform
@@ -88,6 +88,25 @@ async function main() {
       create: socialLink,
     })
   }
+
+  // Informações básicas dos planos (Configurações > Admin > Informações básicas dos planos)
+  const defaultPlans = [
+    { name: 'Gratuito', price: 0, description: 'Gratuito' },
+    { name: 'Pro', price: 20, description: 'Pro' },
+    { name: 'Business', price: 40, description: 'Business' },
+  ]
+
+  await prisma.systemSettings.upsert({
+    where: { key: 'plans' },
+    update: { value: defaultPlans, description: 'Informações básicas dos planos', category: 'pricing', isPublic: true, updatedAt: new Date() },
+    create: {
+      key: 'plans',
+      value: defaultPlans,
+      description: 'Informações básicas dos planos',
+      category: 'pricing',
+      isPublic: true,
+    },
+  })
 
   console.log('Seed executado com sucesso!')
 }
