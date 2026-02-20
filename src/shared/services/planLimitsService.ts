@@ -24,8 +24,8 @@ export class PlanLimitsService {
         select: { subscriptionPlan: true }
       })
       
-      const plan = userStats?.subscriptionPlan || 'free'
-      
+      const raw = userStats?.subscriptionPlan || 'free'
+      const plan = typeof raw === 'string' ? raw.toLowerCase().trim() : 'free'
       return plan
     } catch (error) {
       console.error('Erro ao buscar plano do usuário:', error)
@@ -45,22 +45,24 @@ export class PlanLimitsService {
         prisma.systemSettings.findUnique({ where: { key: 'plans' } })
       ])
 
+      const planKey = typeof plan === 'string' ? plan.toLowerCase().trim() : 'free'
       let planLimits: PlanLimits
       let planPrice = 0
       let planName = plan
 
-      // Buscar limites
+      // Buscar limites (sempre usar chave em minúsculas para evitar "Business" vs "business")
       if (limitsSettings?.value) {
         const limits = limitsSettings.value as Record<string, PlanLimits>
-        if (limits[plan]) {
-          planLimits = limits[plan]
+        const limitsByKey = Object.fromEntries(
+          Object.entries(limits).map(([k, v]) => [k.toLowerCase(), v])
+        )
+        if (limitsByKey[planKey]) {
+          planLimits = limitsByKey[planKey]
         } else {
-          // Fallback para limites padrão
-          planLimits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free
+          planLimits = PLAN_LIMITS[planKey as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free
         }
       } else {
-        // Fallback para limites padrão
-        planLimits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free
+        planLimits = PLAN_LIMITS[planKey as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free
       }
 
       // Buscar preço e nome
@@ -75,7 +77,7 @@ export class PlanLimitsService {
 
       // Se não encontrou preço no banco, usar fallback
       if (planPrice === 0) {
-        const fallbackPlan = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS]
+        const fallbackPlan = PLAN_LIMITS[planKey as keyof typeof PLAN_LIMITS]
         if (fallbackPlan) {
           planPrice = fallbackPlan.price
         }

@@ -158,6 +158,24 @@ export function LegalLinksSettingsComponent({ settings, onUpdate }: LegalLinksSe
           </div>
         )}
 
+        {/* Fixar footer no fundo da tela */}
+        {localSettings.showLegalLinks && localSettings.linksPosition !== 'hidden' && (
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div>
+              <Label className="text-base font-medium">Fixar footer no fundo da tela</Label>
+              <p className="text-sm text-gray-500">
+                Mantém o rodapé colado na parte inferior da tela em dispositivos com pouco conteúdo
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={!!localSettings.stickyFooter}
+              onChange={(e) => handleToggle('stickyFooter', e.target.checked)}
+              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+            />
+          </div>
+        )}
+
         {/* Texto Personalizado */}
         {localSettings.showLegalLinks && localSettings.linksPosition !== 'hidden' && (
           <div>

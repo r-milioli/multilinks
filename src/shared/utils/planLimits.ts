@@ -16,7 +16,7 @@ export const PLAN_LIMITS = {
   pro: {
     maxLinks: 15,
     maxForms: 5,
-    maxWebhooks: 0,
+    maxWebhooks: 1,
     themeEditing: true,
     analytics: true,
     prioritySupport: true,
@@ -25,7 +25,7 @@ export const PLAN_LIMITS = {
   business: {
     maxLinks: -1, // ilimitado
     maxForms: -1, // ilimitado
-    maxWebhooks: 1,
+    maxWebhooks: 3,
     themeEditing: true,
     analytics: true,
     prioritySupport: true,
@@ -51,8 +51,9 @@ export const UPGRADE_MESSAGES = {
     pro: 'Você atingiu o limite de 5 formulários. Faça upgrade para BUSINESS e tenha formulários ilimitados!'
   },
   webhooks: {
-    free: 'Webhooks disponíveis apenas no BUSINESS. Faça upgrade para integrar com outras ferramentas!',
-    pro: 'Webhooks disponíveis apenas no BUSINESS. Faça upgrade para integrar com outras ferramentas!'
+    free: 'Webhooks disponíveis no PRO e BUSINESS. Faça upgrade para integrar com outras ferramentas!',
+    pro: 'Você atingiu o limite de webhooks. Faça upgrade para BUSINESS e tenha mais webhooks!',
+    business: 'Você atingiu o limite de webhooks do seu plano.'
   },
   analytics: {
     free: 'Analytics disponível apenas no PRO e BUSINESS. Faça upgrade para acompanhar suas métricas!'

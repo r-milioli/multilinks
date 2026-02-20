@@ -19,6 +19,8 @@ export interface LegalLinksSettings {
   showContact: boolean
   customFooterText?: string
   linksPosition: 'bottom' | 'top' | 'hidden'
+  /** Fixar o footer no fundo da tela quando o conteúdo for curto */
+  stickyFooter?: boolean
 }
 
 export interface CreateSocialLinkData {

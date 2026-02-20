@@ -42,10 +42,7 @@ export function LegalFooter({ settings, themeSettings }: LegalFooterProps) {
 
   return (
     <footer 
-      className="w-full py-6 px-4 border-t border-gray-200 dark:border-gray-700"
-      style={{
-        borderColor: themeSettings?.borderColor || '#E5E7EB'
-      }}
+      className="w-full py-6 px-4"
     >
       <div className="max-w-4xl mx-auto">
         {/* Links Legais */}

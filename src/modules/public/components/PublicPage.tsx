@@ -134,6 +134,12 @@ export function PublicPage({ user }: PublicPageProps) {
   const themeSettings = user.themeSettings as any || {}
   const privacySettings = user.privacySettings as any || {}
   const integrationSettings = user.integrationSettings as any || {}
+  const legalLinksSettings = (user.legalLinksSettings as any) || {}
+  const stickyFooter = !!(
+    legalLinksSettings.showLegalLinks &&
+    legalLinksSettings.linksPosition !== 'hidden' &&
+    legalLinksSettings.stickyFooter
+  )
 
   // Configurações do avatar
   const avatarSettings = themeSettings?.avatarSettings || {
@@ -331,14 +337,14 @@ export function PublicPage({ user }: PublicPageProps) {
       />
       
       <div 
-        className="min-h-screen"
+        className={cn('min-h-screen', stickyFooter && 'flex flex-col')}
         style={{
           ...getBackgroundStyle(),
           fontFamily: themeSettings?.fontFamily || 'Inter',
           color: themeSettings?.textColor || '#1E293B'
         }}
       >
-        <div className="container mx-auto px-4 py-8 max-w-md">
+        <div className={cn('container mx-auto px-4 py-8 max-w-md', stickyFooter && 'flex-1 flex flex-col')}>
           {/* Profile Header */}
           <div className={cn("mb-8", getAvatarPositionClasses(avatarSettings.position))}>
             {avatarSettings.position === 'top' ? (
@@ -392,7 +398,7 @@ export function PublicPage({ user }: PublicPageProps) {
           )}
 
           {/* Main Links */}
-          <div className="space-y-3">
+          <div className={cn('space-y-3', stickyFooter && 'flex-1')}>
             {user.links && user.links.length > 0 ? (
               <>
                 {/* Links Normais */}
