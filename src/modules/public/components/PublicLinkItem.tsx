@@ -209,6 +209,12 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
     } as const
     
     const hoverClasses = hoverEffectsMap[hoverEffect as keyof typeof hoverEffectsMap] || 'hover:scale-[1.02]'
+    const enableGlow = themeSettings?.enableGlow === true
+    const enablePulse = themeSettings?.enablePulse === true
+    const specialEffectClasses = cn(
+      enableGlow && 'hover:shadow-blue-400/50',
+      enablePulse && 'animate-pulse'
+    )
     
     // Base sempre aplicada com tamanho dinâmico
     const base = `w-full ${getButtonSizeClasses(linkButtonSettings.size)} transition-all focus:outline-none group relative overflow-hidden`
@@ -241,82 +247,82 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
 
     if (hasCustomColors && !isSpecialStyle) {
       const radiusClass = buttonStyle === 'sharp' ? 'rounded-none' : buttonStyle === 'pill' ? 'rounded-full' : rounded
-      return cn(base, radiusClass, 'border-2 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
+      return cn(base, radiusClass, 'border-2 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses, specialEffectClasses)
     }
     
     // Aplicar estilos específicos
     switch (buttonStyle) {
       case 'rounded':
       case 'default':
-        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
+        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses, specialEffectClasses)
       
       case 'sharp':
-        return cn(base, 'rounded-none border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
+        return cn(base, 'rounded-none border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses, specialEffectClasses)
       
       case 'outlined':
-        return cn(base, rounded, 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-offset-2', hoverClasses)
+        return cn(base, rounded, 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-offset-2', hoverClasses, specialEffectClasses)
       
       case 'filled':
-        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2', hoverClasses)
+        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2', hoverClasses, specialEffectClasses)
       
       case 'gradient':
         return cn(
           base, rounded, 'border-0 text-white font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       case 'neon':
         return cn(
           base, rounded, 'border-2 border-cyan-400 bg-black text-cyan-400 font-medium shadow-lg hover:shadow-cyan-400/50 focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2',
           'hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] hover:border-cyan-300',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       case 'glass':
         return cn(
           base, rounded, 'border border-white/20 bg-white/10 backdrop-blur-md text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'hover:bg-white/20 dark:hover:bg-white/20',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       case '3d':
         return cn(
           base, rounded, 'border-2 border-transparent bg-gradient-to-b from-white to-gray-200 dark:from-gray-700 dark:to-gray-900 text-gray-900 dark:text-white shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'hover:from-gray-50 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-800',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       case 'minimal':
         return cn(
           base, 'rounded-none border-0 bg-transparent text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2',
           'hover:shadow-sm',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       case 'pill':
         return cn(
           base, 'rounded-full border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2',
           'hover:bg-gray-50 dark:hover:bg-gray-700',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       case 'card':
         return cn(
           base, rounded, 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg focus:ring-2 focus:ring-offset-2',
           'hover:border-gray-300 dark:hover:border-gray-600',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       case 'modern':
         return cn(
           base, rounded, 'border-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2',
           'hover:bg-gray-800 dark:hover:bg-gray-100',
-          hoverClasses
+          hoverClasses, specialEffectClasses
         )
       
       default:
-        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses)
+        return cn(base, rounded, 'border-2 border-transparent bg-white dark:bg-gray-800 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2', hoverClasses, specialEffectClasses)
     }
   }
 
@@ -327,8 +333,9 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
   })()
   const isSpecialButtonStyle = ['glass', 'neon', 'gradient', '3d', 'modern'].includes(resolvedButtonStyle)
 
+  const animationSpeed = themeSettings?.animationSpeed ?? linkButtonSettings.animationSpeed ?? 300
   const buttonInlineStyle: React.CSSProperties = {
-    transitionDuration: `${linkButtonSettings.animationSpeed || 300}ms`
+    transitionDuration: `${animationSpeed}ms`
   }
   // Raio de borda: pill = fixo (pílula), sharp = 0 (sobrepõe opção de raio), demais = tema
   if (resolvedButtonStyle === 'pill') {
