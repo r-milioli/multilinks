@@ -14,24 +14,31 @@ const ModalClose = DialogPrimitive.Close
 const ModalOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
+>(({ className, style, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
       "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
+    style={style}
     {...props}
   />
 ))
 ModalOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+export interface ModalContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  overlayClassName?: string
+  overlayStyle?: React.CSSProperties
+}
+
 const ModalContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  ModalContentProps
+>(({ className, children, overlayClassName, overlayStyle, ...props }, ref) => (
   <ModalPortal>
-    <ModalOverlay />
+    <ModalOverlay className={overlayClassName} style={overlayStyle} />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

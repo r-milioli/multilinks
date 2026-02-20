@@ -12,39 +12,42 @@ interface FormPreviewProps {
   className?: string
 }
 
+const DEFAULT_FORM_MODAL_SETTINGS = {
+  backgroundColor: '#FFFFFF',
+  textColor: '#1E293B',
+  borderColor: '#E5E7EB',
+  borderRadius: 8,
+  shadow: 'lg',
+  backdropBlur: true,
+  inputBackgroundColor: '#FFFFFF',
+  inputBorderColor: '#E5E7EB',
+  inputTextColor: '#1E293B',
+  inputFocusBorderColor: '#3B82F6',
+  buttonBackgroundColor: '#3B82F6',
+  buttonTextColor: '#FFFFFF',
+  buttonHoverBackgroundColor: '#2563EB',
+  buttonHoverTextColor: '#FFFFFF',
+  titleColor: '#1E293B',
+  descriptionColor: '#64748B',
+  errorColor: '#EF4444',
+  successColor: '#10B981'
+}
+
 export function FormPreview({ themeSettings, className = '' }: FormPreviewProps) {
-  const formModalSettings = themeSettings.formModalSettings || {
-    backgroundColor: '#FFFFFF',
-    textColor: '#1E293B',
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
-    shadow: 'lg',
-    backdropBlur: true,
-    inputBackgroundColor: '#FFFFFF',
-    inputBorderColor: '#E5E7EB',
-    inputTextColor: '#1E293B',
-    inputFocusBorderColor: '#3B82F6',
-    buttonBackgroundColor: '#3B82F6',
-    buttonTextColor: '#FFFFFF',
-    buttonHoverBackgroundColor: '#2563EB',
-    buttonHoverTextColor: '#FFFFFF',
-    titleColor: '#1E293B',
-    descriptionColor: '#64748B',
-    errorColor: '#EF4444',
-    successColor: '#10B981'
+  const formModalSettings = {
+    ...DEFAULT_FORM_MODAL_SETTINGS,
+    ...(themeSettings.formModalSettings || {})
   }
 
-  const getShadowClass = (shadow: string) => {
-    switch (shadow) {
-      case 'none': return ''
-      case 'sm': return 'shadow-sm'
-      case 'md': return 'shadow-md'
-      case 'lg': return 'shadow-lg'
-      case 'xl': return 'shadow-xl'
-      case '2xl': return 'shadow-2xl'
-      default: return 'shadow-lg'
-    }
+  const shadowMap: Record<string, string> = {
+    none: 'none',
+    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+    '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)'
   }
+  const modalBoxShadow = shadowMap[formModalSettings.shadow] ?? shadowMap.lg
 
   const getBorderRadiusClass = (radius: number) => {
     if (radius === 0) return 'rounded-none'
@@ -66,18 +69,26 @@ export function FormPreview({ themeSettings, className = '' }: FormPreviewProps)
       </h3>
       
       <div 
-        className={`p-4 border-2 border-dashed border-gray-300 ${getBorderRadiusClass(formModalSettings.borderRadius)}`}
+        className={`relative p-4 border-2 border-dashed border-gray-300 ${getBorderRadiusClass(formModalSettings.borderRadius)}`}
         style={{
           backgroundColor: themeSettings.backgroundColor || '#F8FAFC'
         }}
       >
+        {/* Overlay de blur (atrás do modal) quando ativado */}
+        {formModalSettings.backdropBlur && (
+          <div
+            className="absolute inset-0 z-0"
+            style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+            aria-hidden
+          />
+        )}
         {/* Simulação do Modal */}
         <div 
-          className={`max-w-sm mx-auto ${getShadowClass(formModalSettings.shadow)} ${getBorderRadiusClass(formModalSettings.borderRadius)} overflow-hidden`}
+          className={`relative z-10 max-w-sm mx-auto ${getBorderRadiusClass(formModalSettings.borderRadius)} overflow-hidden`}
           style={{
             backgroundColor: formModalSettings.backgroundColor,
             border: `1px solid ${formModalSettings.borderColor}`,
-            backdropFilter: formModalSettings.backdropBlur ? 'blur(8px)' : 'none'
+            boxShadow: modalBoxShadow
           }}
         >
           {/* Header do Modal */}
@@ -193,18 +204,26 @@ export function FormPreview({ themeSettings, className = '' }: FormPreviewProps)
               >
                 Cancelar
               </Button>
-              <Button
-                className="flex-1"
-                style={{
-                  backgroundColor: formModalSettings.buttonBackgroundColor,
-                  color: formModalSettings.buttonTextColor,
-                  border: 'none',
-                  borderRadius: `${Math.min(formModalSettings.borderRadius, 8)}px`
-                }}
-                disabled
-              >
-                Enviar
-              </Button>
+              <div className="form-preview-submit-wrapper flex-1">
+                <style>{`
+                  .form-preview-submit-wrapper button:hover:not(:disabled) {
+                    background-color: ${formModalSettings.buttonHoverBackgroundColor ?? formModalSettings.buttonBackgroundColor} !important;
+                    color: ${formModalSettings.buttonHoverTextColor ?? formModalSettings.buttonTextColor} !important;
+                  }
+                `}</style>
+                <Button
+                  className="w-full transition-colors"
+                  style={{
+                    backgroundColor: formModalSettings.buttonBackgroundColor,
+                    color: formModalSettings.buttonTextColor,
+                    border: 'none',
+                    borderRadius: `${Math.min(formModalSettings.borderRadius, 8)}px`
+                  }}
+                  disabled
+                >
+                  Enviar
+                </Button>
+              </div>
             </div>
           </div>
         </div>

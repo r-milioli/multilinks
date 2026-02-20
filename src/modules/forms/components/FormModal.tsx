@@ -25,14 +25,6 @@ export function FormModal({
   linkId, 
   themeSettings 
 }: FormModalProps) {
-  console.log('🎯 FormModal renderizado:', {
-    isOpen,
-    formId: form?.id,
-    formTitle: form?.title,
-    linkId,
-    hasTheme: !!themeSettings
-  })
-
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -190,16 +182,38 @@ export function FormModal({
 
   const themeStyles = getThemeStyles();
 
+  const shadowMap: Record<string, string> = {
+    none: 'none',
+    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+    '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+  };
+  const modalContentStyle: React.CSSProperties = {
+    backgroundColor: themeStyles.backgroundColor,
+    color: themeStyles.textColor,
+    border: `1px solid ${themeStyles.borderColor}`,
+    borderRadius: themeStyles.borderRadius != null ? `${themeStyles.borderRadius}px` : undefined,
+    boxShadow: shadowMap[themeStyles.shadow as string] ?? shadowMap.lg,
+    fontFamily: themeSettings?.fontFamily || 'Inter'
+  };
+
+  const overlayStyle: React.CSSProperties = themeStyles.backdropBlur
+    ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }
+    : { backdropFilter: 'none', WebkitBackdropFilter: 'none' };
+
   return (
     <Modal open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <ModalContent className="max-w-md">
-        <div 
+      <ModalContent
+        className="max-w-md p-0 border-0 bg-transparent border-none shadow-none"
+        overlayStyle={overlayStyle}
+      >
+        <div
           className="p-6"
           style={{
-            backgroundColor: themeStyles.backgroundColor,
-            color: themeStyles.textColor,
-            borderRadius: themeStyles.borderRadius ? `${themeStyles.borderRadius}px` : undefined,
-            fontFamily: themeSettings?.fontFamily || 'Inter'
+            ...modalContentStyle,
+            borderRadius: themeStyles.borderRadius != null ? `${themeStyles.borderRadius}px` : undefined,
           }}
         >
         <div className="mb-6">
@@ -275,26 +289,34 @@ export function FormModal({
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || !form.buttonActive}
-              className="flex-1"
-              style={{
-                backgroundColor: themeStyles.buttonBackgroundColor,
-                color: themeStyles.buttonTextColor,
-                border: 'none',
-                borderRadius: themeStyles.borderRadius ? `${Math.min(themeStyles.borderRadius, 8)}px` : undefined,
-              }}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loading className="w-4 h-4 mr-2" />
-                  Enviando...
-                </>
-              ) : (
-                form.buttonText
-              )}
-            </Button>
+            <div className="form-modal-submit-wrapper flex-1">
+              <style>{`
+                .form-modal-submit-wrapper button:hover:not(:disabled) {
+                  background-color: ${themeStyles.buttonHoverBackgroundColor} !important;
+                  color: ${themeStyles.buttonHoverTextColor} !important;
+                }
+              `}</style>
+              <Button
+                type="submit"
+                disabled={isSubmitting || !form.buttonActive}
+                className="w-full transition-colors"
+                style={{
+                  backgroundColor: themeStyles.buttonBackgroundColor,
+                  color: themeStyles.buttonTextColor,
+                  border: 'none',
+                  borderRadius: themeStyles.borderRadius ? `${Math.min(themeStyles.borderRadius, 8)}px` : undefined,
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loading className="w-4 h-4 mr-2" />
+                    Enviando...
+                  </>
+                ) : (
+                  form.buttonText
+                )}
+              </Button>
+            </div>
           </div>
         </form>
         </div>
