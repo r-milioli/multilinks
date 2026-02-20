@@ -117,19 +117,11 @@ export async function GET(request: NextRequest) {
       }))
     }
 
-    // Se não há dados suficientes, retornar dados mock para desenvolvimento
     if (chartData.length === 0) {
-      console.log('⚠️ API Admin Financial Chart - Sem dados reais, retornando dados mock')
-      chartData = [
-        { date: '2024-01-01', revenue: 1200, sales: 12 },
-        { date: '2024-01-02', revenue: 1500, sales: 15 },
-        { date: '2024-01-03', revenue: 800, sales: 8 },
-        { date: '2024-01-04', revenue: 2000, sales: 20 },
-        { date: '2024-01-05', revenue: 1700, sales: 17 }
-      ]
+      console.log('📭 API Admin Financial Chart - Sem dados no período')
+    } else {
+      console.log(`✅ API Admin Financial Chart - ${chartData.length} pontos de dados gerados`)
     }
-
-    console.log(`✅ API Admin Financial Chart - ${chartData.length} pontos de dados gerados`)
 
     return NextResponse.json({
       success: true,

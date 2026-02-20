@@ -221,11 +221,11 @@ export function SalesTable({ sales, isLoading }: SalesTableProps) {
 
         {filteredSales.length === 0 && (
           <div className="text-center py-8">
-            <div className="text-muted-foreground mb-2">Nenhuma venda encontrada</div>
+            <div className="font-medium text-muted-foreground mb-2">Sem dados</div>
             <div className="text-muted-foreground text-sm">
-              {searchTerm || statusFilter !== 'all' || planFilter !== 'all' 
-                ? 'Tente ajustar os filtros de busca'
-                : 'Não há vendas registradas ainda'
+              {searchTerm || statusFilter !== 'all' || planFilter !== 'all'
+                ? 'Tente ajustar os filtros de busca.'
+                : 'Não há vendas registradas ainda.'
               }
             </div>
           </div>

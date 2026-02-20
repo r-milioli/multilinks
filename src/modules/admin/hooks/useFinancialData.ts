@@ -93,75 +93,10 @@ export function useFinancialData() {
     } catch (err) {
       console.error('Erro ao carregar dados financeiros:', err)
       setError('Erro ao carregar dados financeiros')
-      
-      // Se erro de autenticação, mostrar dados mock temporariamente
-      if (err && typeof err === 'object' && 'status' in err && err.status === 401) {
-        console.log('⚠️ Usuário não autenticado, mostrando dados mock')
-        
-        setStats({
-          totalRevenue: 240.00,
-          monthlyRevenue: 240.00,
-          yearlyRevenue: 240.00,
-          totalSales: 9,
-          monthlySales: 9,
-          conversionRate: 4.5,
-          averageOrderValue: 26.67,
-          refunds: 0,
-          refundRate: 0,
-          growth: {
-            revenue: 0,
-            sales: 0,
-            conversion: 0
-          }
-        })
-
-        setSales([
-          {
-            id: '1',
-            userId: 'user1',
-            userName: 'Robson Milioli',
-            userEmail: 'robson.milioli@gmail.com',
-            planId: 'business',
-            planName: 'Business',
-            amount: 40.00,
-            status: 'pending',
-            paymentMethod: 'CREDIT_CARD',
-            createdAt: new Date().toISOString(),
-            paidAt: undefined,
-            paymentId: 'pay_001'
-          }
-        ])
-
-        setChartData([
-          { date: new Date().toISOString().split('T')[0], revenue: 240, sales: 9 }
-        ])
-
-        setPlanPerformance([
-          {
-            planId: 'business',
-            planName: 'Business',
-            sales: 1,
-            revenue: 40.00,
-            conversionRate: 50.0,
-            growth: 0
-          },
-          {
-            planId: 'pro',
-            planName: 'Pro',
-            sales: 8,
-            revenue: 200.00,
-            conversionRate: 44.4,
-            growth: 0
-          }
-        ])
-      } else {
-        // Limpar dados em caso de outro erro
-        setStats(null)
-        setSales([])
-        setChartData([])
-        setPlanPerformance([])
-      }
-
+      setStats(null)
+      setSales([])
+      setChartData([])
+      setPlanPerformance([])
     } finally {
       setIsLoading(false)
     }

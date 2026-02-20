@@ -144,9 +144,8 @@ export async function GET(request: NextRequest) {
       // Calcular taxa de conversão (usuários que compraram o plano / total de usuários)
       const conversionRate = totalUsers > 0 ? (plan.sales / totalUsers) * 100 : 0
 
-      // Calcular crescimento (comparar com período anterior)
-      // TODO: Implementar cálculo de crescimento real baseado em dados históricos
-      const growth = Math.random() * 20 - 10 // Mock por enquanto
+      // Crescimento: 0 quando não há dados históricos (TODO: implementar comparação com período anterior)
+      const growth = 0
 
       return {
         planId: plan.planId,
@@ -158,41 +157,11 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Se não há dados reais, retornar dados mock para desenvolvimento
     if (performanceData.length === 0) {
-      console.log('⚠️ API Admin Financial Plans Performance - Sem dados reais, retornando dados mock')
-      return NextResponse.json({
-        success: true,
-        data: [
-          {
-            planId: 'pro',
-            planName: 'Pro',
-            sales: 85,
-            revenue: 2125.00,
-            conversionRate: 15.2,
-            growth: 12.5
-          },
-          {
-            planId: 'business',
-            planName: 'Business',
-            sales: 40,
-            revenue: 1960.00,
-            conversionRate: 8.9,
-            growth: 18.3
-          },
-          {
-            planId: 'free',
-            planName: 'Gratuito',
-            sales: 0,
-            revenue: 0.00,
-            conversionRate: 0,
-            growth: 0
-          }
-        ]
-      })
+      console.log('📭 API Admin Financial Plans Performance - Sem dados')
+    } else {
+      console.log(`✅ API Admin Financial Plans Performance - ${performanceData.length} planos analisados`)
     }
-
-    console.log(`✅ API Admin Financial Plans Performance - ${performanceData.length} planos analisados`)
 
     return NextResponse.json({
       success: true,

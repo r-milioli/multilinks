@@ -21,8 +21,7 @@ interface FinancialMetricsProps {
 }
 
 export function FinancialMetrics({ stats, isLoading }: FinancialMetricsProps) {
-  // Verificar se stats existe e não está vazio
-  if (isLoading || !stats) {
+  if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {Array.from({ length: 8 }).map((_, index) => (
@@ -37,6 +36,20 @@ export function FinancialMetrics({ stats, isLoading }: FinancialMetricsProps) {
             </CardContent>
           </Card>
         ))}
+      </div>
+    )
+  }
+
+  if (!stats) {
+    return (
+      <div className="grid grid-cols-1 gap-6">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <DollarSign className="h-12 w-12 text-muted-foreground mb-3 opacity-50" />
+            <p className="font-medium text-muted-foreground">Sem dados</p>
+            <p className="text-sm text-muted-foreground mt-1">Não foi possível carregar as métricas financeiras.</p>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -90,7 +103,7 @@ export function FinancialMetrics({ stats, isLoading }: FinancialMetricsProps) {
     {
       title: 'Ticket Médio',
       value: `R$ ${stats.averageOrderValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      change: 5.2,
+      change: 0,
       changeLabel: 'por venda',
       icon: CreditCard,
       color: 'text-cyan-400',
@@ -108,7 +121,7 @@ export function FinancialMetrics({ stats, isLoading }: FinancialMetricsProps) {
     {
       title: 'Taxa de Reembolso',
       value: `${stats.refundRate.toFixed(1)}%`,
-      change: -2.1,
+      change: 0,
       changeLabel: 'vs anterior',
       icon: TrendingDown,
       color: 'text-yellow-400',
@@ -137,15 +150,22 @@ export function FinancialMetrics({ stats, isLoading }: FinancialMetricsProps) {
                 {metric.value}
               </div>
               <p className={`text-xs flex items-center ${
-                isPositive ? 'text-green-600 dark:text-green-400' : 
-                isNegative ? 'text-red-600 dark:text-red-400' : 
+                isPositive ? 'text-green-600 dark:text-green-400' :
+                isNegative ? 'text-red-600 dark:text-red-400' :
                 'text-muted-foreground'
               }`}>
-                {isPositive && <ArrowUpRight className="h-3 w-3 mr-1" />}
-                {isNegative && <ArrowDownRight className="h-3 w-3 mr-1" />}
-                <span>
-                  {isPositive ? '+' : ''}{metric.change.toFixed(1)}% {metric.changeLabel}
-                </span>
+                {metric.change !== 0 && (
+                  <>
+                    {isPositive && <ArrowUpRight className="h-3 w-3 mr-1" />}
+                    {isNegative && <ArrowDownRight className="h-3 w-3 mr-1" />}
+                    <span>
+                      {isPositive ? '+' : ''}{metric.change.toFixed(1)}% {metric.changeLabel}
+                    </span>
+                  </>
+                )}
+                {metric.change === 0 && (
+                  <span className="text-muted-foreground">Sem dados</span>
+                )}
               </p>
             </CardContent>
           </Card>
