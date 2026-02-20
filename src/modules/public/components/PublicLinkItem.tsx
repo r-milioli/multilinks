@@ -408,31 +408,33 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
       }}
     >
       <div className={`flex items-center ${getImagePositionClasses(imageSettings.position)} ${getImageSpacingClasses(imageSettings.position, imageSettings.spacing)}`}>
-        {/* Imagem do Link ou Favicon */}
-        <div className="flex-shrink-0">
-          {link.image ? (
-            <img
-              src={link.image}
-              alt={link.title || 'Link'}
-              className={`${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius} object-cover`}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement
-                target.src = getFaviconUrl(link.url)
-                target.className = `${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius}`
-              }}
-            />
-          ) : (
-            <img
-              src={getFaviconUrl(link.url)}
-              alt=""
-              className={`${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius}`}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement
-                target.src = '/default-favicon.png'
-              }}
-            />
-          )}
-        </div>
+        {/* Imagem do Link ou Favicon - só exibe se Mostrar Ícones estiver ativo */}
+        {linkButtonSettings.showIcons !== false && (
+          <div className="flex-shrink-0">
+            {link.image ? (
+              <img
+                src={link.image}
+                alt={link.title || 'Link'}
+                className={`${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius} object-cover`}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = getFaviconUrl(link.url)
+                  target.className = `${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius}`
+                }}
+              />
+            ) : (
+              <img
+                src={getFaviconUrl(link.url)}
+                alt=""
+                className={`${getImageSizeClasses(imageSettings.size)} ${imageSettings.borderRadius}`}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = '/default-favicon.png'
+                }}
+              />
+            )}
+          </div>
+        )}
 
         {/* Link Info */}
         <div className="flex-1 text-left min-w-0">
@@ -442,20 +444,24 @@ export function PublicLinkItem({ link, onClick, themeSettings }: PublicLinkItemP
           >
             {link.title}
           </h3>
-          {link.description && (
-            <p 
-              className="text-sm truncate mb-1"
-              style={isSpecialButtonStyle ? { opacity: 0.8 } : { color: buttonColors.text, opacity: 0.8 }}
-            >
-              {link.description}
-            </p>
+          {linkButtonSettings.showDescriptions !== false && (
+            <>
+              {link.description && (
+                <p 
+                  className="text-sm truncate mb-1"
+                  style={isSpecialButtonStyle ? { opacity: 0.8 } : { color: buttonColors.text, opacity: 0.8 }}
+                >
+                  {link.description}
+                </p>
+              )}
+              <p 
+                className="text-sm truncate"
+                style={isSpecialButtonStyle ? { opacity: 0.6 } : { color: buttonColors.text, opacity: 0.6 }}
+              >
+                {formatUrlForDisplay(link.url)}
+              </p>
+            </>
           )}
-          <p 
-            className="text-sm truncate"
-            style={isSpecialButtonStyle ? { opacity: 0.6 } : { color: buttonColors.text, opacity: 0.6 }}
-          >
-            {formatUrlForDisplay(link.url)}
-          </p>
         </div>
 
         {/* External Link Icon */}

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Label } from '@/shared/components/ui/Label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/Card'
-import { Link, Palette, Layout, Sparkles } from 'lucide-react'
+import { Link, Palette } from 'lucide-react'
 
 interface LinkButtonSettingsProps {
   themeSettings: any
@@ -20,13 +20,6 @@ export function LinkButtonSettings({ themeSettings, onUpdate }: LinkButtonSettin
     showDescriptions: true,
     hoverEffect: 'scale',
     animationSpeed: 300
-  }
-
-  const handleStyleChange = (style: string) => {
-    onUpdate('linkButtonSettings', {
-      ...linkButtonSettings,
-      style
-    })
   }
 
   const handleSizeChange = (size: string) => {
@@ -61,20 +54,6 @@ export function LinkButtonSettings({ themeSettings, onUpdate }: LinkButtonSettin
     onUpdate('linkButtonSettings', {
       ...linkButtonSettings,
       showDescriptions
-    })
-  }
-
-  const handleHoverEffectChange = (hoverEffect: string) => {
-    onUpdate('linkButtonSettings', {
-      ...linkButtonSettings,
-      hoverEffect
-    })
-  }
-
-  const handleAnimationSpeedChange = (animationSpeed: number) => {
-    onUpdate('linkButtonSettings', {
-      ...linkButtonSettings,
-      animationSpeed
     })
   }
 
@@ -167,37 +146,6 @@ export function LinkButtonSettings({ themeSettings, onUpdate }: LinkButtonSettin
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Estilo dos Botões */}
-        <div>
-          <Label className="text-base font-medium flex items-center gap-2 mb-3">
-            <Layout className="w-4 h-4" />
-            Estilo dos Botões
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[
-              { value: 'default', label: 'Padrão', description: 'Fundo branco com borda' },
-              { value: 'minimal', label: 'Minimalista', description: 'Transparente com borda' },
-              { value: 'filled', label: 'Preenchido', description: 'Cor sólida' },
-              { value: 'outlined', label: 'Contorno', description: 'Borda colorida' },
-              { value: 'gradient', label: 'Gradiente', description: 'Gradiente colorido' },
-              { value: 'glass', label: 'Vidro', description: 'Efeito glassmorphism' }
-            ].map((style) => (
-              <button
-                key={style.value}
-                onClick={() => handleStyleChange(style.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-left ${
-                  linkButtonSettings.style === style.value
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="font-medium text-sm mb-1">{style.label}</div>
-                <div className="text-xs text-gray-500">{style.description}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Tamanho dos Botões */}
         <div>
           <Label className="text-base font-medium mb-3">Tamanho dos Botões</Label>
@@ -309,57 +257,6 @@ export function LinkButtonSettings({ themeSettings, onUpdate }: LinkButtonSettin
           </div>
         </div>
 
-        {/* Efeitos de Hover */}
-        <div>
-          <Label className="text-base font-medium flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4" />
-            Efeitos de Hover
-          </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[
-              { value: 'none', label: 'Nenhum' },
-              { value: 'scale', label: 'Escala' },
-              { value: 'lift', label: 'Elevação' },
-              { value: 'glow', label: 'Brilho' },
-              { value: 'slide', label: 'Deslizar' },
-              { value: 'rotate', label: 'Rotação' }
-            ].map((effect) => (
-              <button
-                key={effect.value}
-                onClick={() => handleHoverEffectChange(effect.value)}
-                className={`p-3 rounded-lg border-2 transition-all text-center ${
-                  linkButtonSettings.hoverEffect === effect.value
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="font-medium text-sm">{effect.label}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Velocidade da Animação */}
-        <div>
-          <Label htmlFor="animation-speed" className="text-base font-medium mb-3">
-            Velocidade da Animação: {linkButtonSettings.animationSpeed}ms
-          </Label>
-          <input
-            id="animation-speed"
-            type="range"
-            min="100"
-            max="1000"
-            step="100"
-            value={linkButtonSettings.animationSpeed}
-            onChange={(e) => handleAnimationSpeedChange(Number(e.target.value))}
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>Rápido</span>
-            <span>Lento</span>
-          </div>
-        </div>
-
         {/* Preview */}
         <div>
           <Label className="text-base font-medium mb-3">Preview</Label>
@@ -367,9 +264,9 @@ export function LinkButtonSettings({ themeSettings, onUpdate }: LinkButtonSettin
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className={`w-full rounded-lg border transition-all ${getButtonSizeClasses(linkButtonSettings.size)} ${getButtonStyleClasses(linkButtonSettings.style)} ${getButtonAlignmentClasses(linkButtonSettings.alignment)} ${getHoverEffectClasses(linkButtonSettings.hoverEffect)}`}
+                className={`w-full rounded-lg border transition-all ${getButtonSizeClasses(linkButtonSettings.size)} ${getButtonStyleClasses(themeSettings?.buttonStyle ?? linkButtonSettings.style ?? 'default')} ${getButtonAlignmentClasses(linkButtonSettings.alignment)} ${getHoverEffectClasses(themeSettings?.hoverEffect ?? linkButtonSettings.hoverEffect ?? 'scale')}`}
                 style={{
-                  transitionDuration: `${linkButtonSettings.animationSpeed}ms`,
+                  transitionDuration: `${themeSettings?.animationSpeed ?? linkButtonSettings.animationSpeed ?? 300}ms`,
                   borderRadius: themeSettings?.borderRadius ? `${themeSettings.borderRadius}px` : undefined
                 }}
               >
